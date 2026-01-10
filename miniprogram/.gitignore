@@ -1,0 +1,61 @@
+# ======================
+# 依赖
+# ======================
+node_modules/
+jspm_packages/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# ======================
+# 构建产物
+# ======================
+dist/
+output/
+build/
+.temp/
+.cache/
+
+# ======================
+# Taro 相关
+# ======================
+.cache/
+temp/
+dist/
+.rn_temp/
+
+# ======================
+# 微信小程序开发工具
+# ======================
+project.private.config.json
+miniprogram_npm/
+cloudfunctions/**/node_modules/
+
+# ======================
+# 环境配置
+# ======================
+.env
+.env.*
+*.local
+
+# ======================
+# 日志
+# ======================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ======================
+# 系统文件
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# IDE
+# ======================
+.vscode/
+.idea/
+*.swp
+*.swo

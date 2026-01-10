@@ -1,0 +1,15 @@
+{
+  "usingComponents": {
+    "van-tab": "@vant/weapp/tab/index",
+    "van-tabs": "@vant/weapp/tabs/index",
+    "van-button": "@vant/weapp/button/index",
+    "van-cell": "@vant/weapp/cell/index",
+    "van-cell-group": "@vant/weapp/cell-group/index"
+  },
+  "navigationBarTitleText": "首页",
+  "navigationStyle": "custom",
+  "navigationBarBackgroundColor": "@backgroundColor",
+  "navigationBarTextStyle": "@textColor",
+  "enableShareAppMessage": true,
+  "enableShareTimeline": true
+}

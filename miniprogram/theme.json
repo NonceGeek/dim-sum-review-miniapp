@@ -1,0 +1,12 @@
+{
+  "light": {
+    "backgroundColor": "#BCCBFF",
+    "cardbg":"#DFE0E3",
+    "textColor": "black"
+  },
+  "dark": {
+    "backgroundColor": "#000",
+    "cardbg":"#DFE0E3",
+    "textColor": "white"
+  }
+}

@@ -1,0 +1,135 @@
+/**index.wxss**/
+page {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  /* padding-top: 100rpx; */
+}
+
+.swiper-component {
+  width: 100%;
+  height: calc(80vh - 150rpx);
+}
+
+swiper-item {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.scroll {
+  flex: 1;
+  overflow: auto;
+}
+
+.header {
+  padding: 44rpx;
+  color: black;
+  flex-shrink: 0;
+}
+.header-word {
+  font-size: 60rpx;
+  flex-shrink: 0;
+  text-align: center;
+  word-wrap: break-word;
+}
+
+.header-subtitle {
+  font-size: 32rpx;
+  flex-shrink: 0;
+  text-align: center;
+  margin: 20rpx 0;
+}
+
+.header-option {
+  display: flex;
+  justify-content: space-between;
+}
+.source {
+  font-size: 40rpx;
+}
+
+.group-wrapper {
+  margin-bottom: 20rpx;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+}
+.btn-cancel,.btn-submit {
+  margin-right: 20rpx;
+}
+
+.custom-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40rpx auto;
+}
+
+.dot {
+  width: 18rpx;
+  height: 18rpx;
+  background-color: #DFE0E3;
+  border-radius: 9999rpx;
+  margin: 0 20rpx;
+  opacity: 0.6;
+  transform: scale(1);
+  transition: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dot.active {
+  width: 36rpx;
+  opacity: 1;
+  background-color: #DFE0E3;
+  transform: scale(1.1);
+}
+
+
+.custom-cell {
+  background-color: #DFE0E3 !important;
+  color: black;
+}
+
+.custom-cell .van-cell__value {
+  text-align: left !important;   
+  white-space: normal !important; 
+  word-break: break-word;        
+}
+
+.custom-cell .van-cell__title,
+.custom-cell .van-cell__value {
+  color: black !important;
+}
+
+.hide {
+  display: none;
+}
+
+.info-text {
+  margin: 20rpx 0;
+  text-align: center;
+}
+
+.info-message {
+  margin-left: 20rpx;
+}
+
+@media (prefers-color-scheme: dark) {
+  .header {
+    padding: 44rpx;
+    color: white;
+  }
+  .custom-cell {
+    background-color: #DFE0E3 !important;
+    color: black;
+  }
+  .custom-cell .van-cell__title,
+  .custom-cell .van-cell__value {
+    color: black !important;
+  }
+}
+
+

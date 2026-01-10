@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/task/task"
+  ],
+  "window": {
+    "navigationBarTitleText": "标注校验",
+    "navigationBarBackgroundColor": "@backgroundColor",
+    "navigationBarTextStyle": "@textColor"
+  },
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "darkmode": true,
+  "themeLocation": "theme.json",
+  "renderer": "skyline",
+  "rendererOptions": {
+    "skyline": {
+      "defaultDisplayBlock": true
+    }
+  },
+  "permission": {
+    "scope.userInfo": {
+      "desc": "用于完善资料"
+    }
+  }
+}

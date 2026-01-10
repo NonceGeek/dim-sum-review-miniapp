@@ -1,0 +1,85 @@
+<view class="nav" style="padding-top: {{statusBarHeight + 10}}px;">
+  <van-icon name="arrow-left" class="back" bind:click="onGoBack"/>
+  <text class="title">任务列表</text>
+</view>
+<view class="page" scroll-y>
+  <view>
+    <van-tabs active="{{ active }}" animated bind:change="onChange" color="{{ theme === 'light' ? '#000' : '#fff' }}"
+      nav-class="nav-container" tab-class="custom-tab" tab-active-class="active-tab-custom">
+      <!-- 未处理任务 -->
+      <van-tab title="未处理任务" name="uncompleted">
+        <view class="btn-group">
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{unselected === 'all' ? 'active-btn' : ''}}" custom-style="color: #000;" data-type="all">全部
+          </van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{unselected === 'phonetic_mismatch' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="phonetic_mismatch">注音检查</van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{unselected === 'grammar_violation' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="grammar_violation">语法检查
+          </van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{unselected === 'llm_generic_violation' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="llm_generic_violation">通用LLM检查</van-button>
+        </view>
+        <van-cell-group custom-class="cell-group" border="{{false}}">
+          <block wx:if="{{ uncompleted.length > 0 }}">
+            <van-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" custom-class="grid-item"
+              icon="question-o" icon-color="#000"
+              title="{{ item.context.problemChar ? item.context.problemChar:  item.context.sentenceText}}"
+              bind:click="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" is-link />
+
+            <view class="more-view" wx:if="{{!uncompletedLoadFinished}}">
+              <van-button round type="default" color="#DFE0E3" class="btn-type" custom-style="color: #000;"
+                bind:click="onClickMore">加载更多</van-button>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="container">
+              <view class="no-data">暂无数据</view>
+            </view>
+          </block>
+        </van-cell-group>
+      </van-tab>
+
+
+      <!-- 已处理任务 -->
+      <van-tab title="已处理任务" name="completed">
+        <view class="btn-group">
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{selected === 'all' ? 'active-btn' : ''}}" custom-style="color: #000;" data-type="all">全部
+          </van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{selected === 'phonetic_mismatch' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="phonetic_mismatch">注音检查</van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{selected === 'grammar_violation' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="grammar_violation">语法检查
+          </van-button>
+          <van-button type="default" round color="#DFE0E3" bind:click="onButtonClick" class="btn-type"
+            custom-class="{{selected === 'llm_generic_violation' ? 'active-btn' : ''}}" custom-style="color: #000;"
+            data-type="llm_generic_violation">通用LLM检查</van-button>
+        </view>
+        <van-cell-group custom-class="cell-group" border="{{false}}">
+          <block wx:if="{{ completed.length > 0 }}">
+            <van-cell wx:for="{{ completed }}" wx:for-item="item" wx:key="taskId" custom-class="grid-item" icon="passed"
+              icon-color="oklch(79.2% 0.209 151.711)"
+              title="{{ item.context.problemChar ? item.context.problemChar: item.context.sentenceText }}"
+              bind:click="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" is-link />
+
+            <view class="more-view" wx:if="{{!completedLoadFinished}}">
+              <van-button round type="default" color="#DFE0E3" class="btn-type" custom-style="color: #000;"
+                bind:click="onClickMore">加载更多</van-button>
+            </view>
+          </block>
+          <block wx:else>
+            <view class="container">
+              <view class="no-data">暂无数据</view>
+            </view>
+          </block>
+        </van-cell-group>
+      </van-tab>
+    </van-tabs>
+  </view>
+</view>
