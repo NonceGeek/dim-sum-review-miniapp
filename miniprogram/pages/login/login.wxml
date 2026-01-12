@@ -1,0 +1,12 @@
+<view class="container">
+  <view class="logo-box">
+    <!-- Placeholder for logo if needed -->
+    <view class="title">Dim Sum Review</view>
+    <view class="subtitle">标注校验</view>
+  </view>
+  <view class="login-box">
+    <button class="login-btn" type="primary" bindtap="handleLogin" loading="{{loading}}">
+      微信登录
+    </button>
+  </view>
+</view>

@@ -1,0 +1,33 @@
+<t-navbar title="已处理任务" left-arrow bind:go-back="onGoBack" />
+<view style="height: {{headerHeight}}px;"></view>
+<view class="page">
+  <view class="content-wrapper">
+    <scroll-view scroll-x enable-flex class="btn-group-scroll">
+      <view class="btn-group">
+        <t-button theme="{{selected === 'all' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="all" size="small">
+          全部
+        </t-button>
+        <t-button theme="{{selected === 'phonetic_mismatch' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="phonetic_mismatch" size="small">
+          注音检查
+        </t-button>
+        <t-button theme="{{selected === 'grammar_violation' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="grammar_violation" size="small">
+          语法检查
+        </t-button>
+        <t-button theme="{{selected === 'llm_generic_violation' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="llm_generic_violation" size="small">
+          通用LLM检查
+        </t-button>
+      </view>
+    </scroll-view>
+    <t-cell-group theme="card" bordered="{{false}}">
+      <t-cell wx:for="{{ completed }}" wx:for-item="item" wx:key="taskId" leftIcon="check-circle-filled" title="{{ item.context.problemChar ? item.context.problemChar: item.context.sentenceText }}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover />
+      <view class="more-view" wx:if="{{ completed.length > 0 && !loadFinished }}">
+        <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onLoadMore">
+          加载更多
+        </t-button>
+      </view>
+      <view class="container" wx:if="{{ completed.length === 0 }}">
+        <t-empty icon="info" description="暂无数据" />
+      </view>
+    </t-cell-group>
+  </view>
+</view>

@@ -7,9 +7,7 @@
     "van-field": "@vant/weapp/field/index"
   },
   "navigationBarTitleText": "任务详情",
-  "navigationStyle":"custom",
+  "navigationStyle": "custom",
   "navigationBarBackgroundColor": "@backgroundColor",
-  "navigationBarTextStyle":"@textColor",
-  "enableShareAppMessage": true,
-  "enableShareTimeline": true
+  "navigationBarTextStyle": "@textColor"
 }

@@ -1,6 +1,5 @@
 .page {
   background-color: #f6f6f6;
-  padding-bottom: 200rpx;
   min-height: 100vh;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
@@ -34,24 +33,4 @@
 .more-view {
   text-align: center;
   padding: 32rpx 0;
-}
-
-.mine-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 80vh;
-  justify-content: space-between;
-  padding: 32rpx 0;
-}
-
-.logout-container {
-  padding: 32rpx;
-  padding-bottom: 200rpx; /* Space for tab bar */
-}
-
-/* Custom Tab Styles for Dark Mode adaptation if needed, though TDesign handles theme usually */
-@media (prefers-color-scheme: dark) {
-  .page {
-    background-color: #111;
-  }
 }

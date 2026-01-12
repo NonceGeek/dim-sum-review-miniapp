@@ -7,19 +7,14 @@ console.log("theme:", theme);
 Page({
   data: {
     active: "uncompleted",
-    selected: "all",
     unselected: "all",
-    completed: [],
-    uncompleted: [],
+    uncompleted: [] as any[],
+    headerHeight: 0,
     statusBarHeight,
     theme,
-    ori_completed: [],
-    ori_uncompleted: [],
-    completedTotal: 0,
+    ori_uncompleted: [] as any[],
     uncompletedTotal: 0,
     uncompletedLoadFinished: false,
-    completedLoadFinished: false,
-    completedPage: 0,
     uncompletedPage: 0,
   },
   onClick(event: any) {
@@ -30,43 +25,25 @@ Page({
     });
   },
   onChange(event: any) {
-    console.log("event:", event.detail.name);
-    console.log("active:", this.data.active);
-    const { name } = event.detail;
+    console.log("event:", event.detail.value);
+    const { value } = event.detail;
     this.setData({
-      active: name,
+      active: value,
     });
-
-    if (name === "completed") {
-      if (this.data.completed.length === 0) {
-        this.fetchCompletedTasks();
-      }
-    } else {
-      if (this.data.uncompleted.length === 0) {
-        this.fetchUncompletedTasks();
-      }
-    }
   },
 
   onButtonClick(event: any) {
     const { type } = event.currentTarget.dataset;
-    const { active, ori_uncompleted, ori_completed } = this.data;
-    const ori_data = active === "completed" ? ori_completed : ori_uncompleted;
+    const { ori_uncompleted } = this.data;
     const data =
       type === "all"
-        ? ori_data
-        : ori_data.filter((ori) => ori.violationType === type);
-    if (active === "uncompleted") {
-      this.setData({
-        uncompleted: data,
-        unselected: type,
-      });
-    } else {
-      this.setData({
-        completed: data,
-        selected: type,
-      });
-    }
+        ? ori_uncompleted
+        : ori_uncompleted.filter((ori) => ori.violationType === type);
+
+    this.setData({
+      uncompleted: data,
+      unselected: type,
+    });
   },
   onLaunch() {
     wx.getSystemInfo({
@@ -82,11 +59,9 @@ Page({
       const token = await app.ensureLogin(3); // 参数 1 表示登录失败后再尝试一次
       console.log("登录成功，token:", token);
     } catch (err) {
-      console.error("登录失败", err);
-      wx.showToast({
-        title: err.message || "登录失败",
-        icon: "error",
-        duration: 2000,
+      console.log("未登录或 token 失效，跳转登录页");
+      wx.reLaunch({
+        url: '/pages/login/login',
       });
       return; // 登录失败，不继续执行
     }
@@ -94,58 +69,19 @@ Page({
     // 登录完成再发请求
     const { page } = options;
     const p = Number(page) || 0;
+
+    // Calculate Navbar Height
+    const rect = wx.getMenuButtonBoundingClientRect();
+    const { statusBarHeight } = wx.getSystemInfoSync();
+    // Navbar height calculation: (capsule top - status bar) * 2 + capsule height + status bar
+    const navBarHeight = (rect.top - statusBarHeight) * 2 + rect.height + statusBarHeight;
+    
     this.setData({
-      completedPage: p + 1,
       uncompletedPage: p + 1,
+      headerHeight: navBarHeight,
     });
 
     await this.fetchUncompletedTasks();
-  },
-
-  async fetchCompletedTasks() {
-    wx.showLoading({ title: "加载中..." });
-    try {
-      let { completed, completedTotal, completedPage, selected } = this.data;
-      console.log("comdata:", this.data);
-      // 是否已经加载完
-      if (completedTotal && completed.length >= completedTotal) {
-        this.setData({
-          completedLoadFinished: true,
-        });
-        wx.hideLoading();
-        return;
-      }
-
-      const page = completedPage;
-      const data = await request(`/task/completed?page=${page}`);
-
-      // 防御性检查：确保返回数据格式正确
-      if (!data || !Array.isArray(data.items)) {
-        console.error("API 返回数据格式错误:", data);
-        throw new Error(data?.message || "数据加载失败");
-      }
-
-      const reassigninglist = data.items.filter(
-        (d) => d.status !== "reassigning"
-      );
-      const newList = [...completed, ...reassigninglist];
-
-      const filterData =
-        selected === "all"
-          ? newList
-          : newList.filter((ori) => ori.violationType === selected);
-
-      this.setData({
-        completed: filterData,
-        ori_completed: newList,
-        completedTotal: data.pagination?.total - reassigninglist.length || 0,
-      });
-    } catch (err) {
-      console.error("fetchCompletedTasks 失败", err);
-      wx.showToast({ title: "加载失败", icon: "none" });
-    } finally {
-      wx.hideLoading(); // ❗ 无论成功失败都关
-    }
   },
 
   async fetchUncompletedTasks() {
@@ -195,17 +131,10 @@ Page({
   },
 
   async onClickMore() {
-    if (this.data.active === "uncompleted") {
-      this.setData({
-        uncompletedPage: this.data.uncompletedPage + 1,
-      });
-      await this.fetchUncompletedTasks();
-    } else {
-      this.setData({
-        completedPage: this.data.completedPage + 1,
-      });
-      await this.fetchCompletedTasks();
-    }
+    this.setData({
+      uncompletedPage: this.data.uncompletedPage + 1,
+    });
+    await this.fetchUncompletedTasks();
   },
   onGoBack() {
     wx.navigateBack({
@@ -223,5 +152,16 @@ Page({
       title: "任务列表",
       path: "pages/index/index",
     };
+  },
+  onLogout() {
+    wx.showModal({
+      title: '提示',
+      content: '确定要退出登录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          getApp<IAppOption>().logout();
+        }
+      },
+    });
   },
 });

@@ -1,0 +1,11 @@
+{
+  "usingComponents": {
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-cell": "tdesign-miniprogram/cell/cell",
+    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
+    "t-empty": "tdesign-miniprogram/empty/empty",
+    "t-navbar": "tdesign-miniprogram/navbar/navbar"
+  },
+  "navigationBarTitleText": "已处理任务",
+  "navigationStyle": "custom"
+}

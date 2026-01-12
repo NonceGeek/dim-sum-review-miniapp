@@ -40,7 +40,7 @@ App({
    * 确保登录，返回 accessToken，可设置重试次数
    * 自动支持审核模式 mock token
    */
-  ensureLogin(retries = 1): Promise<string> {
+  ensureLogin(_retries = 1): Promise<string> {
     if (!loginPromise) {
       loginPromise = (async () => {
         // 审核模式直接返回 mock token
@@ -65,8 +65,8 @@ App({
           return token;
         }
 
-        // 如果没有 token，调用 doLogin（带重试机制）
-        return await this.tryLogin(retries);
+        console.log('No token in storage, manual login required.');
+        throw new Error('需要手动登录');
       })().finally(() => {
         loginPromise = null; // 登录完成后清掉
       });
@@ -109,7 +109,7 @@ App({
 
               console.log('登录接口返回', resp.data); // 审核模式排查用
 
-              const { accessToken, refreshToken, user } = resp.data || {};
+              const { accessToken, refreshToken, user } = resp.data as any || {};
               if (!accessToken) return reject(new Error('登录失败：未返回 token'));
 
               // 更新全局状态
@@ -138,6 +138,20 @@ App({
           reject(err);
         },
       });
+    });
+  },
+
+  logout() {
+    this.globalData.userInfo = null;
+    this.globalData.accessToken = '';
+    this.globalData.refreshToken = '';
+    
+    wx.removeStorage({ key: 'userInfo' });
+    wx.removeStorage({ key: 'accessToken' });
+    wx.removeStorage({ key: 'refreshToken' });
+
+    wx.reLaunch({
+      url: '/pages/login/login',
     });
   },
 });
