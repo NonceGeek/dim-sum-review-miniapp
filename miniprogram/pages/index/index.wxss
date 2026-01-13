@@ -1,9 +1,11 @@
 .page {
   background-color: #f6f6f6;
+  color: #000;
   padding-bottom: 200rpx;
   min-height: 100vh;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .btn-group-scroll {
@@ -49,9 +51,17 @@
   padding-bottom: 200rpx; /* Space for tab bar */
 }
 
-/* Custom Tab Styles for Dark Mode adaptation if needed, though TDesign handles theme usually */
+/* Dark Mode - 页面特有样式 */
 @media (prefers-color-scheme: dark) {
   .page {
-    background-color: #111;
+    background-color: #000;
+  }
+
+  .btn-group-scroll {
+    background-color: #000;
+  }
+
+  .mine-container {
+    background-color: #000;
   }
 }

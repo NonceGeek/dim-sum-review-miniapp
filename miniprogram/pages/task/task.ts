@@ -15,10 +15,12 @@ Page({
     statusBarHeight,
     hidden: false,
     violationType: "", //检查类型
-    cantonesePronunciations: [] as string[],
-    phrases: [] as string[],
+    cantonesePronunciations: [],
+    phrases: [],
     sentiments: [],
     completedAt: "",
+    expandedValues: [], // 控制折叠面板展开状态
+    customCantoneseList: [], // 自定义新增的粤音列表
   },
 
   /**
@@ -53,7 +55,7 @@ Page({
       console.log("task data:", data);
       console.log("categories:", categories);
       console.log("view:", view)
-      let entity = [] as ITaskDetail[];
+      let entity: ITaskDetail[] = [];
       if (data.violationType === "phonetic_mismatch") {
         console.log('selectedSuggestion:', data.selectedSuggestion)
         entity = (this.data.status === "completed"
@@ -283,5 +285,52 @@ Page({
       title: '任务详情',
       path: `/pages/task/task?taskId=${this.data.taskId}&status=${this.data.status}`,
     }
+  },
+  onCollapseChange(e: any) {
+    this.setData({
+      expandedValues: e.detail.value,
+    });
+  },
+  onAddNewCantonese() {
+    const newId = `custom_${Date.now()}`;
+    const customCantoneseList = this.data.customCantoneseList || [];
+    customCantoneseList.push({
+      id: newId,
+      pronunciation: '',
+      phrase: '',
+      sentiment: '',
+      exampleSentence: '',
+    });
+
+    this.setData({
+      customCantoneseList,
+      expandedValues: [...this.data.expandedValues, newId], // 自动展开新增的面板
+    });
+  },
+  onCustomFieldChange(e: any) {
+    const { id, field } = e.currentTarget.dataset;
+    const value = e.detail;
+
+    const customCantoneseList = this.data.customCantoneseList.map((item: any) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          [field]: value,
+        };
+      }
+      return item;
+    });
+
+    this.setData({
+      customCantoneseList,
+    });
+  },
+  onRemoveCustomCantonese(e: any) {
+    const { id } = e.currentTarget.dataset;
+    const customCantoneseList = this.data.customCantoneseList.filter((item: any) => item.id !== id);
+
+    this.setData({
+      customCantoneseList,
+    });
   }
 });

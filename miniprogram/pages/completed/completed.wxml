@@ -18,7 +18,7 @@
         </t-button>
       </view>
     </scroll-view>
-    <t-cell-group theme="card" bordered="{{false}}">
+    <t-cell-group bordered="{{false}}">
       <t-cell wx:for="{{ completed }}" wx:for-item="item" wx:key="taskId" leftIcon="check-circle-filled" title="{{ item.context.problemChar ? item.context.problemChar: item.context.sentenceText }}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover />
       <view class="more-view" wx:if="{{ completed.length > 0 && !loadFinished }}">
         <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onLoadMore">

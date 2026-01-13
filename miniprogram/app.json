@@ -10,5 +10,7 @@
   },
   "lazyCodeLoading": "requiredComponents",
   "darkmode": true,
+  "navigationBarBackgroundColor": "@backgroundColor",
+  "navigationBarTextStyle": "@textColor",
   "themeLocation": "theme.json"
 }

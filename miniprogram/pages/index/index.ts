@@ -164,4 +164,10 @@ Page({
       },
     });
   },
+  onThemeChange(params: any) {
+    console.log('主题变化:', params.theme);
+    this.setData({
+      theme: params.theme,
+    });
+  },
 });

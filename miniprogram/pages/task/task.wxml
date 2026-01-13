@@ -17,125 +17,144 @@
           </view>
         </view>
 
+        <!-- 使用 t-collapse 包裹内容 -->
+        <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange">
+          <t-collapse-panel value="details" header="详细信息">
+            <!-- 粤语 pronunciations -->
+            <block wx:for="{{task.cantonesePronunciations}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-cell title="粤音{{index + 1}}：" value="{{cp}}" size="large" custom-class="custom-cell"
+                    title-width="100px" />
+                </van-cell-group>
+              </view>
+            </block>
 
-        <!-- 粤语 pronunciations -->
-        <block wx:for="{{task.cantonesePronunciations}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="粤音{{index + 1}}：" value="{{cp}}" size="large" custom-class="custom-cell"
-                title-width="100px" />
-            </van-cell-group>
-          </view>
-        </block>
-        <block wx:if="{{task.new}}">
-          <block wx:for="{{cantonesePronunciations}}" wx:for-index="cpIndex" wx:key="cpIndex">
-            <view class="group-wrapper">
-              <van-cell-group inset>
-                <van-field label="粤语{{cpIndex + 1}}：" size="large" custom-class="custom-cell" data-index="{{cpIndex}}"
-                  data-type="cantonesePronunciations" bind:change="onFieldChange" />
-                <van-cell title="操作">
-                  <van-icon slot="right-icon" name="add" size="36px" bind:click="onAddCellClick"
-                    data-type="cantonesePronunciations" />
-                  <van-icon wx:if="{{cpIndex > 0}}" slot="right-icon" name="clear" size="36px"
-                    bind:click="onRemoveCellClick" data-type="cantonesePronunciations" />
-                </van-cell>
-              </van-cell-group>
-            </view>
-          </block>
+            <!-- 词组 -->
+            <block wx:if="{{task.phrases_join}}">
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-cell title="词组：" value="{{task.phrases_join}}" size="large" custom-class="custom-cell"
+                    title-width="100px" />
+                </van-cell-group>
+              </view>
+            </block>
+
+            <!-- 情感 sentiments -->
+            <block wx:if="{{task.sentiments}}">
+              <block wx:for="{{task.sentiments}}" wx:for-item="sens" wx:for-index="sIndex" wx:key="sIndex">
+                <view class="group-wrapper">
+                  <van-cell-group inset>
+                    <van-cell title="情感{{sIndex + 1}}：" value="{{sens.sentiment}}" size="large"
+                      custom-class="custom-cell" />
+                    <van-cell title="例句：" value="{{sens.exampleSentences ? sens.exampleSentences.join('; ') : ''}}"
+                      size="large" custom-class="custom-cell" />
+                  </van-cell-group>
+                </view>
+              </block>
+            </block>
+
+            <block wx:if="{{task.source === 'llm'}}">
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-cell title="解释：" value="{{task.suggestions.explanation}}" size="large" custom-class="custom-cell"
+                    title-width="100px" />
+                </van-cell-group>
+              </view>
+            </block>
+
+            <block wx:if="{{status === 'completed'}}">
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell"
+                    title-width="100px" />
+                </van-cell-group>
+              </view>
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="100px" />
+                </van-cell-group>
+              </view>
+            </block>
+          </t-collapse-panel>
+        </t-collapse>
+
+        <!-- 动态新增的粤音面板 -->
+        <block wx:for="{{customCantoneseList}}" wx:for-item="custom" wx:key="id">
+          <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange">
+            <t-collapse-panel value="{{custom.id}}" header="自定义粤音 {{index + 1}}">
+              <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-field
+                    label="粤音："
+                    size="large"
+                    custom-class="custom-cell"
+                    value="{{custom.pronunciation}}"
+                    data-id="{{custom.id}}"
+                    data-field="pronunciation"
+                    bind:change="onCustomFieldChange"
+                    placeholder="请输入粤音"
+                    disabled="{{false}}"
+                  />
+                </van-cell-group>
+                </view>
+                <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-field
+                    label="词组："
+                    size="large"
+                    custom-class="custom-cell"
+                    value="{{custom.phrase}}"
+                    data-id="{{custom.id}}"
+                    data-field="phrase"
+                    bind:change="onCustomFieldChange"
+                    placeholder="请输入词组"
+                    disabled="{{false}}"
+                  />
+                </van-cell-group>
+                </view>
+                <view class="group-wrapper">
+                <van-cell-group inset>
+                  <van-field
+                    label="情感："
+                    size="large"
+                    custom-class="custom-cell"
+                    value="{{custom.sentiment}}"
+                    data-id="{{custom.id}}"
+                    data-field="sentiment"
+                    bind:change="onCustomFieldChange"
+                    placeholder="请输入情感"
+                    disabled="{{false}}"
+                  />
+                  <van-field
+                    label="例句："
+                    size="large"
+                    custom-class="custom-cell"
+                    value="{{custom.exampleSentence}}"
+                    data-id="{{custom.id}}"
+                    data-field="exampleSentence"
+                    bind:change="onCustomFieldChange"
+                    placeholder="请输入例句"
+                    disabled="{{false}}"
+                  />
+                </van-cell-group>
+              </view>
+            </t-collapse-panel>
+          </t-collapse>
         </block>
 
-
-        <!-- 词组 -->
-        <block wx:if="{{task.phrases_join}}">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="词组：" value="{{task.phrases_join}}" size="large" custom-class="custom-cell"
-                title-width="100px" />
-            </van-cell-group>
-          </view>
-        </block>
-        <block wx:if="{{task.new}}">
-          <block wx:for="{{phrases}}" wx:for-index="pIndex" wx:key="pIndex">
-            <view class="group-wrapper">
-              <van-cell-group inset>
-                <van-field label="词组{{pIndex + 1}}：" size="large" custom-class="custom-cell" data-index="{{pIndex}}"
-                  data-type="phrases" bind:change="onFieldChange" />
-                <van-cell title="操作">
-                  <van-icon slot="right-icon" name="add" size="36px" bind:click="onAddCellClick" data-type="phrases" />
-                  <van-icon wx:if="{{pIndex > 0}}" slot="right-icon" name="clear" size="36px"
-                    bind:click="onRemoveCellClick" data-type="phrases" />
-                </van-cell>
-              </van-cell-group>
-            </view>
-          </block>
-        </block>
-
-
-        <!-- 情感 sentiments -->
-        <block wx:if="{{task.sentiments}}">
-          <block wx:for="{{task.sentiments}}" wx:for-item="sens" wx:for-index="sIndex" wx:key="sIndex">
-            <view class="group-wrapper">
-              <van-cell-group inset>
-                <van-cell title="情感{{sIndex + 1}}：" value="{{sens.sentiment}}" size="large"
-                  custom-class="custom-cell" />
-                <van-cell title="例句：" value="{{sens.exampleSentences ? sens.exampleSentences.join('; ') : ''}}"
-                  size="large" custom-class="custom-cell" />
-              </van-cell-group>
-            </view>
-          </block>
-        </block>
-        <block wx:if="{{task.new}}">
-          <block wx:for="{{sentiments}}" wx:for-item="sens_new" wx:for-index="sIdx" wx:key="sIdx">
-            <view class="group-wrapper">
-              <van-cell-group inset>
-                <!-- <van-cell title="情感{{sIdx + 1}}：" value="" size="large" custom-class="custom-cell" /> -->
-                <van-field label="情感{{sIdx + 1}}：" size="large" custom-class="custom-cell" data-index="{{sIdx}}"
-                  data-type="sentiment" bind:change="onSentimentsFieldChange" />
-                <!-- <van-cell title="例句：" value="" size="large" custom-class="custom-cell" /> -->
-                <van-field label="例句：" size="large" custom-class="custom-cell" data-index="{{sIdx}}"
-                  data-type="exampleSentences" bind:change="onSentimentsFieldChange" />
-                <van-cell title="操作">
-                  <van-icon slot="right-icon" name="add" size="36px" bind:click="onAddCellClick"
-                    data-type="sentiments" />
-                  <van-icon wx:if="{{sIdx > 0}}" slot="right-icon" name="clear" size="36px"
-                    bind:click="onRemoveCellClick" data-type="phrases" />
-                </van-cell>
-              </van-cell-group>
-            </view>
-          </block>
-        </block>
-
-        <block wx:if="{{task.source === 'llm'}}">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="解释：" value="{{task.suggestions.explanation}}" size="large" custom-class="custom-cell"
-                title-width="100px" />
-            </van-cell-group>
-          </view>
-        </block>
-
-        <block wx:if="{{status === 'completed'}}">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell"
-                title-width="100px" />
-            </van-cell-group>
-          </view>
-        </block>
-        <block wx:if="{{status === 'completed'}}">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="100px" />
-            </van-cell-group>
-          </view>
-        </block>
+        <!-- 新增粤音按钮 -->
+        <view class="btn-add-group">
+          <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese"><van-icon name="plus" custom-class="add-item-icon"/> 新增粤音
+          </t-button>
+        </view>
       </scroll-view>
 
     </swiper-item>
   </block>
 </swiper>
 
-<block wx:if="{{status !== 'completed' && taskDetail.length > 0 }}">
+<block wx:if="{{status !== 'completed' && taskDetail.length > 0}}">
   <view class="info-text">
     <van-icon name="warning-o" />
     <text class="info-message">请向左滑动查看选项</text>

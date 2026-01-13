@@ -5,6 +5,8 @@
   justify-content: center;
   height: 100vh;
   background-color: #f7f8fa;
+  color: #000;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .logo-box {
@@ -17,11 +19,13 @@
   font-weight: bold;
   color: #333;
   margin-bottom: 20rpx;
+  transition: color 0.3s;
 }
 
 .subtitle {
   font-size: 32rpx;
   color: #666;
+  transition: color 0.3s;
 }
 
 .login-box {
@@ -30,4 +34,20 @@
 
 .login-btn {
   width: 100%;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #000;
+    color: #fff;
+  }
+
+  .title {
+    color: #fff;
+  }
+
+  .subtitle {
+    color: #ccc;
+  }
 }

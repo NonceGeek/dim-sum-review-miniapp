@@ -18,3 +18,85 @@ text {
 .nav {
   text-align: center;
 }
+
+/* Dark Mode - Global TDesign Theme Variables */
+page {
+  --td-bg-color-container: #fff;
+  --td-bg-color-page: #f6f6f6;
+  --td-text-color-primary: #000;
+  --td-text-color-secondary: #666;
+  --td-text-color-placeholder: #999;
+  --td-border-color: #e7e7e7;
+  --td-font-family: Arial;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Dark mode - Override all TDesign component colors */
+@media (prefers-color-scheme: dark) {
+  page {
+    --td-bg-color-container: #000 !important;
+    --td-bg-color-page: #000 !important;
+    --td-text-color-primary: #fff !important;
+    --td-text-color-secondary: #ccc !important;
+    --td-text-color-placeholder: #999 !important;
+    --td-border-color: #2a2a2a !important;
+    --td-cell-bg-color: #000 !important;
+    --td-navbar-bg-color: #000 !important;
+    background-color: #000;
+  }
+
+  /* TDesign Cell components - use attribute selector for better specificity */
+  .t-cell {
+    background-color: #000 !important;
+  }
+
+  .t-cell .t-cell__title,
+  .t-cell__title-text,
+  t-cell .t-cell__title {
+    color: #fff !important;
+  }
+
+  .t-cell .t-cell__note {
+    color: #ccc !important;
+  }
+
+  .t-cell .t-cell__left-icon,
+  .t-icon {
+    color: #fff !important;
+  }
+
+  /* TDesign Navbar */
+  .t-navbar {
+    background-color: #000 !important;
+  }
+
+  .t-navbar .t-navbar__title,
+  .t-navbar__title {
+    color: #fff !important;
+  }
+
+  .t-navbar .t-icon {
+    color: #fff !important;
+  }
+
+  /* TDesign Tab Bar - force all icons to use CSS variable */
+  .t-tab-bar-item {
+    --td-tab-bar-item-icon-color: #999 !important;
+  }
+
+  /* Selected tab bar item - blue icon */
+  .t-tab-bar-item.is-active .t-icon,
+  .t-tab-bar-item [aria-selected="true"] .t-icon {
+    color: #0052d9 !important;
+  }
+
+  .t-tab-bar-item.is-active .t-tab-bar-item__text,
+  .t-tab-bar-item[aria-selected="true"] .t-tab-bar-item__text {
+    color: #0052d9 !important;
+  }
+
+  /* Unselected - gray icon */
+  .t-tab-bar-item .t-icon {
+    color: #999 !important;
+  }
+}

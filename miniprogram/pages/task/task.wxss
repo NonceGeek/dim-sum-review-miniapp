@@ -117,6 +117,12 @@ swiper-item {
   margin-left: 20rpx;
 }
 
+.btn-add-group {
+  margin-top: 60rpx;
+  display: flex;
+  justify-content: center;
+}
+
 @media (prefers-color-scheme: dark) {
   .header {
     padding: 44rpx;

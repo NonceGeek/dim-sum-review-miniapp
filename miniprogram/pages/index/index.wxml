@@ -20,8 +20,8 @@
           </t-button>
         </view>
       </scroll-view>
-      <t-cell-group theme="card" bordered="{{false}}">
-        <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{ item.context.problemChar ? item.context.problemChar:  item.context.sentenceText}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover />
+      <t-cell-group bordered="{{false}}" class="custom-cell-group">
+        <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{ item.context.problemChar ? item.context.problemChar:  item.context.sentenceText}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
         <view class="more-view" wx:if="{{ uncompleted.length > 0 && !uncompletedLoadFinished }}">
           <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onClickMore">
             加载更多
@@ -35,15 +35,15 @@
   </block>
   <block wx:if="{{ active === 'mine' }}">
     <view class="mine-container">
-      <t-cell-group theme="card">
-        <t-cell title="已处理任务" leftIcon="check-circle" hover arrow url="/pages/completed/completed" />
+      <t-cell-group theme="card" class="custom-cell-group-card">
+        <t-cell title="已处理任务" leftIcon="check-circle" hover arrow url="/pages/completed/completed" class="custom-cell-mine" />
       </t-cell-group>
       <view class="logout-container">
         <t-button theme="danger" size="large" block bind:tap="onLogout">退出登录</t-button>
       </view>
     </view>
   </block>
-  <t-tab-bar value="{{active}}" bind:change="onChange" theme="tag" split="{{false}}">
+  <t-tab-bar value="{{active}}" bordered="{{false}}" bind:change="onChange" theme="tag" split="{{false}}">
     <t-tab-bar-item value="uncompleted" icon="home">任务</t-tab-bar-item>
     <t-tab-bar-item value="mine" icon="user">我的</t-tab-bar-item>
   </t-tab-bar>
