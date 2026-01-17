@@ -166,7 +166,7 @@ swiper-item {
 .audio-label {
   font-size: 28rpx;
   color: #000;
-  width: 140rpx;
+  width: 185rpx;
   flex-shrink: 0;
 }
 

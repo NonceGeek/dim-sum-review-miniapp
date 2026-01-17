@@ -3,9 +3,8 @@
 <view style="height: {{headerHeight}}px;"></view>
 <view class="page">
   <block wx:if="{{ active === 'uncompleted' }}">
-    <view class="content-wrapper">
-      <scroll-view scroll-x enable-flex class="btn-group-scroll">
-        <view class="btn-group">
+    <scroll-view scroll-x enable-flex class="btn-group-scroll btn-group-fixed" style="top: {{headerHeight}}px;">
+      <view class="btn-group">
           <t-button theme="{{unselected === 'all' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="all" size="small">
             全部
           </t-button>
@@ -20,24 +19,27 @@
           </t-button>
         </view>
       </scroll-view>
-      <t-cell-group bordered="{{false}}" class="custom-cell-group">
-        <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{ item.context.problemChar ? item.context.problemChar:  item.context.sentenceText}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
-        <view class="more-view" wx:if="{{ uncompleted.length > 0 && !uncompletedLoadFinished }}">
-          <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onClickMore">
-            加载更多
-          </t-button>
-        </view>
-        <view class="container" wx:if="{{ uncompleted.length === 0 }}">
-          <t-empty icon="info" description="暂无数据" />
-        </view>
-      </t-cell-group>
-    </view>
+      <view class="content-wrapper">
+        <t-cell-group bordered="{{false}}" class="custom-cell-group">
+          <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{ item.context.problemChar ? item.context.problemChar:  item.context.sentenceText}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
+          <view class="more-view" wx:if="{{ uncompleted.length > 0 && !uncompletedLoadFinished }}">
+            <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onClickMore">
+              加载更多
+            </t-button>
+          </view>
+          <view class="container" wx:if="{{ uncompleted.length === 0 }}">
+            <t-empty icon="info" description="暂无数据" />
+          </view>
+        </t-cell-group>
+      </view>
   </block>
   <block wx:if="{{ active === 'mine' }}">
     <view class="mine-container">
-      <t-cell-group theme="card" class="custom-cell-group-card">
-        <t-cell title="已处理任务" leftIcon="check-circle" hover arrow url="/pages/completed/completed" class="custom-cell-mine" />
-      </t-cell-group>
+      <view class="card-wrapper">
+        <t-cell-group theme="card" class="custom-cell-group-card">
+          <t-cell title="已处理任务" leftIcon="check-circle" hover arrow url="/pages/completed/completed" t-class="custom-cell-mine" />
+        </t-cell-group>
+      </view>
       <view class="logout-container">
         <t-button theme="danger" size="large" block bind:tap="onLogout">退出登录</t-button>
       </view>

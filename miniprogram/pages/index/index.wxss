@@ -11,8 +11,15 @@
 .btn-group-scroll {
   width: 100%;
   box-sizing: border-box;
-  padding-top: 24rpx;
+  padding: 24rpx 0;
   background-color: var(--td-bg-color-container, #fff);
+}
+
+.btn-group-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 10;
 }
 
 .btn-group {
@@ -20,6 +27,10 @@
   padding: 0 24rpx;
   gap: 16rpx;
   box-sizing: border-box;
+}
+
+.content-wrapper {
+  padding-top: 120rpx;
 }
 
 .btn-type {
@@ -51,6 +62,20 @@
   padding-bottom: 200rpx; /* Space for tab bar */
 }
 
+.card-wrapper {
+  margin: 0 32rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+
+.custom-cell-group-card {
+  background-color: #fff;
+}
+
+.custom-cell-mine .t-cell__title {
+  width: 100rpx;
+}
+
 /* Dark Mode - 页面特有样式 */
 @media (prefers-color-scheme: dark) {
   .page {
@@ -63,5 +88,9 @@
 
   .mine-container {
     background-color: #000;
+  }
+
+  .custom-cell-group-card {
+    border: 1px solid #dfe0e3;
   }
 }

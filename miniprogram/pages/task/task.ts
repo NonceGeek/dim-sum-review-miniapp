@@ -156,14 +156,16 @@ Page({
             cantonesePronunciations: [s.value],
             suggestions: s,
             // test
-            card: [
-              {
-                jyutping: "wai4",
-                type: "character", // 或 "word", "idiom", 'sentence'
-                text: "為",
-                blocks: formatBlocks(s),
-              },
-            ],
+            record: {
+              data: [
+                {
+                  jyutping: "wai4",
+                  type: "character", // 或 "word", "idiom", 'sentence'
+                  text: "為",
+                  blocks: formatBlocks(s),
+                },
+              ],
+            },
           };
         } else {
           return {
@@ -173,14 +175,16 @@ Page({
             source_name,
             suggestions: s,
             // test
-            card: [
-              {
-                jyutping: "wai4",
-                type: "character", // 或 "word", "idiom", 'sentence'
-                text: "為",
-                blocks: formatBlocks(s),
-              },
-            ],
+            record: {
+              data: [
+                {
+                  jyutping: "wai4",
+                  type: "character", // 或 "word", "idiom", 'sentence'
+                  text: "為",
+                  blocks: formatBlocks(s),
+                },
+              ],
+            },
           };
         }
       }) as ITaskDetail[];
@@ -208,12 +212,14 @@ Page({
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
-    currentTask.card = currentTask.card
-      .filter((c) => !c.new)
-      .map((c) => ({
-        ...c,
-        blocks: c.blocks.filter((b) => !b.new),
-      }));
+    if (currentTask.record && currentTask.record.data) {
+      currentTask.record.data = currentTask.record.data
+        .filter((c) => !c.new)
+        .map((c) => ({
+          ...c,
+          blocks: c.blocks.filter((b) => !b.new),
+        }));
+    }
     if (
       JSON.stringify(updatedTaskDetail[currentIndex]) ===
       JSON.stringify(currentTask)
@@ -265,12 +271,14 @@ Page({
     const preSubmit = JSON.parse(JSON.stringify(taskDetail[currentIndex]));
 
     // 过滤掉空的blocks（既没有content也没有url）
-    preSubmit.card = preSubmit.card.map((c) => ({
-      ...c,
-      blocks: c.blocks.filter(
-        (b) => (b.content && b.content.trim()) || (b.url && b.url.trim())
-      ),
-    }));
+    if (preSubmit.record && preSubmit.record.data) {
+      preSubmit.record.data = preSubmit.record.data.map((c) => ({
+        ...c,
+        blocks: c.blocks.filter(
+          (b) => (b.content && b.content.trim()) || (b.url && b.url.trim())
+        ),
+      }));
+    }
 
     wx.showLoading({ title: "请稍后..." });
 
@@ -404,10 +412,12 @@ Page({
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
-    if (!currentTask.card) {
-      currentTask.card = [];
+    if (!currentTask.record) {
+      currentTask.record = { data: [] };
+    } else if (!currentTask.record.data) {
+      currentTask.record.data = [];
     }
-    currentTask.card.push({
+    currentTask.record.data.push({
       new: true,
       jyutping: "",
       type: "character", // 或 "word", "idiom", 'sentence'
@@ -459,12 +469,16 @@ Page({
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
 
+    if (!currentTask.record || !currentTask.record.data) {
+      return;
+    }
+
     if (field === "cantonesePronunciations") {
       // 处理粤音
-      currentTask.card[index].jyutping = value;
+      currentTask.record.data[index].jyutping = value;
     } else if (index !== undefined && parentindex !== undefined) {
       // 处理数组字段（如 cantonesePronunciations）
-      currentTask.card[parentindex].blocks[index]["content"] = value;
+      currentTask.record.data[parentindex].blocks[index]["content"] = value;
     }
 
     updatedTaskDetail[currentIndex] = currentTask;
@@ -492,7 +506,12 @@ Page({
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
-    currentTask.card.at(-1).blocks.push(this.addBlock(value));
+
+    if (!currentTask.record || !currentTask.record.data || !currentTask.record.data.length) {
+      return;
+    }
+
+    currentTask.record.data.at(-1).blocks.push(this.addBlock(value));
     console.log("currentTask:", currentTask);
     updatedTaskDetail[currentIndex] = currentTask;
 
@@ -528,11 +547,15 @@ Page({
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
 
+    if (!currentTask.record || !currentTask.record.data) {
+      return;
+    }
+
     if (cardIndex !== undefined && blockIndex !== undefined) {
-      currentTask.card[cardIndex].blocks.splice(blockIndex, 1);
+      currentTask.record.data[cardIndex].blocks.splice(blockIndex, 1);
     }
     if (cardIndex !== undefined && blockIndex === undefined) {
-      currentTask.card.splice(cardIndex, 1);
+      currentTask.record.data.splice(cardIndex, 1);
     }
 
     updatedTaskDetail[currentIndex] = currentTask;
@@ -657,9 +680,13 @@ Page({
       JSON.stringify(updatedTaskDetail[currentIndex])
     );
 
+    if (!currentTask.record || !currentTask.record.data) {
+      return;
+    }
+
     // iOS 临时文件可以直接播放，不需要保存
-    currentTask.card[cardIndex].blocks[blockIndex].url = filePath;
-    currentTask.card[cardIndex].blocks[blockIndex].duration = Math.floor(
+    currentTask.record.data[cardIndex].blocks[blockIndex].url = filePath;
+    currentTask.record.data[cardIndex].blocks[blockIndex].duration = Math.floor(
       duration / 1000
     );
 
@@ -734,13 +761,13 @@ Page({
     }
 
     const currentTask = taskDetail[currentIndex];
-    if (!currentTask || !currentTask.card || currentTask.card.length === 0) {
+    if (!currentTask || !currentTask.record || !currentTask.record.data || currentTask.record.data.length === 0) {
       this.setData({ canSubmit: false });
       return;
     }
 
     // 检查是否至少有一个 card 的 jyutping 完整（非空）
-    const hasValidJyutping = currentTask.card.some(
+    const hasValidJyutping = currentTask.record.data.some(
       (card: any) => card.jyutping && card.jyutping.trim() !== ""
     );
 

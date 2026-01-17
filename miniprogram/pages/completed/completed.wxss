@@ -10,8 +10,15 @@
 .btn-group-scroll {
   width: 100%;
   box-sizing: border-box;
-  padding-top: 24rpx;
+  padding: 24rpx 0;
   background-color: var(--td-bg-color-container, #fff);
+}
+
+.btn-group-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 10;
 }
 
 .btn-group {
@@ -19,6 +26,10 @@
   padding: 0 24rpx;
   gap: 16rpx;
   box-sizing: border-box;
+}
+
+.content-wrapper {
+  padding-top: 120rpx;
 }
 
 .btn-type {
@@ -45,6 +56,6 @@
   }
 
   .btn-group-scroll {
-    background-color: #1a1a1a;
+    background-color: #000;
   }
 }
