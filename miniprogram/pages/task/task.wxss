@@ -58,7 +58,8 @@ swiper-item {
   display: flex;
   justify-content: flex-end;
 }
-.btn-cancel,.btn-submit {
+.btn-cancel,
+.btn-submit {
   margin-right: 20rpx;
 }
 
@@ -72,7 +73,7 @@ swiper-item {
 .dot {
   width: 18rpx;
   height: 18rpx;
-  background-color: #DFE0E3;
+  background-color: #dfe0e3;
   border-radius: 9999rpx;
   margin: 0 20rpx;
   opacity: 0.6;
@@ -83,20 +84,19 @@ swiper-item {
 .dot.active {
   width: 36rpx;
   opacity: 1;
-  background-color: #DFE0E3;
+  background-color: #dfe0e3;
   transform: scale(1.1);
 }
 
-
 .custom-cell {
-  background-color: #DFE0E3 !important;
+  background-color: #dfe0e3 !important;
   color: black;
 }
 
 .custom-cell .van-cell__value {
-  text-align: left !important;   
-  white-space: normal !important; 
-  word-break: break-word;        
+  text-align: left !important;
+  white-space: normal !important;
+  word-break: break-word;
 }
 
 .custom-cell .van-cell__title,
@@ -123,19 +123,107 @@ swiper-item {
   justify-content: center;
 }
 
+.popup-container {
+  padding: 40rpx;
+  background: #fff;
+  border-radius: 32rpx 32rpx 0 0;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.longpress-view {
+  width: 50vw;
+  min-height: 40rpx;
+  background-color: #f5f5f5;
+  border-radius: 8rpx;
+  margin: 20rpx 0;
+  color: #999;
+  text-align: center;
+  font-size: 24rpx;
+}
+
+.delete-icon {
+  color: #ff4444 !important;
+  cursor: pointer;
+}
+
+.field-class {
+  width: 100rpx;
+}
+
+/* 音频组件样式 */
+.audio-container {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 32rpx;
+  min-height: 100rpx;
+}
+
+.audio-label {
+  font-size: 28rpx;
+  color: #000;
+  width: 140rpx;
+  flex-shrink: 0;
+}
+
+.audio-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.audio-controls {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.audio-icon {
+  color: #000;
+  flex-shrink: 0;
+}
+
+.audio-icon-record {
+  color: #576b95 !important;
+}
+
+.audio-hint,
+.audio-duration,
+.audio-recording-hint {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.audio-recording-hint {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.audio-delete {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
 @media (prefers-color-scheme: dark) {
   .header {
     padding: 44rpx;
-    color: white;
+    color: #fff;
   }
   .custom-cell {
-    background-color: #DFE0E3 !important;
-    color: black;
+    background-color: #dfe0e3 !important;
+    color: #000;
   }
   .custom-cell .van-cell__title,
   .custom-cell .van-cell__value {
-    color: black !important;
+    color: #000 !important;
+  }
+  .popup-container {
+    background: #000 !important;
   }
 }
-
-

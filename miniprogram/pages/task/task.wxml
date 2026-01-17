@@ -18,134 +18,159 @@
         </view>
 
         <!-- 使用 t-collapse 包裹内容 -->
-        <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange">
-          <t-collapse-panel value="details" header="详细信息">
-            <!-- 粤语 pronunciations -->
-            <block wx:for="{{task.cantonesePronunciations}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
+        <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange" theme="card">
+          <block wx:for="{{task.card}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
+            <t-collapse-panel value="card_{{index}}" header="粤音 {{index + 1}}">
+              <!-- 粤语 pronunciations -->
               <view class="group-wrapper">
                 <van-cell-group inset>
-                  <van-cell title="粤音{{index + 1}}：" value="{{cp}}" size="large" custom-class="custom-cell"
-                    title-width="100px" />
+                  <van-field label="粤音：" size="large" label-class="field-class" custom-class="custom-cell" value="{{cp.jyutping}}"
+                    data-field="cantonesePronunciations" data-index="{{index}}" bind:change="onOriginalBaseFieldChange"
+                    placeholder="请输入粤音">
+                    <van-icon wx:if="{{cp.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px" custom-class="delete-icon"
+                      data-card-index="{{index}}" bind:tap="onDeleteBlock" />
+                  </van-field>
                 </van-cell-group>
               </view>
-            </block>
 
-            <!-- 词组 -->
-            <block wx:if="{{task.phrases_join}}">
-              <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-cell title="词组：" value="{{task.phrases_join}}" size="large" custom-class="custom-cell"
-                    title-width="100px" />
-                </van-cell-group>
-              </view>
-            </block>
-
-            <!-- 情感 sentiments -->
-            <block wx:if="{{task.sentiments}}">
-              <block wx:for="{{task.sentiments}}" wx:for-item="sens" wx:for-index="sIndex" wx:key="sIndex">
-                <view class="group-wrapper">
-                  <van-cell-group inset>
-                    <van-cell title="情感{{sIndex + 1}}：" value="{{sens.sentiment}}" size="large"
-                      custom-class="custom-cell" />
-                    <van-cell title="例句：" value="{{sens.exampleSentences ? sens.exampleSentences.join('; ') : ''}}"
-                      size="large" custom-class="custom-cell" />
-                  </van-cell-group>
-                </view>
+              <block wx:for="{{cp.blocks}}" wx:for-item="blk" wx:for-index="blkIndex" wx:key="blkIndex">
+                <block wx:if="{{blk.type === 'phrase'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <van-field label="词组：" size="large" custom-class="custom-cell" value="{{blk.content}}"
+                        data-field="phrase" data-parentIndex="{{index}}" data-index="{{blkIndex}}"
+                        bind:change="onOriginalBaseFieldChange" placeholder="请输入词组">
+                        <van-icon wx:if="{{blk.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px"
+                          custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                          bind:tap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
+                <block wx:if="{{blk.type === 'definition'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <van-field label="解释：" size="large" type="textarea" autosize custom-class="custom-cell"
+                        value="{{blk.content}}" data-field="definition" data-parentIndex="{{index}}"
+                        data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入解释">
+                        <van-icon wx:if="{{blk.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px"
+                          custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                          bind:tap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
+                <block wx:if="{{blk.type === 'sentence'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <van-field label="例句：" size="large" type="textarea" autosize custom-class="custom-cell"
+                        value="{{blk.content}}" data-field="sentence" data-parentIndex="{{index}}"
+                        data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入例句">
+                        <van-icon wx:if="{{blk.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px"
+                          custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                          bind:tap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
+                <block wx:if="{{blk.type === 'introduction'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <van-field label="介绍：" size="large" type="textarea" autosize custom-class="custom-cell"
+                        value="{{blk.content}}" data-field="introduction" data-parentIndex="{{index}}"
+                        data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入介绍">
+                        <van-icon wx:if="{{blk.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px"
+                          custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                          bind:tap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
+                <block wx:if="{{blk.type === 'other'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <van-field label="其他：" size="large" type="textarea" autosize custom-class="custom-cell"
+                        value="{{blk.content}}" data-field="other" data-parentIndex="{{index}}"
+                        data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入其他">
+                        <van-icon wx:if="{{blk.new === true && index === task.card.length - 1}}" slot="icon" name="cross" size="16px"
+                          custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                          bind:tap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
+                <block wx:if="{{blk.type === 'audio'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group inset>
+                      <view class="audio-container custom-cell">
+                        <view class="audio-label">音频：</view>
+                        <view class="audio-content">
+                          <!-- 有录音时显示播放按钮 -->
+                          <block wx:if="{{blk.url}}">
+                            <view class="audio-controls">
+                              <van-icon name="volume-o" size="20px" class="audio-icon"
+                                bind:tap="onPlayAudio"
+                                data-url="{{blk.url}}"
+                                data-card-index="{{index}}"
+                                data-block-index="{{blkIndex}}" />
+                              <text class="audio-duration">{{blk.duration + 's' || '已有录音'}}</text>
+                              <view class="audio-recording-hint">点击播放</view>
+                            </view>
+                          </block>
+                          <!-- 无录音时显示录音提示 -->
+                          <block wx:else>
+                            <view class="audio-controls"
+                              bind:longpress="onStartRecord"
+                              bind:touchend="onStopRecord"
+                              data-card-index="{{index}}"
+                              data-block-index="{{blkIndex}}">
+                              <van-icon name="volume" size="20px" class="audio-icon audio-icon-record" />
+                              <text class="audio-hint">长按录音</text>
+                            </view>
+                          </block>
+                          <!-- 删除按钮 -->
+                          <view class="audio-delete">
+                            <van-icon wx:if="{{(blk.new === true || blk.url) && index === task.card.length - 1}}" name="cross" size="16px"
+                              custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}"
+                              bind:tap="onDeleteBlock" />
+                          </view>
+                        </view>
+                      </view>
+                    </van-cell-group>
+                  </view>
+                </block>
               </block>
-            </block>
 
-            <block wx:if="{{task.source === 'llm'}}">
-              <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-cell title="解释：" value="{{task.suggestions.explanation}}" size="large" custom-class="custom-cell"
-                    title-width="100px" />
-                </van-cell-group>
-              </view>
-            </block>
-
-            <block wx:if="{{status === 'completed'}}">
-              <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell"
-                    title-width="100px" />
-                </van-cell-group>
-              </view>
-              <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="100px" />
-                </van-cell-group>
-              </view>
-            </block>
-          </t-collapse-panel>
-        </t-collapse>
-
-        <!-- 动态新增的粤音面板 -->
-        <block wx:for="{{customCantoneseList}}" wx:for-item="custom" wx:key="id">
-          <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange">
-            <t-collapse-panel value="{{custom.id}}" header="自定义粤音 {{index + 1}}">
-              <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-field
-                    label="粤音："
-                    size="large"
-                    custom-class="custom-cell"
-                    value="{{custom.pronunciation}}"
-                    data-id="{{custom.id}}"
-                    data-field="pronunciation"
-                    bind:change="onCustomFieldChange"
-                    placeholder="请输入粤音"
-                    disabled="{{false}}"
-                  />
-                </van-cell-group>
+              <!-- 原始内容的长按触发区域 - 只在最后一个 card 显示 -->
+              <view class="group-wrapper flex" wx:if="{{index === task.card.length - 1}}"
+                bind:longpress="onLongPressOriginal">
+                <view class="longpress-view">
+                  长按此处添加更多内容
                 </view>
-                <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-field
-                    label="词组："
-                    size="large"
-                    custom-class="custom-cell"
-                    value="{{custom.phrase}}"
-                    data-id="{{custom.id}}"
-                    data-field="phrase"
-                    bind:change="onCustomFieldChange"
-                    placeholder="请输入词组"
-                    disabled="{{false}}"
-                  />
-                </van-cell-group>
-                </view>
-                <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-field
-                    label="情感："
-                    size="large"
-                    custom-class="custom-cell"
-                    value="{{custom.sentiment}}"
-                    data-id="{{custom.id}}"
-                    data-field="sentiment"
-                    bind:change="onCustomFieldChange"
-                    placeholder="请输入情感"
-                    disabled="{{false}}"
-                  />
-                  <van-field
-                    label="例句："
-                    size="large"
-                    custom-class="custom-cell"
-                    value="{{custom.exampleSentence}}"
-                    data-id="{{custom.id}}"
-                    data-field="exampleSentence"
-                    bind:change="onCustomFieldChange"
-                    placeholder="请输入例句"
-                    disabled="{{false}}"
-                  />
-                </van-cell-group>
               </view>
             </t-collapse-panel>
-          </t-collapse>
+          </block>
+        </t-collapse>
+
+        <!-- 已完成状态信息 -->
+        <block wx:if="{{status === 'completed'}}">
+          <view class="group-wrapper">
+            <van-cell-group inset>
+              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell"
+                title-width="100px" />
+            </van-cell-group>
+          </view>
+          <view class="group-wrapper">
+            <van-cell-group inset>
+              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="100px" />
+            </van-cell-group>
+          </view>
         </block>
 
         <!-- 新增粤音按钮 -->
         <view class="btn-add-group">
-          <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese"><van-icon name="plus" custom-class="add-item-icon"/> 新增粤音
+          <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese">
+            <van-icon name="plus" custom-class="add-item-icon" /> 新增粤音
           </t-button>
         </view>
       </scroll-view>
@@ -153,6 +178,20 @@
     </swiper-item>
   </block>
 </swiper>
+
+<!-- 底部弹出选择框 -->
+<t-popup visible="{{ showPopup }}" placement="bottom" bind:visible-change="onPopupClose"
+  close-on-overlay-click="{{true}}">
+  <view class="popup-container">
+    <view style="text-align: center; font-size: 32rpx; margin-bottom: 40rpx;">选择要添加的内容</view>
+    <t-cell-group>
+      <block wx:for="{{extraFields}}" wx:key="value">
+        <t-cell title="{{item.label}}" bordered="{{false}}" hover arrow data-value="{{item.value}}"
+          bind:tap="onPopupSelect" />
+      </block>
+    </t-cell-group>
+  </view>
+</t-popup>
 
 <block wx:if="{{status !== 'completed' && taskDetail.length > 0}}">
   <view class="info-text">
@@ -164,7 +203,7 @@
 <view class="custom-dots" wx:if="{{status !== 'completed'}}">
   <view wx:for="{{taskDetail}}" wx:for-index="index" wx:key="index"
     class="dot {{index === currentIndex ? 'active' : ''}}"></view>
-  <!-- <van-icon name="add" color="#DFE0E3" size="36px" bind:click="onAddClick" class="add-icon {{hidden ? 'hide' : ''}}" /> -->
+  <van-icon name="add" color="#DFE0E3" size="36px" bind:click="onAddClick" class="add-icon {{hidden ? 'hide' : ''}}" />
 </view>
 
 
@@ -174,6 +213,7 @@
   <van-button type="default" round color="#181818" bind:click="onCancel" class="btn-cancel"
     custom-style="color: #DFE0E3;">不处理</van-button>
 
-  <van-button type="default" round color="#DFE0E3" bind:click="onSubmit" class="btn-submit" custom-style="color: #000;">
+  <van-button type="default" round color="#DFE0E3" bind:click="onSubmit" class="btn-submit"
+    custom-style="color: #000;" disabled="{{!canSubmit}}">
     正确</van-button>
 </view>
