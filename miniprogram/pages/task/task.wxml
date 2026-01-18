@@ -116,7 +116,7 @@
                               data-url="{{blk.url}}" bind:longpress="onStartRecord" bind:touchend="onStopRecord"
                               data-card-index="{{index}}" data-block-index="{{blkIndex}}" />
                             <text class="audio-duration">{{blk.url ? (blk.duration + 's' || '已有录音') : ''}}</text>
-                            <view class="audio-recording-hint">点击播放</view>
+                            <view class="audio-recording-hint">{{blk.url ? '点击播放': '长按录音'}}</view>
                           </view>
                           <!-- 删除按钮 -->
                           <view class="audio-delete">
