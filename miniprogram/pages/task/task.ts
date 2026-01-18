@@ -199,7 +199,7 @@ Page({
         },
         () => {
           this.checkCanSubmit();
-        }
+        },
       );
     } catch (err) {
       console.error("[页面] 请求异常:", err);
@@ -210,7 +210,7 @@ Page({
     const updatedTaskDetail = [...taskDetail];
     console.log("原始updatedTaskDetail:", updatedTaskDetail);
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
     if (currentTask.record && currentTask.record.data) {
       currentTask.record.data = currentTask.record.data
@@ -230,18 +230,18 @@ Page({
         },
         () => {
           this.checkCanSubmit();
-        }
+        },
       );
     } else {
       wx.showModal({
         title: "提示",
-        content: "是否保存提交？",
+        content: "是否保存并提交当前编辑内容？",
         showCancel: true,
         cancelText: "取消",
         confirmText: "确定",
         success: async (res) => {
           if (res.confirm) {
-            this.onSubmit();
+            await this.doSubmit();
           } else if (res.cancel) {
             console.log("用户点击取消");
 
@@ -254,15 +254,30 @@ Page({
               },
               () => {
                 this.checkCanSubmit();
-              }
+              },
             );
           }
         },
       });
     }
   },
-  //////
   async onSubmit() {
+    wx.showModal({
+      title: "提示",
+      content: "是否确认提交？",
+      showCancel: true,
+      cancelText: "取消",
+      confirmText: "确定",
+      success: async (res) => {
+        if (res.confirm) {
+          await this.doSubmit();
+        } else {
+          console.log("用户点击了取消");
+        }
+      },
+    });
+  },
+  async doSubmit() {
     const { id } = wx.getStorageSync("userInfo");
     const currentIndex = this.data.currentIndex;
     const taskDetail = this.data.taskDetail;
@@ -275,7 +290,7 @@ Page({
       preSubmit.record.data = preSubmit.record.data.map((c) => ({
         ...c,
         blocks: c.blocks.filter(
-          (b) => (b.content && b.content.trim()) || (b.url && b.url.trim())
+          (b) => (b.content && b.content.trim()) || (b.url && b.url.trim()),
         ),
       }));
     }
@@ -383,7 +398,7 @@ Page({
       },
       () => {
         this.checkCanSubmit();
-      }
+      },
     );
   },
   onShareAppMessage() {
@@ -410,7 +425,7 @@ Page({
     const { taskDetail, currentIndex } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
     if (!currentTask.record) {
       currentTask.record = { data: [] };
@@ -434,7 +449,7 @@ Page({
       },
       () => {
         this.checkCanSubmit();
-      }
+      },
     );
   },
 
@@ -480,7 +495,7 @@ Page({
 
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
 
     if (!currentTask.record || !currentTask.record.data) {
@@ -503,7 +518,7 @@ Page({
       },
       () => {
         this.checkCanSubmit();
-      }
+      },
     );
   },
   onPopupClose() {
@@ -518,10 +533,14 @@ Page({
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
 
-    if (!currentTask.record || !currentTask.record.data || !currentTask.record.data.length) {
+    if (
+      !currentTask.record ||
+      !currentTask.record.data ||
+      !currentTask.record.data.length
+    ) {
       return;
     }
 
@@ -535,7 +554,7 @@ Page({
       },
       () => {
         this.checkCanSubmit();
-      }
+      },
     );
     this.onPopupClose();
   },
@@ -558,7 +577,7 @@ Page({
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
 
     if (!currentTask.record || !currentTask.record.data) {
@@ -580,7 +599,7 @@ Page({
       },
       () => {
         this.checkCanSubmit();
-      }
+      },
     );
   },
 
@@ -684,14 +703,14 @@ Page({
     cardIndex: number,
     blockIndex: number,
     filePath: string,
-    duration: number
+    duration: number,
   ) {
     console.log("临时录音路径:", filePath);
 
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex])
+      JSON.stringify(updatedTaskDetail[currentIndex]),
     );
 
     if (!currentTask.record || !currentTask.record.data) {
@@ -701,7 +720,7 @@ Page({
     // iOS 临时文件可以直接播放，不需要保存
     currentTask.record.data[cardIndex].blocks[blockIndex].url = filePath;
     currentTask.record.data[cardIndex].blocks[blockIndex].duration = Math.floor(
-      duration / 1000
+      duration / 1000,
     );
 
     updatedTaskDetail[currentIndex] = currentTask;
@@ -775,14 +794,19 @@ Page({
     }
 
     const currentTask = taskDetail[currentIndex];
-    if (!currentTask || !currentTask.record || !currentTask.record.data || currentTask.record.data.length === 0) {
+    if (
+      !currentTask ||
+      !currentTask.record ||
+      !currentTask.record.data ||
+      currentTask.record.data.length === 0
+    ) {
       this.setData({ canSubmit: false });
       return;
     }
 
     // 检查是否至少有一个 card 的 jyutping 完整（非空）
     const hasValidJyutping = currentTask.record.data.some(
-      (card: any) => card.jyutping && card.jyutping.trim() !== ""
+      (card: any) => card.jyutping && card.jyutping.trim() !== "",
     );
 
     this.setData({ canSubmit: hasValidJyutping });
