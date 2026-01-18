@@ -464,6 +464,20 @@ Page({
       }
     }
 
+    // 粤拼字段验证：只允许输入英文和数字
+    if (field === "cantonesePronunciations" && value) {
+      // 检查是否只包含英文字母和数字
+      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+      if (!alphanumericRegex.test(value)) {
+        wx.showToast({
+          title: "粤拼只能输入英文和数字",
+          icon: "none",
+          duration: 2000,
+        });
+        return; // 阻止更新
+      }
+    }
+
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex])
