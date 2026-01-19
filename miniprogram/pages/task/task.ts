@@ -157,11 +157,10 @@ Page({
             suggestions: s,
             // test
             record: {
+              text: "為",
               data: [
                 {
                   jyutping: "wai4",
-                  type: "character", // 或 "word", "idiom", 'sentence'
-                  text: "為",
                   blocks: formatBlocks(s),
                 },
               ],
@@ -176,11 +175,10 @@ Page({
             suggestions: s,
             // test
             record: {
+              text: "為",
               data: [
                 {
                   jyutping: "wai4",
-                  type: "character", // 或 "word", "idiom", 'sentence'
-                  text: "為",
                   blocks: formatBlocks(s),
                 },
               ],
@@ -284,6 +282,7 @@ Page({
 
     // 深拷贝，避免修改原数据
     const preSubmit = JSON.parse(JSON.stringify(taskDetail[currentIndex]));
+    console.log("preSubmit:", preSubmit);
 
     // 过滤掉空的blocks（既没有content也没有url）
     if (preSubmit.record && preSubmit.record.data) {
@@ -294,14 +293,16 @@ Page({
         ),
       }));
     }
-
+    // test
+    const submitData = { ...preSubmit.suggestions, ...preSubmit.record };
+    console.log("submitData:", submitData);
     wx.showLoading({ title: "请稍后..." });
 
     const data = await request(`/task/submit/${this.data.taskId}`, {
       method: "POST",
       data: {
         actorRef: id,
-        selected: [preSubmit.suggestions],
+        selected: [submitData],
       },
     });
     if (data.ok) {
