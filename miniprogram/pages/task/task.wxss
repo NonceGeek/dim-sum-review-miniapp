@@ -176,7 +176,6 @@ swiper-item {
 
 .audio-content {
   flex: 1;
-  display: flex;
   align-items: center;
   justify-content: space-between;
 }
@@ -188,25 +187,48 @@ swiper-item {
   gap: 16rpx;
 }
 
-.audio-icon {
-  color: #000;
-  flex-shrink: 0;
+/* 录音按钮样式 */
+.record-btn {
+  width: 100%;
+  background: #fff;
+  border: 2rpx solid #dfe0e3;
+  border-radius: 9999rpx;
+  padding: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  transition: all 0.2s ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
 }
 
-.audio-icon-record {
-  color: #576b95 !important;
+.record-btn.recording {
+  background: #07c160;
+  border-color: #07c160;
+  transform: scale(1.05);
+  box-shadow: 0 4rpx 12rpx rgba(7, 193, 96, 0.3);
 }
 
-.audio-hint,
-.audio-duration,
-.audio-recording-hint {
-  font-size: 28rpx;
+.record-btn.recording .mic-icon {
+  color: #fff;
+}
+
+.record-btn.recording .record-text {
+  color: #fff;
+}
+
+.mic-icon {
   color: #666;
 }
 
-.audio-recording-hint {
-  font-size: 24rpx;
-  color: #999;
+.record-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.audio-icon {
+  background: #dfe0e3;
+  color: #fff;
 }
 
 .audio-delete {
@@ -229,5 +251,23 @@ swiper-item {
   }
   .popup-container {
     background: #000 !important;
+  }
+
+  .audio-icon {
+    color: #000;
+    background: #dfe0e3;
+  }
+
+  .record-btn {
+    background: #dfe0e3;
+    border-color: #dfe0e3;
+  }
+
+  .mic-icon {
+    color: #000;
+  }
+
+  .record-text {
+    color: #000;
   }
 }

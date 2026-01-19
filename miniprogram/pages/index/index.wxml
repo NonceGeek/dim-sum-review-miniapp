@@ -17,7 +17,7 @@
           <t-button theme="{{unselected === 'llm_generic_violation' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="llm_generic_violation" size="small">
             通用LLM检查
           </t-button>
-          <t-button theme="{{unselected === 'data_review' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="llm_generic_violation" size="small">
+          <t-button theme="{{unselected === 'data_review' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="data_review" size="small">
             巡检
           </t-button>
         </view>

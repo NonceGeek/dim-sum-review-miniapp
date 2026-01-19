@@ -46,6 +46,9 @@ Page({
     recordTime: 0,
     recordTimer: null as number | null,
     currentAudioPath: "",
+    touchStartTime: 0, // 记录 touchstart 时间戳
+    touchStartTimer: null as number | null, // touchstart 延迟定时器
+    justFinishedRecording: false, // 刚完成录音标志
     // 提交按钮状态
     canSubmit: false,
   },
@@ -589,6 +592,23 @@ Page({
     const { cardIndex, blockIndex } = e.currentTarget.dataset;
     console.log("开始录音", cardIndex, blockIndex);
 
+    // 记录 touchstart 时间戳
+    this.setData({ touchStartTime: Date.now() });
+
+    // 清除之前的定时器
+    if (this.data.touchStartTimer) {
+      clearTimeout(this.data.touchStartTimer);
+    }
+
+    // 延迟 200ms 后才开始录音，避免和点击冲突
+    const timer = setTimeout(() => {
+      this.checkAndStartRecord(cardIndex, blockIndex);
+    }, 200) as unknown as number;
+
+    this.setData({ touchStartTimer: timer });
+  },
+
+  checkAndStartRecord(cardIndex: number, blockIndex: number) {
     // 检查录音权限
     wx.getSetting({
       success: (res) => {
@@ -654,10 +674,17 @@ Page({
 
   // 停止录音
   onStopRecord(e: any) {
-    if (!this.data.recording) return;
-
     const { cardIndex, blockIndex } = e.currentTarget.dataset;
     console.log("停止录音", cardIndex, blockIndex);
+
+    // 清除 touchstart 延迟定时器
+    if (this.data.touchStartTimer) {
+      clearTimeout(this.data.touchStartTimer);
+      this.setData({ touchStartTimer: null });
+    }
+
+    // 如果没有真正开始录音，直接返回
+    if (!this.data.recording) return;
 
     // 清除计时器
     if (this.data.recordTimer) {
@@ -677,6 +704,12 @@ Page({
     }
 
     wx.hideToast();
+
+    // 设置标志，表示刚完成录音，阻止播放
+    this.setData({ justFinishedRecording: true });
+    setTimeout(() => {
+      this.setData({ justFinishedRecording: false });
+    }, 300);
   },
 
   // 保存音频到block
@@ -720,6 +753,12 @@ Page({
   // 播放音频
   onPlayAudio(e: any) {
     const { url } = e.currentTarget.dataset;
+
+    // 如果正在录音或刚完成录音，不播放
+    if (this.data.recording || this.data.justFinishedRecording) {
+      return;
+    }
+
     console.log("=== 播放音频 ===");
     console.log("URL:", url);
 

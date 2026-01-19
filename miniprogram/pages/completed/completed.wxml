@@ -20,7 +20,7 @@
         通用LLM检查
       </t-button>
       <t-button theme="{{unselected === 'data_review' ? 'primary' : 'default'}}" variant="outline" shape="round"
-        bind:tap="onButtonClick" class="btn-type" data-type="llm_generic_violation" size="small">
+        bind:tap="onButtonClick" class="btn-type" data-type="data_review" size="small">
         巡检
       </t-button>
     </view>
