@@ -50,6 +50,10 @@ swiper-item {
   font-size: 40rpx;
 }
 
+.source-name {
+  width: 50%;
+}
+
 .group-wrapper {
   margin-bottom: 20rpx;
 }

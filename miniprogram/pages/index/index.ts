@@ -35,11 +35,14 @@ Page({
   onButtonClick(event: any) {
     const { type } = event.currentTarget.dataset;
     const { ori_uncompleted } = this.data;
-    const data =
+
+    let data =
       type === "all"
         ? ori_uncompleted
         : ori_uncompleted.filter((ori) => ori.violationType === type);
-
+    if (type === "data_review") {
+      data = ori_uncompleted.filter((ori) => ori.taskType === type);
+    }
     this.setData({
       uncompleted: data,
       unselected: type,
@@ -61,7 +64,7 @@ Page({
     } catch (err) {
       console.log("未登录或 token 失效，跳转登录页");
       wx.reLaunch({
-        url: '/pages/login/login',
+        url: "/pages/login/login",
       });
       return; // 登录失败，不继续执行
     }
@@ -74,8 +77,9 @@ Page({
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight } = wx.getSystemInfoSync();
     // Navbar height calculation: (capsule top - status bar) * 2 + capsule height + status bar
-    const navBarHeight = (rect.top - statusBarHeight) * 2 + rect.height + statusBarHeight;
-    
+    const navBarHeight =
+      (rect.top - statusBarHeight) * 2 + rect.height + statusBarHeight;
+
     this.setData({
       uncompletedPage: p + 1,
       headerHeight: navBarHeight,
@@ -108,15 +112,18 @@ Page({
       }
 
       const reassigninglist = data.items.filter(
-        (d) => d.status !== "reassigning"
+        (d) => d.status !== "reassigning",
       );
       const newList = [...uncompleted, ...reassigninglist];
 
-      const filterData =
+      let filterData =
         unselected === "all"
           ? newList
           : newList.filter((ori) => ori.violationType === unselected);
 
+      if (unselected === "data_review") {
+        filterData = newList.filter((ori) => ori.taskType === unselected);
+      }
       this.setData({
         uncompleted: filterData,
         ori_uncompleted: newList,
@@ -155,8 +162,8 @@ Page({
   },
   onLogout() {
     wx.showModal({
-      title: '提示',
-      content: '确定要退出登录吗？',
+      title: "提示",
+      content: "确定要退出登录吗？",
       success: (res) => {
         if (res.confirm) {
           getApp<IAppOption>().logout();
@@ -165,7 +172,7 @@ Page({
     });
   },
   onThemeChange(params: any) {
-    console.log('主题变化:', params.theme);
+    console.log("主题变化:", params.theme);
     this.setData({
       theme: params.theme,
     });

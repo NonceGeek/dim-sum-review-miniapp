@@ -13,14 +13,14 @@
           <view class="header-subtitle">{{task.sentenseText}}</view>
           <view class="header-option">
             <text class="source">选项{{tIndex + 1}}</text>
-            <text>{{ status === 'completed' ? "任务":"数据"}}来源：{{task.source_name}}</text>
+            <text class="source-name">{{ status === 'completed' ? "任务":"数据"}}来源：{{task.source_name}}</text>
           </view>
         </view>
 
         <!-- 使用 t-collapse 包裹内容 -->
         <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange" theme="card">
           <block wx:for="{{task.record.data}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
-            <t-collapse-panel value="card_{{index}}" header="粤音 {{index + 1}}">
+            <t-collapse-panel value="card_{{index}}" header="{{cp.jyutping}}">
               <!-- 粤语 pronunciations -->
               <view class="group-wrapper">
                 <van-cell-group inset>
@@ -115,12 +115,12 @@
                             <van-icon name="volume-o" size="20px" class="audio-icon" bind:tap="onPlayAudio"
                               data-url="{{blk.url}}" bind:longpress="onStartRecord" bind:touchend="onStopRecord"
                               data-card-index="{{index}}" data-block-index="{{blkIndex}}" />
-                            <text class="audio-duration">{{blk.url ? (blk.duration + 's' || '已有录音') : ''}}</text>
+                            <text class="audio-duration">{{blk.url ? (blk.duration ?  (blk.duration + 's' || '已有录音'): '') : ''}}</text>
                             <view class="audio-recording-hint">{{blk.url ? '点击播放': '长按录音'}}</view>
                           </view>
                           <!-- 删除按钮 -->
                           <view class="audio-delete">
-                            <van-icon wx:if="{{(blk.new === true || blk.url) && index === task.record.data.length - 1}}"
+                            <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}"
                               name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                               data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                           </view>

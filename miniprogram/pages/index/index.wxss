@@ -5,7 +5,9 @@
   min-height: 100vh;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .btn-group-scroll {
@@ -24,17 +26,26 @@
 
 .btn-group {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   padding: 0 24rpx;
   gap: 16rpx;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .content-wrapper {
-  padding-top: 120rpx;
+  padding-top: 180rpx;
 }
 
 .btn-type {
-  flex-shrink: 0 !important;
+  flex: 0 0 auto !important;
+  align-self: flex-start !important;
+  width: auto !important;
+  max-width: 100%;
+  display: inline-flex !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
 }
 
 .container {

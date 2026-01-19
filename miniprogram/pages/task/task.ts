@@ -5,29 +5,13 @@ const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
 
 const SOURCE_NAME_DEFAULT = "llm";
-function getSourceInfo(suggestion: any, categories: any[]) {
-  const source =
-    suggestion.source === "lexicon"
-      ? suggestion.lexiconBaseCorpusName
-      : suggestion.source;
+function getSourceInfo(kind: string, corpusName: string, categories: any[]) {
+  const source = kind === "llm" ? SOURCE_NAME_DEFAULT : corpusName;
   const category = categories.find((cat) => cat.name === source);
   return {
     source,
     source_name: category ? category.nickname : SOURCE_NAME_DEFAULT,
   };
-}
-
-function formatBlocks(suggestion: any) {
-  return [
-    {
-      type: "definition",
-      content: suggestion.explanation,
-    },
-    {
-      type: "phrase",
-      content: suggestion.value,
-    },
-  ];
 }
 
 Page({
@@ -52,7 +36,7 @@ Page({
         placeholder: "请输入例句",
       },
       { label: "解释", value: "definition", placeholder: "请输入解释" },
-      // { label: "介绍", value: "introduction", placeholder: "请输入介绍" },
+      { label: "介绍", value: "introduction", placeholder: "请输入介绍" },
       { label: "音频", value: "audio", placeholder: "请输入音频" },
       { label: "其他", value: "other", placeholder: "请输入其他" },
     ],
@@ -91,11 +75,11 @@ Page({
         type: "definition",
         content: "",
       }),
-      // introduction: () => ({
-      //   new: true,
-      //   type: "introduction",
-      //   content: "",
-      // }),
+      introduction: () => ({
+        new: true,
+        type: "introduction",
+        content: "",
+      }),
       other: () => ({
         new: true,
         type: "other",
@@ -145,44 +129,28 @@ Page({
           ? [data.selectedSuggestion]
           : data.suggestions;
       const entity = suggestions.map((s: any) => {
-        const { source, source_name } = getSourceInfo(s, categories);
+        const { source, source_name } = getSourceInfo(
+          s.kind,
+          data.context.corpusName,
+          categories,
+        );
 
         if (data.violationType === "phonetic_mismatch") {
           return {
-            data: data.context.problemChar,
-            sentenseText: data.context.sentenceText,
+            data: data.context.text,
             source,
             source_name,
             cantonesePronunciations: [s.value],
             suggestions: s,
-            // test
-            record: {
-              text: "為",
-              data: [
-                {
-                  jyutping: "wai4",
-                  blocks: formatBlocks(s),
-                },
-              ],
-            },
+            record: JSON.parse(JSON.stringify(s.record)),
           };
         } else {
           return {
-            data: data.context.sentenceText,
-            phrases_join: s.value,
+            data: data.context.text,
             source,
             source_name,
             suggestions: s,
-            // test
-            record: {
-              text: "為",
-              data: [
-                {
-                  jyutping: "wai4",
-                  blocks: formatBlocks(s),
-                },
-              ],
-            },
+            record: JSON.parse(JSON.stringify(s.record)),
           };
         }
       }) as ITaskDetail[];
@@ -204,6 +172,7 @@ Page({
     }
   },
   onSwiperChange(e) {
+    const { id } = wx.getStorageSync("userInfo");
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
     console.log("原始updatedTaskDetail:", updatedTaskDetail);
@@ -220,7 +189,10 @@ Page({
     }
     if (
       JSON.stringify(updatedTaskDetail[currentIndex]) ===
-      JSON.stringify(currentTask)
+        JSON.stringify(currentTask) &&
+      JSON.stringify(currentTask.record) ===
+        JSON.stringify(updatedTaskDetail[currentIndex].suggestions.record) &&
+      currentTask.source !== id
     ) {
       this.setData(
         {
@@ -245,10 +217,18 @@ Page({
 
             updatedTaskDetail[currentIndex] = currentTask;
 
+            if (currentTask.source === id) {
+              updatedTaskDetail.pop();
+            } else {
+              updatedTaskDetail[currentIndex].record =
+                currentTask.suggestions.record;
+            }
+
             this.setData(
               {
                 currentIndex: e.detail.current,
                 taskDetail: updatedTaskDetail,
+                hidden: !currentTask.source === id,
               },
               () => {
                 this.checkCanSubmit();
@@ -282,7 +262,7 @@ Page({
 
     // 深拷贝，避免修改原数据
     const preSubmit = JSON.parse(JSON.stringify(taskDetail[currentIndex]));
-    console.log("preSubmit:", preSubmit);
+    console.log("preSubmit.suggestions:", preSubmit.suggestions);
 
     // 过滤掉空的blocks（既没有content也没有url）
     if (preSubmit.record && preSubmit.record.data) {
@@ -293,8 +273,8 @@ Page({
         ),
       }));
     }
-    // test
-    const submitData = { ...preSubmit.suggestions, ...preSubmit.record };
+
+    const submitData = { ...preSubmit.suggestions, record: preSubmit.record };
     console.log("submitData:", submitData);
     wx.showLoading({ title: "请稍后..." });
 
@@ -483,7 +463,7 @@ Page({
     // 粤拼字段验证：只允许输入英文和数字
     if (field === "cantonesePronunciations" && value) {
       // 检查是否只包含英文字母和数字
-      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+      const alphanumericRegex = /^[a-zA-Z0-9 ]+$/;
       if (!alphanumericRegex.test(value)) {
         wx.showToast({
           title: "粤拼只能输入英文和数字",
