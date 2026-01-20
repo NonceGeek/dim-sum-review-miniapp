@@ -25,11 +25,13 @@
               <!-- 粤语 pronunciations -->
               <view class="group-wrapper">
                 <van-cell-group inset>
-                  <van-field label="粤音：" size="large" label-class="field-class" custom-class="custom-cell"
-                    value="{{cp.jyutping}}" data-field="cantonesePronunciations" data-index="{{index}}"
-                    bind:change="onOriginalBaseFieldChange" placeholder="请输入粤音" title-width="85px">
-                    <van-icon wx:if="{{cp.new === true && index === task.record.data.length - 1}}" slot="icon"
-                      name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                  <van-field label="粤音：" size="large" type="textarea" autosize label-class="field-class"
+                    custom-class="custom-cell" value="{{cp.jyutping}}" data-field="cantonesePronunciations"
+                    data-index="{{index}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入粤音"
+                    title-width="85px" readonly="{{status === 'completed'}}">
+                    <van-icon
+                      wx:if="{{cp.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                      slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                       bind:tap="onDeleteBlock" />
                   </van-field>
                 </van-cell-group>
@@ -39,11 +41,13 @@
                 <block wx:if="{{blk.type === 'phrase'}}">
                   <view class="group-wrapper">
                     <van-cell-group inset>
-                      <van-field label="词组：" size="large" custom-class="custom-cell" value="{{blk.content}}"
-                        data-field="phrase" data-parentIndex="{{index}}" data-index="{{blkIndex}}"
-                        bind:change="onOriginalBaseFieldChange" placeholder="请输入词组" title-width="85px">
-                        <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}" slot="icon"
-                          name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                      <van-field label="词组：" size="large" type="textarea" autosize custom-class="custom-cell"
+                        value="{{blk.content}}" data-field="phrase" data-parentIndex="{{index}}"
+                        data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入词组"
+                        title-width="85px" readonly="{{status === 'completed'}}">
+                        <van-icon
+                          wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                          slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                           data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
@@ -55,9 +59,10 @@
                       <van-field label="解释：" size="large" type="textarea" autosize custom-class="custom-cell"
                         value="{{blk.content}}" data-field="definition" data-parentIndex="{{index}}"
                         data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入解释"
-                        title-width="85px">
-                        <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}" slot="icon"
-                          name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                        title-width="85px" readonly="{{status === 'completed'}}">
+                        <van-icon
+                          wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                          slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                           data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
@@ -69,9 +74,10 @@
                       <van-field label="例句：" size="large" type="textarea" autosize custom-class="custom-cell"
                         value="{{blk.content}}" data-field="sentence" data-parentIndex="{{index}}"
                         data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入例句"
-                        title-width="85px">
-                        <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}" slot="icon"
-                          name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                        title-width="85px" readonly="{{status === 'completed'}}">
+                        <van-icon
+                          wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                          slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                           data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
@@ -83,9 +89,10 @@
                       <van-field label="介绍：" size="large" type="textarea" autosize custom-class="custom-cell"
                         value="{{blk.content}}" data-field="introduction" data-parentIndex="{{index}}"
                         data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入介绍"
-                        title-width="85px">
-                        <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}" slot="icon"
-                          name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                        title-width="85px" readonly="{{status === 'completed'}}">
+                        <van-icon
+                          wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                          slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                           data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
@@ -97,9 +104,10 @@
                       <van-field label="其他：" size="large" type="textarea" autosize custom-class="custom-cell"
                         value="{{blk.content}}" data-field="other" data-parentIndex="{{index}}"
                         data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入其他"
-                        title-width="85px">
-                        <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}" slot="icon"
-                          name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
+                        title-width="85px" readonly="{{status === 'completed'}}">
+                        <van-icon
+                          wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
+                          slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                           data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
@@ -112,16 +120,20 @@
                         <view class="audio-label">音频：</view>
                         <view class="audio-content">
                           <view class="audio-controls">
-                            <view class="record-btn {{recording ? 'recording' : ''}}" bind:touchstart="onStartRecord"
-                              bind:touchend="onStopRecord" catchtap="onPlayAudio" data-url="{{blk.url}}"
-                              data-card-index="{{index}}" data-block-index="{{blkIndex}}">
-                              <van-icon name="{{recording ? 'volume' : (blk.url ? 'play-circle-o' : 'volume-o')}}" size="20px" class="mic-icon" />
-                              <text class="record-text">{{recording ? '松开 结束' : (blk.url ? '点击播放 / 按住重录' : '按住 说话')}}</text>
+                            <view class="record-btn {{recording ? 'recording' : ''}}"
+                              bind:touchstart="{{status !== 'completed' ? 'onStartRecord' : ''}}"
+                              bind:touchend="{{status !== 'completed' ? 'onStopRecord' : ''}}" catchtap="onPlayAudio"
+                              data-url="{{blk.url}}" data-card-index="{{index}}" data-block-index="{{blkIndex}}">
+                              <van-icon name="{{status === 'completed' || blk.url ? 'play-circle-o' : 'volume-o'}}"
+                                size="20px" class="mic-icon" />
+                              <text
+                                class="record-text">{{status === 'completed' ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 按住重录' : '按住 说话'))}}</text>
                             </view>
                           </view>
                           <!-- 删除按钮 -->
                           <view class="audio-delete">
-                            <van-icon wx:if="{{blk.new === true && index === task.record.data.length - 1}}"
+                            <van-icon
+                              wx:if="{{blk.new === true && index === task.record.data.length - 1 && status !== 'completed'}}"
                               name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}"
                               data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                           </view>
@@ -132,40 +144,42 @@
                 </block>
               </block>
 
-          <!-- 原始内容的长按触发区域 - 只在最后一个 card 显示 -->
-          <view class="group-wrapper flex" wx:if="{{index === task.record.data.length - 1}}"
-            bind:longpress="onLongPressOriginal">
-            <view class="longpress-view">
-              长按此处添加更多内容
-            </view>
-          </view>
-          </t-collapse-panel>
+              <!-- 原始内容的长按触发区域 - 只在最后一个 card 显示 -->
+              <view class="group-wrapper flex"
+                wx:if="{{index === task.record.data.length - 1 && status !== 'completed'}}"
+                bind:longpress="onLongPressOriginal">
+                <view class="longpress-view">
+                  长按此处添加更多内容
+                </view>
+              </view>
+            </t-collapse-panel>
           </block>
-  </t-collapse>
+        </t-collapse>
 
-  <!-- 已完成状态信息 -->
-  <block wx:if="{{status === 'completed'}}">
-    <view class="group-wrapper">
-      <van-cell-group inset>
-        <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell" title-width="85px" />
-      </van-cell-group>
-    </view>
-    <view class="group-wrapper">
-      <van-cell-group inset>
-        <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="85px" />
-      </van-cell-group>
-    </view>
-  </block>
+        <!-- 已完成状态信息 -->
+        <block wx:if="{{status === 'completed'}}">
+          <view class="group-wrapper">
+            <van-cell-group inset>
+              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell"
+                title-width="85px" />
+            </van-cell-group>
+          </view>
+          <view class="group-wrapper">
+            <van-cell-group inset>
+              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="85px" />
+            </van-cell-group>
+          </view>
+        </block>
 
-  <!-- 新增粤音按钮 -->
-  <view class="btn-add-group">
-    <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese">
-      <van-icon name="plus" custom-class="add-item-icon" /> 新增粤音
-    </t-button>
-  </view>
-  </scroll-view>
+        <!-- 新增粤音按钮 -->
+        <view class="btn-add-group" wx:if="{{status !== 'completed'}}">
+          <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese">
+            <van-icon name="plus" custom-class="add-item-icon" /> 新增粤音
+          </t-button>
+        </view>
+      </scroll-view>
 
-  </swiper-item>
+    </swiper-item>
   </block>
 </swiper>
 

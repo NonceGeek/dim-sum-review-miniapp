@@ -298,4 +298,7 @@ swiper-item {
   .record-text {
     color: #000;
   }
+  .back-btn {
+    color: #fff;
+  }
 }

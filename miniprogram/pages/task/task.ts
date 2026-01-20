@@ -1,12 +1,23 @@
 import { ITaskDetail } from "../../types/task";
-import { formatTime } from "../../utils/date";
+import { add8Hours } from "../../utils/date";
 import request, { agent_request, public_request } from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
 
 const SOURCE_NAME_DEFAULT = "llm";
-function getSourceInfo(kind: string, corpusName: string, categories: any[]) {
-  const source = kind === "llm" ? SOURCE_NAME_DEFAULT : corpusName;
+// should test when use baseline: lexiconBaseCorpusName
+function getSourceInfo(
+  kind: string,
+  lexiconBaseCorpusName: string,
+  corpusName: string,
+  categories: any[],
+) {
+  const source =
+    kind === "llm"
+      ? SOURCE_NAME_DEFAULT
+      : kind === "baseline"
+        ? lexiconBaseCorpusName
+        : corpusName;
   const category = categories.find((cat) => cat.name === source);
   return {
     source,
@@ -128,11 +139,13 @@ Page({
       console.log("categories:", categories);
       const suggestions =
         this.data.status === "completed"
-          ? [data.selectedSuggestion.editedPayload.structured_note]
+          ? [data.selectedSuggestion]
           : data.suggestions;
+      console.log("data.status:", data.status);
       const entity = suggestions.map((s: any) => {
         const { source, source_name } = getSourceInfo(
           s.kind,
+          s.lexiconBaseCorpusName,
           data.context.corpusName,
           categories,
         );
@@ -144,7 +157,13 @@ Page({
             source_name,
             cantonesePronunciations: [s.value],
             suggestions: s,
-            record: JSON.parse(JSON.stringify(s.record)),
+            record: JSON.parse(
+              JSON.stringify(
+                data.status === "completed"
+                  ? s.editedPayload.structured_note
+                  : s.record,
+              ),
+            ),
           };
         } else {
           return {
@@ -152,7 +171,13 @@ Page({
             source,
             source_name,
             suggestions: s,
-            record: JSON.parse(JSON.stringify(s.record)),
+            record: JSON.parse(
+              JSON.stringify(
+                data.status === "completed"
+                  ? s.editedPayload.structured_note
+                  : s.record,
+              ),
+            ),
           };
         }
       }) as ITaskDetail[];
@@ -163,7 +188,7 @@ Page({
         {
           taskDetail: entity,
           violationType: data.violationType,
-          completedAt: formatTime(data.resolvedAt),
+          completedAt: add8Hours(data.resolvedAt),
         },
         () => {
           this.checkCanSubmit();
@@ -174,7 +199,7 @@ Page({
     }
   },
   onSwiperChange(e) {
-    console.log('e:', e.detail.current)
+    console.log("e:", e.detail.current);
     const { id } = wx.getStorageSync("userInfo");
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
