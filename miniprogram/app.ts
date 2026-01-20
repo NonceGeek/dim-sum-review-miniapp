@@ -1,17 +1,18 @@
 // app.ts
-import ENV from './config/setting';
+import ENV from "./config/setting";
 
 let loginPromise: Promise<string> | null = null;
 
 App({
   globalData: {
     userInfo: null,
-    accessToken: '',
-    refreshToken: '',
+    accessToken: "",
+    refreshToken: "",
+    allowedCorpora: [],
   },
 
   onLaunch(options: any) {
-    console.log('小程序启动参数:', options);
+    console.log("小程序启动参数:", options);
   },
 
   // 封装异步获取 storage
@@ -45,28 +46,28 @@ App({
       loginPromise = (async () => {
         // 审核模式直接返回 mock token
         if (ENV.IS_REVIEW) {
-          console.log('审核模式，使用 mock token');
-          const mockToken = 'review-token';
-          const mockUser = { nickname: '审核用户', avatar: '' };
+          console.log("审核模式，使用 mock token");
+          const mockToken = "review-token";
+          const mockUser = { nickname: "审核用户", avatar: "" };
           this.globalData.accessToken = mockToken;
           this.globalData.userInfo = mockUser;
           await Promise.all([
-            this.setStorage('accessToken', mockToken),
-            this.setStorage('userInfo', mockUser),
+            this.setStorage("accessToken", mockToken),
+            this.setStorage("userInfo", mockUser),
           ]);
           return mockToken;
         }
 
         // 尝试从 storage 获取 token
-        const token = await this.getStorage('accessToken');
+        const token = await this.getStorage("accessToken");
         if (token) {
           this.globalData.accessToken = token;
-          console.log('已存在 token，直接使用');
+          console.log("已存在 token，直接使用");
           return token;
         }
 
-        console.log('No token in storage, manual login required.');
-        throw new Error('需要手动登录');
+        console.log("No token in storage, manual login required.");
+        throw new Error("需要手动登录");
       })().finally(() => {
         loginPromise = null; // 登录完成后清掉
       });
@@ -79,52 +80,57 @@ App({
     try {
       return await this.doLogin();
     } catch (err: any) {
-      console.warn(`登录失败: ${err.message || err.errMsg || err}`, `剩余重试次数: ${retries}`);
+      console.warn(
+        `登录失败: ${err.message || err.errMsg || err}`,
+        `剩余重试次数: ${retries}`,
+      );
       if (retries > 0) {
-        await new Promise(res => setTimeout(res, 500)); // 延迟 500ms 再重试
+        await new Promise((res) => setTimeout(res, 500)); // 延迟 500ms 再重试
         return this.tryLogin(retries - 1);
       }
-      throw new Error(err.message || '登录失败');
+      throw new Error(err.message || "登录失败");
     }
   },
 
   // 执行登录
   doLogin(): Promise<string> {
-    wx.showLoading({ title: '登录中...' });
+    wx.showLoading({ title: "登录中..." });
     return new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
           if (!res.code) {
             wx.hideLoading();
-            return reject(new Error('登录失败：未获取 code'));
+            return reject(new Error("登录失败：未获取 code"));
           }
 
           wx.request({
             url: `${ENV.API_BASE_URL}/auth/login`,
-            method: 'POST',
+            method: "POST",
             data: { code: res.code },
             timeout: 15000, // 审核环境可能较慢
             success: async (resp) => {
               wx.hideLoading();
 
-              console.log('登录接口返回', resp.data); // 审核模式排查用
+              console.log("登录接口返回", resp.data); // 审核模式排查用
 
-              const { accessToken, refreshToken, user } = resp.data as any || {};
-              if (!accessToken) return reject(new Error('登录失败：未返回 token'));
-
+              const { accessToken, refreshToken, user, allowedCorpora } =
+                (resp.data as any) || {};
+              if (!accessToken)
+                return reject(new Error("登录失败：未返回 token"));
               // 更新全局状态
               this.globalData.accessToken = accessToken;
               this.globalData.refreshToken = refreshToken;
               this.globalData.userInfo = user;
-
+              this.globalData.allowedCorpora = allowedCorpora;
               // 异步存储
               await Promise.all([
-                this.setStorage('accessToken', accessToken),
-                this.setStorage('refreshToken', refreshToken),
-                this.setStorage('userInfo', user),
+                this.setStorage("accessToken", accessToken),
+                this.setStorage("refreshToken", refreshToken),
+                this.setStorage("userInfo", user),
+                this.setStorage("allowedCorpora", allowedCorpora),
               ]);
 
-              console.log('登录成功', user);
+              console.log("登录成功", user);
               resolve(accessToken);
             },
             fail: (err) => {
@@ -143,15 +149,17 @@ App({
 
   logout() {
     this.globalData.userInfo = null;
-    this.globalData.accessToken = '';
-    this.globalData.refreshToken = '';
-    
-    wx.removeStorage({ key: 'userInfo' });
-    wx.removeStorage({ key: 'accessToken' });
-    wx.removeStorage({ key: 'refreshToken' });
+    this.globalData.accessToken = "";
+    this.globalData.refreshToken = "";
+    this.globalData.allowedCorpora = [];
+
+    wx.removeStorage({ key: "userInfo" });
+    wx.removeStorage({ key: "accessToken" });
+    wx.removeStorage({ key: "refreshToken" });
+    wx.removeStorage({ key: "allowedCorpora" });
 
     wx.reLaunch({
-      url: '/pages/login/login',
+      url: "/pages/login/login",
     });
   },
 });

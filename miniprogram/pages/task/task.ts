@@ -25,6 +25,47 @@ function getSourceInfo(
   };
 }
 
+function getAuthCorpus(data) {
+  const corpusFromData = data.suggestions.map((s) => {
+    if (s.kind === "original") {
+      return data.context.corpusName;
+    } else if (s.kind === "llm") {
+      return SOURCE_NAME_DEFAULT;
+    } else if (s.kind === "baseline") {
+      return s.lexiconBaseCorpusName;
+    }
+  });
+  const { role, isSystemAdmin } = wx.getStorageSync("userInfo");
+
+  const allowedCorpora = wx.getStorageSync("allowedCorpora");
+  const categoryWrite = allowedCorpora
+    .map((corpus) => {
+      if (corpus.permission === "WRITE") {
+        return corpus.category_name;
+      }
+    })
+    .filter(Boolean);
+  if (isSystemAdmin) {
+    return {
+      canEdit: corpusFromData,
+      canAdd: true,
+      canDelete: true,
+    };
+  } else if (role.toUpperCase() === "RESEARCHER") {
+    return {
+      canEdit: corpusFromData,
+      canAdd: true,
+    };
+  } else if (/^TAGGER_[A-Z]*$/.test(role.toUpperCase())) {
+    return {
+      canEdit: [
+        ...categoryWrite.filter((x) => new Set(corpusFromData).has(x)),
+        "llm",
+      ],
+    };
+  }
+}
+
 Page({
   /**
    * 页面的初始数据
@@ -62,6 +103,8 @@ Page({
     justFinishedRecording: false, // 刚完成录音标志
     // 提交按钮状态
     canSubmit: false,
+    // 编辑权限
+    corpus: {} as { canEdit?: string[]; canAdd?: boolean; canDelete?: boolean },
   },
 
   addBlock(type: string) {
@@ -141,7 +184,9 @@ Page({
         this.data.status === "completed"
           ? [data.selectedSuggestion]
           : data.suggestions;
-      console.log("data.status:", data.status);
+
+      const corpusWrite = getAuthCorpus(data);
+      console.log("corpus:", corpusWrite);
       const entity = suggestions.map((s: any) => {
         const { source, source_name } = getSourceInfo(
           s.kind,
@@ -155,6 +200,7 @@ Page({
             data: data.context.text,
             source,
             source_name,
+            canEdit: (corpusWrite?.canEdit as string[]).includes(source),
             cantonesePronunciations: [s.value],
             suggestions: s,
             record: JSON.parse(
@@ -170,6 +216,7 @@ Page({
             data: data.context.text,
             source,
             source_name,
+            canEdit: (corpusWrite?.canEdit as string[]).includes(source),
             suggestions: s,
             record: JSON.parse(
               JSON.stringify(
@@ -189,6 +236,7 @@ Page({
           taskDetail: entity,
           violationType: data.violationType,
           completedAt: add8Hours(data.resolvedAt),
+          corpus: corpusWrite,
         },
         () => {
           this.checkCanSubmit();

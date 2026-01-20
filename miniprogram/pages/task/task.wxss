@@ -78,7 +78,8 @@ swiper-item {
 }
 
 .source-name {
-  width: 50%;
+  width: 55%;
+  text-align: right;
 }
 
 .group-wrapper {
@@ -204,6 +205,7 @@ swiper-item {
 
 .audio-content {
   flex: 1;
+  display: flex;
   align-items: center;
   justify-content: space-between;
 }
@@ -261,7 +263,7 @@ swiper-item {
 
 .audio-delete {
   flex-shrink: 0;
-  margin-left: 16rpx;
+  text-align: right;
 }
 
 @media (prefers-color-scheme: dark) {
