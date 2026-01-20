@@ -105,7 +105,6 @@ Page({
     await this.getTask(taskId);
   },
 
-  //////
   async getTask(taskId: string) {
     wx.showLoading({
       title: "加载中...",
@@ -129,7 +128,7 @@ Page({
       console.log("categories:", categories);
       const suggestions =
         this.data.status === "completed"
-          ? [data.selectedSuggestion]
+          ? [data.selectedSuggestion.editedPayload.structured_note]
           : data.suggestions;
       const entity = suggestions.map((s: any) => {
         const { source, source_name } = getSourceInfo(
@@ -175,6 +174,7 @@ Page({
     }
   },
   onSwiperChange(e) {
+    console.log('e:', e.detail.current)
     const { id } = wx.getStorageSync("userInfo");
     const { currentIndex, taskDetail } = this.data;
     const updatedTaskDetail = [...taskDetail];
@@ -193,8 +193,8 @@ Page({
     if (
       JSON.stringify(updatedTaskDetail[currentIndex]) ===
         JSON.stringify(currentTask) &&
-      JSON.stringify(currentTask.record) ===
-        JSON.stringify(updatedTaskDetail[currentIndex].suggestions.record) &&
+      JSON.stringify(currentTask?.record) ===
+        JSON.stringify(updatedTaskDetail[currentIndex].suggestions?.record) &&
       currentTask.source !== id
     ) {
       this.setData(
@@ -309,6 +309,12 @@ Page({
       });
     }
   },
+
+  // 返回上一页
+  onBack() {
+    wx.navigateBack();
+  },
+
   onCancel() {
     const taskId = this.data.taskId;
     wx.showModal({
@@ -419,8 +425,6 @@ Page({
     currentTask.record.data.push({
       new: true,
       jyutping: "",
-      type: "character", // 或 "word", "idiom", 'sentence'
-      text: "",
       blocks: [this.addBlock("phrase"), this.addBlock("sentence")],
     });
 
@@ -490,7 +494,7 @@ Page({
       // 处理粤音
       currentTask.record.data[index].jyutping = value;
     } else if (index !== undefined && parentindex !== undefined) {
-      // 处理数组字段（如 cantonesePronunciations）
+      // 处理数组字段
       currentTask.record.data[parentindex].blocks[index]["content"] = value;
     }
 

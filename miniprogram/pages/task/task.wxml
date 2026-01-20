@@ -1,4 +1,5 @@
-<view class="nav" style="padding-top: {{statusBarHeight + 10}}px;">
+<view class="nav" style="padding-top: {{statusBarHeight + 25}}px;">
+  <van-icon name="arrow-left" size="20px" class="back-btn" bind:click="onBack" />
   <text class="title">任务详情</text>
 </view>
 <swiper indicator-dots="{{false}}" autoplay="{{false}}" indicator-type="expand" transformer-type="scaleAndFade"

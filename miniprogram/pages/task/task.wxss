@@ -7,9 +7,36 @@ page {
   /* padding-top: 100rpx; */
 }
 
+/* 导航栏样式 */
+.nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 32rpx;
+  height: 88rpx;
+  box-sizing: border-box;
+}
+
+.back-btn {
+  position: absolute;
+  left: 32rpx;
+  top: 90%;
+  transform: translateY(-50%);
+  color: #000;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #000;
+}
+
 .swiper-component {
   width: 100%;
-  height: calc(80vh - 150rpx);
+  height: calc(80vh - 160rpx);
 }
 
 swiper-item {
@@ -61,6 +88,7 @@ swiper-item {
 .footer {
   display: flex;
   justify-content: flex-end;
+  margin-bottom: -40rpx;
 }
 .btn-cancel,
 .btn-submit {
@@ -71,7 +99,7 @@ swiper-item {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 40rpx auto;
+  margin: 20rpx auto 30rpx auto;
 }
 
 .dot {
