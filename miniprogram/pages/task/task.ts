@@ -156,7 +156,18 @@ Page({
       status,
     });
     console.log("[页面] onLoad options:", options);
+    this.syncTheme();
     await this.getTask(taskId);
+  },
+
+  onShow() {
+    this.syncTheme();
+  },
+
+  syncTheme() {
+    const app = getApp<any>();
+    const currentTheme = app.getTheme() || 'light';
+    this.setData({ currentTheme });
   },
 
   async getTask(taskId: string) {

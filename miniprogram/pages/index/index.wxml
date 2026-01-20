@@ -1,10 +1,11 @@
-<t-navbar title="任务列表" left-arrow bind:go-back="onGoBack" />
-<!-- Add a space holder div because t-navbar is fixed -->
-<view style="height: {{headerHeight}}px;"></view>
-<view class="page">
-  <block wx:if="{{ active === 'uncompleted' }}">
-    <view class="btn-group-scroll btn-group-fixed" style="top: {{headerHeight}}px;">
-      <view class="btn-group">
+<view class="container-wrap theme-{{currentTheme}}">
+  <t-navbar title="{{active === 'mine' ? '我的' : '任务列表'}}" left-arrow bind:go-back="onGoBack" />
+  <!-- Add a space holder div because t-navbar is fixed -->
+  <view style="height: {{headerHeight}}px;"></view>
+  <view class="page">
+    <block wx:if="{{ active === 'uncompleted' }}">
+      <scroll-view class="btn-group-scroll btn-group-fixed" scroll-x enable-flex style="top: {{headerHeight}}px; width: 100%">
+        <view class="btn-group">
           <t-button theme="{{unselected === 'all' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="all" size="small">
             全部
           </t-button>
@@ -21,12 +22,12 @@
             巡检
           </t-button>
         </view>
-      </view>
+      </scroll-view>
       <view class="content-wrapper">
         <t-cell-group bordered="{{false}}" class="custom-cell-group">
           <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
           <view class="more-view" wx:if="{{ uncompleted.length > 0 && !uncompletedLoadFinished }}">
-            <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onClickMore">
+            <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
               加载更多
             </t-button>
           </view>
@@ -35,21 +36,67 @@
           </view>
         </t-cell-group>
       </view>
-  </block>
-  <block wx:if="{{ active === 'mine' }}">
-    <view class="mine-container">
-      <view class="card-wrapper">
-        <t-cell-group theme="card" class="custom-cell-group-card">
-          <t-cell title="已处理任务" leftIcon="check-circle" hover arrow url="/pages/completed/completed" t-class="custom-cell-mine" />
-        </t-cell-group>
+    </block>
+    <block wx:if="{{ active === 'mine' }}">
+      <view class="mine-container">
+        <!-- 用户信息卡片 -->
+        <view class="profile-section">
+          <view class="profile-card">
+            <view class="avatar-wrapper">
+              <view class="avatar">
+                <text class="avatar-text">{{userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
+              </view>
+            </view>
+            <view class="user-info">
+              <text class="user-name">{{userInfo.nickname || '用户'}}</text>
+              <text class="user-role">标注员</text>
+            </view>
+          </view>
+        </view>
+        <!-- 设置选项 -->
+        <view class="settings-section">
+          <view class="section-title">设置</view>
+          <view class="settings-card">
+            <!-- 外观模式 -->
+            <view class="setting-item" bind:tap="onThemeSettingTap">
+              <view class="setting-left">
+                <view class="setting-icon theme-icon">
+                  <t-icon name="{{currentTheme === 'dark' ? 'mode-dark' : 'mode-light'}}" size="48rpx" color="inherit" />
+                </view>
+                <text class="setting-label">外观模式</text>
+              </view>
+              <view class="setting-right">
+                <text class="setting-value">{{themeModeText}}</text>
+                <view class="arrow-icon">›</view>
+              </view>
+            </view>
+            <!-- 已处理任务 -->
+            <navigator url="/pages/completed/completed" class="setting-item" hover-class="setting-item-hover">
+              <view class="setting-left">
+                <view class="setting-icon completed-icon">
+                  <t-icon name="check" size="48rpx" color="inherit" />
+                </view>
+                <text class="setting-label">已处理任务</text>
+              </view>
+              <view class="setting-right">
+                <view class="arrow-icon">›</view>
+              </view>
+            </navigator>
+          </view>
+        </view>
+        <!-- 退出登录按钮 -->
+        <view class="logout-section">
+          <t-button theme="danger" variant="light" size="large" block bind:tap="onLogout" class="logout-btn">
+            退出登录
+          </t-button>
+        </view>
       </view>
-      <view class="logout-container">
-        <t-button theme="danger" size="large" block bind:tap="onLogout">退出登录</t-button>
-      </view>
-    </view>
-  </block>
-  <t-tab-bar value="{{active}}" bordered="{{false}}" bind:change="onChange" theme="tag" split="{{false}}">
-    <t-tab-bar-item value="uncompleted" icon="home">任务</t-tab-bar-item>
-    <t-tab-bar-item value="mine" icon="user">我的</t-tab-bar-item>
-  </t-tab-bar>
+      <!-- 主题选择弹窗 -->
+      <t-action-sheet visible="{{showThemeSheet}}" items="{{themeOptions}}" bind:selected="onThemeSelect" bind:cancel="onThemeSheetClose" bind:close="onThemeSheetClose" />
+    </block>
+    <t-tab-bar value="{{active}}" bordered="{{false}}" bind:change="onChange" split="{{false}}" color="{{tabBarColor}}">
+      <t-tab-bar-item value="uncompleted" icon="home">任务</t-tab-bar-item>
+      <t-tab-bar-item value="mine" icon="user">我的</t-tab-bar-item>
+    </t-tab-bar>
+  </view>
 </view>

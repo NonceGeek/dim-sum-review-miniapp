@@ -1,53 +1,156 @@
+/* login.wxss - 登录页样式 */
+
 .container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #f7f8fa;
-  color: #000;
-  transition: background-color 0.3s, color 0.3s;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  padding: 0 64rpx;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 背景装饰 */
+.container::before {
+  content: '';
+  position: absolute;
+  top: -30%;
+  right: -30%;
+  width: 600rpx;
+  height: 600rpx;
+  background: var(--gradient-primary);
+  opacity: 0.1;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.container::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  left: -20%;
+  width: 500rpx;
+  height: 500rpx;
+  background: var(--secondary);
+  opacity: 0.08;
+  border-radius: 50%;
+  filter: blur(60px);
 }
 
 .logo-box {
-  margin-bottom: 100rpx;
+  margin-bottom: 120rpx;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
+/* Logo 图标容器 */
+.logo-icon {
+  width: 200rpx;
+  height: 200rpx; /* 调整尺寸适合图片 */
+  margin: 0 auto 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 40rpx; /* 可选：给图片加圆角 */
+}
+
+
 .title {
-  font-size: 48rpx;
-  font-weight: bold;
-  color: #333;
-  margin-bottom: 20rpx;
-  transition: color 0.3s;
+  font-size: 56rpx;
+  font-weight: 700;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 16rpx;
+  letter-spacing: -1rpx;
 }
 
 .subtitle {
   font-size: 32rpx;
-  color: #666;
-  transition: color 0.3s;
+  color: var(--text-secondary);
+  font-weight: 400;
 }
 
 .login-box {
-  width: 80%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .login-btn {
-  width: 100%;
+  width: 100% !important;
+  height: 100rpx !important;
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  border-radius: var(--radius-full) !important;
+  font-size: 32rpx !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-primary) !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-/* Dark Mode */
+.login-btn::after {
+  border: none !important;
+}
+
+.login-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 底部提示 */
+.login-hint {
+  margin-top: 40rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   .container {
-    background-color: #000;
-    color: #fff;
+    background: var(--bg-page);
+    color: var(--text-primary);
   }
-
+  
+  .container::before {
+    opacity: 0.15;
+  }
+  
+  .container::after {
+    opacity: 0.12;
+  }
+  
   .title {
-    color: #fff;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
-
+  
   .subtitle {
-    color: #ccc;
+    color: var(--text-secondary);
+  }
+  
+  .login-btn {
+    background: var(--gradient-primary) !important;
+    box-shadow: var(--shadow-primary) !important;
   }
 }

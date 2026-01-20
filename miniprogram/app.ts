@@ -3,16 +3,121 @@ import ENV from "./config/setting";
 
 let loginPromise: Promise<string> | null = null;
 
+// 主题类型定义
+export type ThemeMode = 'auto' | 'light' | 'dark';
+export type ThemeValue = 'light' | 'dark';
+
 App({
   globalData: {
     userInfo: null,
     accessToken: "",
     refreshToken: "",
     allowedCorpora: [],
+    themeMode: 'auto' as ThemeMode,  // 用户设置：auto/light/dark
+    theme: 'light' as ThemeValue,     // 实际应用的主题：light/dark
   },
 
   onLaunch(options: any) {
     console.log("小程序启动参数:", options);
+    
+    // 初始化主题
+    this.initTheme();
+    
+    // 监听系统主题变化
+    wx.onThemeChange((result) => {
+      console.log('系统主题变化:', result.theme);
+      if (this.globalData.themeMode === 'auto') {
+        this.applyTheme(result.theme as ThemeValue);
+      }
+    });
+  },
+
+  /**
+   * 初始化主题设置
+   */
+  async initTheme() {
+    try {
+      const savedMode = await this.getStorage('themeMode') as ThemeMode;
+      const systemInfo = wx.getSystemInfoSync();
+      const systemTheme = (systemInfo.theme || 'light') as ThemeValue;
+      
+      if (savedMode && ['auto', 'light', 'dark'].includes(savedMode)) {
+        this.globalData.themeMode = savedMode;
+        if (savedMode === 'auto') {
+          this.applyTheme(systemTheme);
+        } else {
+          this.applyTheme(savedMode as ThemeValue);
+        }
+      } else {
+        // 默认跟随系统
+        this.globalData.themeMode = 'auto';
+        this.applyTheme(systemTheme);
+      }
+    } catch (e) {
+      console.error('初始化主题失败:', e);
+      this.applyTheme('light');
+    }
+  },
+
+  /**
+   * 应用主题到页面
+   */
+  applyTheme(theme: ThemeValue) {
+    this.globalData.theme = theme;
+    
+    // 设置页面根节点的主题类
+    const pages = getCurrentPages();
+    pages.forEach((page: any) => {
+      if (typeof page.onThemeChange === 'function') {
+        page.onThemeChange({ theme });
+      } else if (page.setData) {
+        page.setData({ currentTheme: theme });
+      }
+    });
+    
+    // 设置导航栏样式
+    const navBarStyle = theme === 'dark' 
+      ? { backgroundColor: '#161B22', frontColor: '#ffffff' }
+      : { backgroundColor: '#FFFFFF', frontColor: '#000000' };
+    
+    wx.setNavigationBarColor({
+      frontColor: navBarStyle.frontColor as '#ffffff' | '#000000',
+      backgroundColor: navBarStyle.backgroundColor,
+      animation: { duration: 300, timingFunc: 'easeInOut' }
+    });
+    
+    console.log('主题已应用:', theme);
+  },
+
+  /**
+   * 获取当前主题模式
+   */
+  getThemeMode(): ThemeMode {
+    return this.globalData.themeMode;
+  },
+
+  /**
+   * 获取当前实际主题
+   */
+  getTheme(): ThemeValue {
+    return this.globalData.theme;
+  },
+
+  /**
+   * 设置主题模式
+   */
+  async setThemeMode(mode: ThemeMode) {
+    this.globalData.themeMode = mode;
+    await this.setStorage('themeMode', mode);
+    
+    if (mode === 'auto') {
+      const systemInfo = wx.getSystemInfoSync();
+      this.applyTheme((systemInfo.theme || 'light') as ThemeValue);
+    } else {
+      this.applyTheme(mode as ThemeValue);
+    }
+    
+    console.log('主题模式已设置:', mode);
   },
 
   // 封装异步获取 storage
@@ -48,9 +153,9 @@ App({
         if (ENV.IS_REVIEW) {
           console.log("审核模式，使用 mock token");
           const mockToken = "review-token";
-          const mockUser = { nickname: "审核用户", avatar: "" };
+          const mockUser: { nickname: string; avatar: string } = { nickname: "审核用户", avatar: "" };
           this.globalData.accessToken = mockToken;
-          this.globalData.userInfo = mockUser;
+          this.globalData.userInfo = mockUser as any;
           await Promise.all([
             this.setStorage("accessToken", mockToken),
             this.setStorage("userInfo", mockUser),

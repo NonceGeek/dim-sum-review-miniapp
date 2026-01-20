@@ -25,8 +25,19 @@ Page({
       page: p + 1,
       headerHeight: navBarHeight,
     });
-
+    
+    this.syncTheme();
     await this.fetchTasks();
+  },
+
+  onShow() {
+    this.syncTheme();
+  },
+
+  syncTheme() {
+    const app = getApp<any>();
+    const currentTheme = app.getTheme() || 'light';
+    this.setData({ currentTheme });
   },
 
   async fetchTasks() {

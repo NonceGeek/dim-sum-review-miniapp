@@ -1,4 +1,10 @@
-/**app.wxss**/
+/**app.wxss - 科技蓝紫配色方案**/
+
+/* ============================================
+   Design System - Tech Blue Purple Theme
+   ============================================ */
+
+/* 基础容器样式 */
 .container {
   height: 100%;
   display: flex;
@@ -9,94 +15,544 @@
   box-sizing: border-box;
 }
 
+/* 全局字体 */
 page,
 view,
 text {
-  font-family: Arial;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .nav {
   text-align: center;
 }
 
-/* Dark Mode - Global TDesign Theme Variables */
+/* ============================================
+   Light Mode - CSS Variables
+   ============================================ */
 page {
-  --td-bg-color-container: #fff;
-  --td-bg-color-page: #f6f6f6;
-  --td-text-color-primary: #000;
-  --td-text-color-secondary: #666;
-  --td-text-color-placeholder: #dfe0e3;
-  --td-border-color: #e7e7e7;
-  --td-font-family: Arial;
-  transition: background-color 0.3s, color 0.3s;
+  /* 主色调 */
+  --primary: #4A7CF3;
+  --primary-light: #6B93F5;
+  --primary-dark: #3566D9;
+  --secondary: #7C5CFF;
+  --secondary-light: #9178FF;
+  
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #4A7CF3 0%, #7C5CFF 100%);
+  --gradient-button: linear-gradient(135deg, #4A7CF3 0%, #6B93F5 100%);
+  
+  /* 背景色 */
+  --bg-page: #F5F7FA;
+  --bg-card: #FFFFFF;
+  --bg-input: #F8FAFC;
+  --bg-elevated: #FFFFFF;
+  
+  /* 文字色 */
+  --text-primary: #1A1F36;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+  --text-inverse: #FFFFFF;
+  
+  /* 边框 */
+  --border-color: #E2E8F0;
+  --border-light: #F1F5F9;
+  
+  /* 状态色 */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #3B82F6;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-primary: 0 4px 14px rgba(74, 124, 243, 0.25);
+  
+  /* 圆角 */
+  --radius-sm: 8rpx;
+  --radius-md: 16rpx;
+  --radius-lg: 24rpx;
+  --radius-xl: 32rpx;
+  --radius-full: 9999rpx;
+  
+  /* TDesign 覆盖 */
+  --td-bg-color-container: var(--bg-card);
+  --td-bg-color-page: var(--bg-page);
+  --td-text-color-primary: var(--text-primary);
+  --td-text-color-secondary: var(--text-secondary);
+  --td-text-color-placeholder: var(--text-muted);
+  --td-border-color: var(--border-color);
+  --td-brand-color: var(--primary);
+  --td-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+  
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark mode - Override all TDesign component colors */
+/* ============================================
+   Dark Mode - CSS Variables Override
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   page {
-    --td-bg-color-container: #000 !important;
-    --td-bg-color-page: #000 !important;
-    --td-text-color-primary: #fff !important;
-    --td-text-color-secondary: #ccc !important;
-    --td-text-color-placeholder: #dfe0e3 !important;
-    --td-border-color: #2a2a2a !important;
-    --td-cell-bg-color: #000 !important;
-    --td-navbar-bg-color: #000 !important;
-    background-color: #000;
+    /* 主色调 - 稍微提亮 */
+    --primary: #5D8CF5;
+    --primary-light: #7BA3F7;
+    --primary-dark: #4A7CF3;
+    --secondary: #9178FF;
+    --secondary-light: #A892FF;
+    
+    /* 渐变 */
+    --gradient-primary: linear-gradient(135deg, #5D8CF5 0%, #9178FF 100%);
+    --gradient-button: linear-gradient(135deg, #5D8CF5 0%, #7BA3F7 100%);
+    
+    /* 背景色 */
+    --bg-page: #0D1117;
+    --bg-card: #161B22;
+    --bg-input: #21262D;
+    --bg-elevated: #1C2128;
+    
+    /* 文字色 */
+    --text-primary: #F0F6FC;
+    --text-secondary: #8B949E;
+    --text-muted: #6E7681;
+    --text-inverse: #0D1117;
+    
+    /* 边框 */
+    --border-color: #30363D;
+    --border-light: #21262D;
+    
+    /* 阴影 - 深色模式使用发光效果 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-primary: 0 4px 20px rgba(93, 140, 245, 0.3);
+    
+    /* TDesign 覆盖 */
+    --td-bg-color-container: var(--bg-card);
+    --td-bg-color-page: var(--bg-page);
+    --td-text-color-primary: var(--text-primary);
+    --td-text-color-secondary: var(--text-secondary);
+    --td-text-color-placeholder: var(--text-muted);
+    --td-border-color: var(--border-color);
+    --td-brand-color: var(--primary);
+    --td-cell-bg-color: var(--bg-card);
+    --td-navbar-bg-color: var(--bg-card);
+    --td-tab-bar-bg-color: var(--bg-card);
+    --td-tab-bar-item-color: var(--text-muted);
+    --td-tab-bar-item-active-color: var(--primary);
+    
+    background-color: var(--bg-page);
   }
-
-  /* TDesign Cell components - use attribute selector for better specificity */
+  
+  /* TDesign Cell 组件深色适配 */
   .t-cell {
-    background-color: #000 !important;
+    background-color: var(--bg-card) !important;
   }
-
+  
   .t-cell .t-cell__title,
   .t-cell__title-text,
   t-cell .t-cell__title {
-    color: #fff !important;
+    color: var(--text-primary) !important;
   }
-
+  
   .t-cell .t-cell__note {
-    color: #ccc !important;
+    color: var(--text-secondary) !important;
   }
-
+  
   .t-cell .t-cell__left-icon,
   .t-icon {
-    color: #fff !important;
+    color: var(--text-primary) !important;
   }
-
-  /* TDesign Navbar */
+  
+  /* TDesign Navbar 深色适配 */
   .t-navbar {
-    background-color: #000 !important;
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color);
   }
-
+  
   .t-navbar .t-navbar__title,
   .t-navbar__title {
-    color: #fff !important;
+    color: var(--text-primary) !important;
   }
-
+  
   .t-navbar .t-icon {
-    color: #fff !important;
+    color: var(--text-primary) !important;
   }
-
-  /* TDesign Tab Bar - force all icons to use CSS variable */
+  
+  /* TDesign Tab Bar 深色适配 */
+  .t-tab-bar {
+    background-color: var(--bg-card) !important;
+    border-top: 1px solid var(--border-color);
+  }
+  
   .t-tab-bar-item {
-    --td-tab-bar-item-icon-color: #dfe0e3 !important;
+    --td-tab-bar-item-icon-color: var(--text-muted) !important;
   }
-
-  /* Selected tab bar item - blue icon */
+  
   .t-tab-bar-item.is-active .t-icon,
   .t-tab-bar-item [aria-selected="true"] .t-icon {
-    color: #0052d9 !important;
+    color: var(--primary) !important;
   }
-
+  
   .t-tab-bar-item.is-active .t-tab-bar-item__text,
   .t-tab-bar-item[aria-selected="true"] .t-tab-bar-item__text {
-    color: #0052d9 !important;
+    color: var(--primary) !important;
   }
-
-  /* Unselected - gray icon */
+  
   .t-tab-bar-item .t-icon {
-    color: #dfe0e3 !important;
+    color: var(--text-muted) !important;
   }
+  
+  .t-tab-bar-item .t-tab-bar-item__text {
+    color: var(--text-muted) !important;
+  }
+  
+  /* TDesign Button 深色适配 */
+  .t-button--primary {
+    background: var(--gradient-primary) !important;
+    border: none !important;
+  }
+  
+  .t-button--default {
+    background-color: var(--bg-input) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+  }
+  
+  /* TDesign Collapse 深色适配 */
+  .t-collapse-panel {
+    background-color: var(--bg-card) !important;
+  }
+  
+  .t-collapse-panel__header {
+    color: var(--text-primary) !important;
+  }
+  
+  /* TDesign Empty 深色适配 */
+  .t-empty__description {
+    color: var(--text-secondary) !important;
+  }
+}
+
+/* ============================================
+   通用组件样式
+   ============================================ */
+
+/* 毛玻璃效果 */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass-effect {
+    background: rgba(22, 27, 34, 0.85);
+  }
+}
+
+/* 渐变按钮基础样式 */
+.btn-gradient {
+  background: var(--gradient-primary);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-primary);
+  transition: all 0.2s ease;
+}
+
+.btn-gradient:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+/* 卡片基础样式 */
+.card {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+/* 输入框样式 */
+.input-field {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(74, 124, 243, 0.15);
+}
+
+/* 状态标签 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-full);
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+.badge-primary {
+  background: rgba(74, 124, 243, 0.15);
+  color: var(--primary);
+}
+
+.badge-success {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+/* 分隔线 */
+.divider {
+  height: 1px;
+  background-color: var(--border-color);
+  margin: 24rpx 0;
+}
+
+/* 图标按钮 */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.icon-btn:active {
+  background-color: var(--border-color);
+  transform: scale(0.95);
+}
+
+/* ============================================
+   手动主题切换支持 - JS 控制的主题类
+   使用 .theme-dark 类实现手动深色模式
+   ============================================ */
+
+/* 强制浅色主题 */
+.theme-light {
+  /* 主色调 */
+  --primary: #4A7CF3 !important;
+  --primary-light: #6B93F5 !important;
+  --primary-dark: #3566D9 !important;
+  --secondary: #7C5CFF !important;
+  --secondary-light: #9178FF !important;
+  
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #4A7CF3 0%, #7C5CFF 100%) !important;
+  --gradient-button: linear-gradient(135deg, #4A7CF3 0%, #6B93F5 100%) !important;
+  
+  /* 背景色 */
+  --bg-page: #F5F7FA !important;
+  --bg-card: #FFFFFF !important;
+  --bg-input: #F8FAFC !important;
+  --bg-elevated: #FFFFFF !important;
+  
+  /* 文字色 */
+  --text-primary: #1A1F36 !important;
+  --text-secondary: #64748B !important;
+  --text-muted: #94A3B8 !important;
+  --text-inverse: #FFFFFF !important;
+  
+  /* 边框 */
+  --border-color: #E2E8F0 !important;
+  --border-light: #F1F5F9 !important;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+  --shadow-primary: 0 4px 14px rgba(74, 124, 243, 0.25) !important;
+  
+  background-color: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 强制深色主题 */
+.theme-dark {
+  /* 主色调 - 稍微提亮 */
+  --primary: #5D8CF5 !important;
+  --primary-light: #7BA3F7 !important;
+  --primary-dark: #4A7CF3 !important;
+  --secondary: #9178FF !important;
+  --secondary-light: #A892FF !important;
+  
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, #5D8CF5 0%, #9178FF 100%) !important;
+  --gradient-button: linear-gradient(135deg, #5D8CF5 0%, #7BA3F7 100%) !important;
+  
+  /* 背景色 */
+  --bg-page: #0D1117 !important;
+  --bg-card: #161B22 !important;
+  --bg-input: #21262D !important;
+  --bg-elevated: #1C2128 !important;
+  
+  /* 文字色 */
+  --text-primary: #F0F6FC !important;
+  --text-secondary: #8B949E !important;
+  --text-muted: #6E7681 !important;
+  --text-inverse: #0D1117 !important;
+  
+  /* 边框 */
+  --border-color: #30363D !important;
+  --border-light: #21262D !important;
+  
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4) !important;
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5) !important;
+  --shadow-primary: 0 4px 20px rgba(93, 140, 245, 0.3) !important;
+  
+  /* TDesign 覆盖 */
+  --td-bg-color-container: var(--bg-card) !important;
+  --td-bg-color-page: var(--bg-page) !important;
+  --td-text-color-primary: var(--text-primary) !important;
+  --td-text-color-secondary: var(--text-secondary) !important;
+  --td-text-color-placeholder: var(--text-muted) !important;
+  --td-border-color: var(--border-color) !important;
+  --td-brand-color: var(--primary) !important;
+  --td-cell-bg-color: var(--bg-card) !important;
+  --td-navbar-bg-color: var(--bg-card) !important;
+  --td-tab-bar-bg-color: var(--bg-card) !important;
+  --td-tab-bar-item-color: var(--text-muted) !important;
+  --td-tab-bar-item-active-color: var(--primary) !important;
+  
+  background-color: var(--bg-page) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 容器包裹层，确保背景色铺满且变量穿透 */
+.container-wrap {
+  min-height: 100vh;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* 深色主题下的组件样式覆盖 */
+.theme-dark .t-cell {
+  background-color: var(--bg-card) !important;
+}
+
+.theme-dark .t-cell .t-cell__title,
+.theme-dark .t-cell__title-text {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .t-cell .t-cell__note {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .t-cell .t-cell__left-icon,
+.theme-dark .t-icon {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .t-navbar {
+  background-color: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+.theme-dark .t-navbar .t-navbar__title,
+.theme-dark .t-navbar__title {
+  color: var(--text-primary) !important;
+}
+
+/* TDesign Tab Bar 深色适配 - 依赖 CSS 变量，移除强制覆盖 */
+.theme-dark .t-tab-bar {
+  background-color: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color);
+}
+
+/* 按钮样式修正 */
+/* 仅对带有 btn-gradient 类的按钮应用全局渐变，或者默认按钮 */
+
+
+/* 显式定义渐变按钮类 */
+.theme-dark .btn-gradient,
+.theme-dark .login-btn {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+}
+
+/* 确保 outline 按钮背景透明 */
+.theme-dark .t-button--variant-outline {
+  background: transparent !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+
+
+.theme-dark .t-button--default {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 特殊处理 tag 主题的 TabBar */
+.theme-dark .t-tab-bar--tag .t-tab-bar-item--active {
+  background-color: rgba(93, 140, 245, 0.2) !important; /* 半透明主色 */
+}
+
+.theme-dark .t-tab-bar--tag .t-tab-bar-item--active .t-tab-bar-item__content {
+  background-color: transparent !important;
+}
+
+.theme-dark .t-collapse-panel {
+  background-color: var(--bg-card) !important;
+}
+
+.theme-dark .t-collapse-panel__header {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .t-empty__description {
+  color: var(--text-secondary) !important;
+}
+
+.theme-dark .glass-effect {
+  background: rgba(22, 27, 34, 0.85) !important;
+}
+
+/* 浅色主题组件样式确保 */
+.theme-light .t-cell {
+  background-color: var(--bg-card) !important;
+}
+
+.theme-light .t-cell .t-cell__title,
+.theme-light .t-cell__title-text {
+  color: var(--text-primary) !important;
+}
+
+.theme-light .t-navbar {
+  background-color: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}
+
+.theme-light .t-tab-bar {
+  background-color: var(--bg-card) !important;
+  border-top: 1px solid var(--border-light) !important;
 }

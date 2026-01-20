@@ -9,7 +9,8 @@
     "t-navbar": "tdesign-miniprogram/navbar/navbar",
     "t-empty": "tdesign-miniprogram/empty/empty",
     "t-tab-bar": "tdesign-miniprogram/tab-bar/tab-bar",
-    "t-tab-bar-item": "tdesign-miniprogram/tab-bar-item/tab-bar-item"
+    "t-tab-bar-item": "tdesign-miniprogram/tab-bar-item/tab-bar-item",
+    "t-action-sheet": "tdesign-miniprogram/action-sheet/action-sheet"
   },
   "navigationBarTitleText": "首页",
   "navigationStyle": "custom",

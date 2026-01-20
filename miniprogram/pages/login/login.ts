@@ -3,6 +3,21 @@ const app = getApp<IAppOption>();
 Page({
   data: {
     loading: false,
+    currentTheme: 'light',
+  },
+
+  onLoad() {
+    this.syncTheme();
+  },
+
+  onShow() {
+    this.syncTheme();
+  },
+
+  syncTheme() {
+    const app = getApp<any>();
+    const currentTheme = app.getTheme() || 'light';
+    this.setData({ currentTheme });
   },
 
   async handleLogin() {

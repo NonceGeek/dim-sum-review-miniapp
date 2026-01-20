@@ -1,12 +1,16 @@
-<view class="container">
+<view class="container theme-{{currentTheme}}">
   <view class="logo-box">
-    <!-- Placeholder for logo if needed -->
+    <!-- Logo Icon -->
+    <view class="logo-icon">
+      <image src="/public/image/logo.png" mode="aspectFit" class="logo-img"></image>
+    </view>
     <view class="title">Dim Sum Review</view>
-    <view class="subtitle">标注校验</view>
+    <view class="subtitle">粤语数据标注校验平台</view>
   </view>
   <view class="login-box">
     <button class="login-btn" type="primary" bindtap="handleLogin" loading="{{loading}}">
-      微信登录
+      微信一键登录
     </button>
+    <view class="login-hint">使用微信账号快速登录</view>
   </view>
 </view>

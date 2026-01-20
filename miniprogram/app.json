@@ -6,11 +6,12 @@
     "pages/completed/completed"
   ],
   "window": {
-    "navigationBarTitleText": "标注校验"
+    "navigationBarTitleText": "Dim Sum Review",
+    "navigationBarBackgroundColor": "@navBgColor",
+    "navigationBarTextStyle": "@textColor",
+    "backgroundColor": "@backgroundColor"
   },
   "lazyCodeLoading": "requiredComponents",
   "darkmode": true,
-  "navigationBarBackgroundColor": "@backgroundColor",
-  "navigationBarTextStyle": "@textColor",
   "themeLocation": "theme.json"
 }

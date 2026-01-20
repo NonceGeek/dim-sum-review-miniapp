@@ -1,12 +1,22 @@
 {
   "light": {
-    "backgroundColor": "#BCCBFF",
-    "cardbg": "#DFE0E3",
-    "textColor": "black"
+    "backgroundColor": "#F5F7FA",
+    "navBgColor": "#FFFFFF",
+    "textColor": "black",
+    "primaryColor": "#4A7CF3",
+    "secondaryColor": "#7C5CFF",
+    "cardBg": "#FFFFFF",
+    "borderColor": "#E2E8F0",
+    "textSecondary": "#64748B"
   },
   "dark": {
-    "backgroundColor": "#000",
-    "cardbg": "#DFE0E3",
-    "textColor": "white"
+    "backgroundColor": "#0D1117",
+    "navBgColor": "#161B22",
+    "textColor": "white",
+    "primaryColor": "#5D8CF5",
+    "secondaryColor": "#9178FF",
+    "cardBg": "#161B22",
+    "borderColor": "#30363D",
+    "textSecondary": "#8B949E"
   }
 }

@@ -1,20 +1,25 @@
+/* index.wxss - 任务列表页样式 */
+
 .page {
-  background-color: #f6f6f6;
-  color: #000;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   padding-bottom: 200rpx;
   min-height: 100vh;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
-  transition:
-    background-color 0.3s,
-    color 0.3s;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* ============================================
+   筛选按钮组
+   ============================================ */
 .btn-group-scroll {
   width: 100%;
   box-sizing: border-box;
   padding: 24rpx 0;
-  background-color: var(--td-bg-color-container, #fff);
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  transition: background-color 0.3s ease;
 }
 
 .btn-group-fixed {
@@ -22,22 +27,25 @@
   left: 0;
   right: 0;
   z-index: 10;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .btn-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-start;
   padding: 0 24rpx;
   gap: 16rpx;
   box-sizing: border-box;
-  width: 100%;
+  width: max-content;
 }
 
 .content-wrapper {
-  padding-top: 180rpx;
+  padding-top: 160rpx;
 }
 
+/* 筛选按钮样式 */
 .btn-type {
   flex: 0 0 auto !important;
   align-self: flex-start !important;
@@ -46,62 +54,342 @@
   display: inline-flex !important;
   margin: 0 !important;
   justify-content: flex-start !important;
+  border-radius: var(--radius-full) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
 }
 
+/* TDesign 按钮样式覆盖 - primary状态 */
+.btn-type.t-button--primary {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+/* TDesign 按钮样式覆盖 - default状态 */
+.btn-type.t-button--default {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.btn-type.t-button--default:active {
+  background-color: var(--border-color) !important;
+}
+
+/* ============================================
+   任务列表
+   ============================================ */
+.custom-cell-group {
+  margin: 0 24rpx;
+}
+
+/* 自定义 Cell 样式 */
+.custom-cell {
+  margin-bottom: 16rpx !important;
+  border-radius: var(--radius-lg) !important;
+  background-color: var(--bg-card) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-cell:active {
+  transform: scale(0.995);
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Cell 左侧图标 */
+.custom-cell .t-cell__left-icon {
+  color: var(--primary) !important;
+}
+
+/* Cell 标题 */
+.custom-cell .t-cell__title {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* Cell 箭头 */
+.custom-cell .t-cell__right-icon {
+  color: var(--text-muted) !important;
+}
+
+/* 空状态容器 */
 .container {
   height: 60vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
+/* 加载更多 */
 .more-view {
   text-align: center;
   padding: 32rpx 0;
 }
 
+.container-wrap .more-view .btn-type {
+  color: var(--text-secondary) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* ============================================
+   我的页面 - 重新设计
+   ============================================ */
 .mine-container {
   display: flex;
   flex-direction: column;
-  min-height: 80vh;
-  justify-content: space-between;
-  padding: 32rpx 0;
+  min-height: calc(100vh - 160rpx - env(safe-area-inset-bottom));
+  padding-bottom: calc(200rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 }
 
-.logout-container {
-  padding: 32rpx;
-  padding-bottom: 200rpx; /* Space for tab bar */
+/* 用户信息区域 */
+.profile-section {
+  padding: 40rpx 32rpx;
 }
 
-.card-wrapper {
-  margin: 0 32rpx;
-  border-radius: 12rpx;
+.profile-card {
+  display: flex;
+  align-items: center;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-xl);
+  padding: 40rpx 32rpx;
+  box-shadow: var(--shadow-primary);
+}
+
+.avatar-wrapper {
+  margin-right: 28rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid rgba(255, 255, 255, 0.4);
+}
+
+.avatar-text {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #fff;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8rpx;
+}
+
+.user-role {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4rpx 16rpx;
+  border-radius: var(--radius-full);
+  width: fit-content;
+}
+
+/* 设置区域 */
+.settings-section {
+  padding: 0 32rpx;
+  flex: 1;
+}
+
+.section-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 20rpx;
+  padding-left: 8rpx;
+}
+
+.settings-card {
+  background-color: var(--bg-card);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
 }
 
-.custom-cell-group-card {
-  background-color: #fff;
+/* 设置项 */
+.setting-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  transition: background-color 0.2s ease;
 }
 
-.custom-cell-mine .t-cell__title {
-  width: 100rpx;
+.setting-item:not(:last-child) {
+  border-bottom: 1px solid var(--border-light);
 }
 
-/* Dark Mode - 页面特有样式 */
+.setting-item-hover {
+  background-color: var(--bg-input);
+}
+
+.setting-item:active {
+  background-color: var(--bg-input);
+}
+
+.setting-left {
+  display: flex;
+  align-items: center;
+}
+
+.setting-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+}
+
+.icon-text {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.theme-icon {
+  background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+  color: #B45309;
+}
+
+.completed-icon {
+  background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+  color: #047857;
+}
+
+
+.setting-label {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.setting-right {
+  display: flex;
+  align-items: center;
+}
+
+.setting-value {
+  font-size: 28rpx;
+  color: var(--text-secondary);
+  margin-right: 8rpx;
+}
+
+.arrow-icon {
+  font-size: 36rpx;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* 退出登录区域 */
+.logout-section {
+  padding: 40rpx 32rpx;
+  margin-top: auto;
+}
+
+.logout-btn {
+  width: 100%;
+  --td-button-large-height: 96rpx;
+}
+
+/* Action Sheet 样式修正 */
+t-action-sheet {
+  position: relative;
+  z-index: 9999;
+}
+
+/* ============================================
+   深色模式下的我的页面
+   ============================================ */
+.theme-dark .profile-card {
+  background: var(--gradient-primary);
+}
+
+.theme-dark .settings-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.theme-dark .setting-item:not(:last-child) {
+  border-bottom-color: var(--border-color);
+}
+
+.theme-dark .setting-item:active,
+.theme-dark .setting-item-hover {
+  background-color: var(--bg-input);
+}
+
+.theme-dark .theme-icon {
+  background: linear-gradient(135deg, #1E3A5F 0%, #2D4A6F 100%);
+  color: #60A5FA;
+}
+
+.theme-dark .completed-icon {
+  background: linear-gradient(135deg, #064E3B 0%, #065F46 100%);
+  color: #34D399;
+}
+
+
+/* ============================================
+   底部 Tab Bar
+   ============================================ */
+.t-tab-bar {
+  background-color: var(--bg-card) !important;
+  border-top: 1px solid var(--border-light) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   .page {
-    background-color: #000;
+    background-color: var(--bg-page);
   }
 
   .btn-group-scroll {
-    background-color: #000;
+    background-color: rgba(22, 27, 34, 0.85);
+    border-bottom-color: var(--border-color);
   }
 
   .mine-container {
-    background-color: #000;
+    background-color: var(--bg-page);
   }
 
   .custom-cell-group-card {
-    border: 1px solid #dfe0e3;
+    background-color: var(--bg-card);
+    border-color: var(--border-color);
+  }
+  
+  .custom-cell {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+  }
+  
+  .card-wrapper {
+    box-shadow: none;
+    border: 1px solid var(--border-color);
   }
 }
