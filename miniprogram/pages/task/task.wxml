@@ -12,9 +12,7 @@
           <view class="header-subtitle">{{task.sentenseText}}</view>
           <view class="header-option">
             <text class="source">选项{{tIndex + 1}}</text>
-            <text class="source-name">
-              {{ status === 'completed' ? "任务":"数据"}}来源：{{task.source_name}}
-            </text>
+            <text class="source-name">{{ status === 'completed' ? "任务":"数据"}}来源：{{task.source_name}}</text>
           </view>
         </view>
         <!-- 使用 t-collapse 包裹内容 -->
