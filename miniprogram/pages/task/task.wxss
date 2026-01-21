@@ -214,6 +214,10 @@ swiper-item {
   max-width: 280rpx;
 }
 
+.btn-submit {
+  text-align: right;
+}
+
 /* 取消按钮 */
 .btn-cancel .van-button {
   background-color: var(--bg-input) !important;

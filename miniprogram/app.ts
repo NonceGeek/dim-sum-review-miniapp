@@ -1,5 +1,6 @@
 // app.ts
 import ENV from "./config/setting";
+import { public_request } from "./utils/http";
 
 let loginPromise: Promise<string> | null = null;
 
@@ -13,8 +14,9 @@ App({
     accessToken: "",
     refreshToken: "",
     allowedCorpora: [],
-    themeMode: 'auto' as ThemeMode,  // 用户设置：auto/light/dark
-    theme: 'light' as ThemeValue,     // 实际应用的主题：light/dark
+    themeMode: "auto" as ThemeMode, // 用户设置：auto/light/dark
+    theme: "light" as ThemeValue, // 实际应用的主题：light/dark
+    categories: [],
   },
 
   onLaunch(options: any) {
@@ -222,17 +224,21 @@ App({
                 (resp.data as any) || {};
               if (!accessToken)
                 return reject(new Error("登录失败：未返回 token"));
+
+              const categories = await public_request("/corpus_categories");
               // 更新全局状态
               this.globalData.accessToken = accessToken;
               this.globalData.refreshToken = refreshToken;
               this.globalData.userInfo = user;
               this.globalData.allowedCorpora = allowedCorpora;
+              this.globalData.categories = categories;
               // 异步存储
               await Promise.all([
                 this.setStorage("accessToken", accessToken),
                 this.setStorage("refreshToken", refreshToken),
                 this.setStorage("userInfo", user),
                 this.setStorage("allowedCorpora", allowedCorpora),
+                this.setStorage("categories", categories),
               ]);
 
               console.log("登录成功", user);
@@ -257,11 +263,13 @@ App({
     this.globalData.accessToken = "";
     this.globalData.refreshToken = "";
     this.globalData.allowedCorpora = [];
+    this.globalData.categories = [];
 
     wx.removeStorage({ key: "userInfo" });
     wx.removeStorage({ key: "accessToken" });
     wx.removeStorage({ key: "refreshToken" });
     wx.removeStorage({ key: "allowedCorpora" });
+    wx.removeStorage({ key: "categories" });
 
     wx.reLaunch({
       url: "/pages/login/login",

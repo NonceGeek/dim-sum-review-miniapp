@@ -3,6 +3,12 @@ import { add8Hours } from "../../utils/date";
 import request, { agent_request, public_request } from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
+const app = getApp<{
+  globalData: {
+    allowedCorpora?: { category_name: string; permission: string }[];
+    categories: [];
+  };
+}>();
 
 const SOURCE_NAME_DEFAULT = "llm";
 // should test when use baseline: lexiconBaseCorpusName
@@ -37,9 +43,11 @@ function getAuthCorpus(data) {
   });
   const { role, isSystemAdmin } = wx.getStorageSync("userInfo");
 
-  const allowedCorpora = wx.getStorageSync("allowedCorpora");
+  const allowedCorpora =
+    wx.getStorageSync("allowedCorpora") || app.globalData.allowedCorpora || [];
+  console.log("allowedCorpora:", allowedCorpora);
   const categoryWrite = allowedCorpora
-    .map((corpus) => {
+    ?.map((corpus) => {
       if (corpus.permission === "WRITE") {
         return corpus.category_name;
       }
@@ -160,13 +168,35 @@ Page({
     await this.getTask(taskId);
   },
 
+  async onReady() {
+    const app = getApp<any>();
+    const { id } = wx.getStorageSync("userInfo");
+
+    const [view, categories] = await Promise.all([
+      agent_request(`/tasks/${this.data.taskId}/view`, {
+        method: "POST",
+        data: { actorRef: id },
+      }),
+      public_request("/corpus_categories"), // 移除 await
+    ]);
+
+    console.log("view:", view);
+
+    if (
+      JSON.stringify(app.globalData.categories) !== JSON.stringify(categories)
+    ) {
+      app.globalData.categories = categories;
+      wx.setStorage("categories", categories);
+    }
+  },
+
   onShow() {
     this.syncTheme();
   },
 
   syncTheme() {
     const app = getApp<any>();
-    const currentTheme = app.getTheme() || 'light';
+    const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
 
@@ -176,19 +206,10 @@ Page({
     });
     console.log("status:", this.data.status);
     try {
-      const { id } = wx.getStorageSync("userInfo");
-      const [data, categories] = await Promise.all([
-        request(`/task/${taskId}`),
-        public_request("/corpus_categories"),
-        this.data.status === "completed"
-          ? null
-          : agent_request(`/tasks/${this.data.taskId}/view`, {
-              method: "POST",
-              data: {
-                actorRef: id,
-              },
-            }),
-      ]);
+      const categories =
+        wx.getStorageSync("categories") || app.globalData.categories || [];
+      const data = await request(`/task/${taskId}`);
+
       console.log("task data:", data);
       console.log("categories:", categories);
       const suggestions =
