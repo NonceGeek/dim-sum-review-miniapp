@@ -1,6 +1,6 @@
 import { ITaskDetail } from "../../types/task";
 import { add8Hours } from "../../utils/date";
-import request, { agent_request, public_request } from "../../utils/http";
+import request, { public_request } from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
 const app = getApp<{
@@ -71,6 +71,8 @@ function getAuthCorpus(data) {
         "llm",
       ],
     };
+  } else {
+    return { canEdit: ["llm"] };
   }
 }
 
@@ -181,7 +183,7 @@ Page({
     const { id } = wx.getStorageSync("userInfo");
 
     const [view, categories] = await Promise.all([
-      agent_request(`/tasks/${this.data.taskId}/view`, {
+      request(`/task/${this.data.taskId}/view`, {
         method: "POST",
         data: { actorRef: id },
       }),

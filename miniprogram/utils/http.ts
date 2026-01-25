@@ -185,28 +185,5 @@ function public_request(url: string, options: any = {}): Promise<any> {
   });
 }
 
-function agent_request(url: string, options: any = {}): Promise<any> {
-  return new Promise((resolve, reject) => {
-    wx.request({
-      url: `${ENV.API_AGENT_URL}${url}`,
-      method: options.method || "GET",
-      data: options.data || {},
-      timeout: 10000,
-      header: {
-        ...(options.header || {}),
-      },
-
-      success: async (res) => {
-        // console.log("agent res:", res);
-        resolve(res.data); // 正常返回
-      },
-
-      fail: (err) => {
-        console.error("[request] wx.request fail:", JSON.stringify(err));
-        reject(err);
-      },
-    });
-  });
-}
-export { public_request, agent_request };
+export { public_request };
 export default request;
