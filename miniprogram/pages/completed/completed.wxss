@@ -1,9 +1,22 @@
 /* completed.wxss - 已完成任务页样式 */
 
+page {
+  /* TDesign Navbar 变量 - 响应主题 */
+  --td-navbar-bg-color: var(--bg-card);
+  --td-navbar-color: var(--text-primary);
+}
+
+/* 主题容器 - 不影响布局 */
+.container-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
 .page {
+  flex: 1;
   background-color: var(--bg-page);
   color: var(--text-primary);
-  min-height: 100vh;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -142,9 +155,14 @@
 }
 
 /* ============================================
-   Dark Mode
+   Dark Mode - System Preference
    ============================================ */
 @media (prefers-color-scheme: dark) {
+  page {
+    --td-navbar-bg-color: #161B22;
+    --td-navbar-color: #F0F6FC;
+  }
+
   .page {
     background-color: var(--bg-page);
     color: var(--text-primary);
@@ -165,4 +183,28 @@
     border-color: var(--border-color) !important;
     color: var(--text-secondary) !important;
   }
+}
+
+/* ============================================
+   Dark Mode - Manual Theme Toggle
+   ============================================ */
+.page.theme-dark {
+  background-color: #0D1117;
+  color: #F0F6FC;
+}
+
+.page.theme-dark .btn-group-scroll {
+  background-color: rgba(22, 27, 34, 0.85);
+  border-bottom-color: #30363D;
+}
+
+.page.theme-dark .t-cell {
+  background-color: #161B22 !important;
+  border-color: #30363D !important;
+}
+
+.page.theme-dark .btn-type.t-button--default {
+  background-color: #21262D !important;
+  border-color: #30363D !important;
+  color: #8B949E !important;
 }

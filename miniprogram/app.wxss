@@ -476,7 +476,13 @@ page {
 }
 
 .theme-dark .t-navbar .t-navbar__title,
-.theme-dark .t-navbar__title {
+.theme-dark .t-navbar__title,
+.theme-dark .t-navbar__center-title {
+  color: var(--text-primary) !important;
+}
+
+.theme-dark .t-navbar__btn,
+.theme-dark .t-navbar__left-arrow {
   color: var(--text-primary) !important;
 }
 

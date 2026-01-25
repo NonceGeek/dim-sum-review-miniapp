@@ -2,10 +2,19 @@
 
 page {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
   background-color: var(--bg-page);
   color: var(--text-primary);
+  /* TDesign Navbar 变量 - 响应主题 */
+  --td-navbar-bg-color: var(--bg-card);
+  --td-navbar-color: var(--text-primary);
+}
+
+/* 主题容器 - 不影响布局 */
+.container-wrap {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ============================================
@@ -26,16 +35,16 @@ page {
 }
 
 .back-btn {
-  position: absolute;
+  position: absolute !important;
   left: 32rpx;
-  top: 90%;
+  top: 50%;
   transform: translateY(-50%);
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
   cursor: pointer;
   z-index: 10;
   width: 72rpx;
   height: 72rpx;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
@@ -135,7 +144,7 @@ swiper-item {
    表单组
    ============================================ */
 .group-wrapper {
-  margin: 0 24rpx 20rpx;
+  margin: 0 12rpx 16rpx;
 }
 
 /* Vant Cell 样式覆盖 */
@@ -144,6 +153,10 @@ swiper-item {
   color: var(--text-primary) !important;
   border-radius: var(--radius-lg) !important;
   border: 1px solid var(--border-light) !important;
+}
+
+.custom-cell.van-cell {
+  padding: 16rpx 18rpx !important;
 }
 
 .custom-cell .van-cell__value {
@@ -186,12 +199,12 @@ swiper-item {
   background-color: var(--bg-card) !important;
   color: var(--text-primary) !important;
   font-weight: 600 !important;
-  padding: 24rpx 32rpx !important;
+  padding: 16rpx 24rpx !important;
 }
 
 .t-collapse-panel__content {
   background-color: var(--bg-input) !important;
-  padding: 16rpx !important;
+  padding: 20rpx 0 !important;
 }
 
 /* ============================================
@@ -219,7 +232,7 @@ swiper-item {
 }
 
 /* 取消按钮 */
-.btn-cancel .van-button {
+.btn-cancel-inner {
   background-color: var(--bg-input) !important;
   border: 1px solid var(--border-color) !important;
   color: var(--text-secondary) !important;
@@ -227,7 +240,7 @@ swiper-item {
 }
 
 /* 确认按钮 */
-.btn-submit .van-button {
+.btn-submit-inner {
   background: var(--gradient-primary) !important;
   border: none !important;
   color: #fff !important;
@@ -235,7 +248,7 @@ swiper-item {
   box-shadow: var(--shadow-primary) !important;
 }
 
-.btn-submit .van-button--disabled {
+.btn-submit-inner.van-button--disabled {
   opacity: 0.5 !important;
   box-shadow: none !important;
 }
@@ -247,8 +260,9 @@ swiper-item {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20rpx auto 30rpx auto;
+  padding: 20rpx 0 30rpx 0;
   gap: 16rpx;
+  background-color: var(--bg-page);
 }
 
 .dot {
@@ -287,12 +301,13 @@ swiper-item {
    提示信息
    ============================================ */
 .info-text {
-  margin: 20rpx 0;
+  padding: 20rpx 0;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
+  background-color: var(--bg-page);
 }
 
 .info-message {
@@ -327,12 +342,25 @@ swiper-item {
   padding: 40rpx;
   background: var(--bg-card);
   border-radius: 32rpx 32rpx 0 0;
+  color: var(--text-primary);
+}
+
+.popup-title {
+  text-align: center;
+  font-size: 32rpx;
+  margin-bottom: 40rpx;
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .popup-container .t-cell {
   background-color: var(--bg-input) !important;
   margin-bottom: 12rpx !important;
   border-radius: var(--radius-md) !important;
+}
+
+.info-icon {
+  color: var(--text-muted) !important;
 }
 
 /* ============================================
@@ -370,13 +398,32 @@ swiper-item {
    删除图标
    ============================================ */
 .delete-icon {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.1);
   color: var(--danger) !important;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .delete-icon:active {
-  opacity: 0.7;
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(0.9);
+}
+
+/* 深色模式下删除图标 */
+@media (prefers-color-scheme: dark) {
+  .delete-icon {
+    background: rgba(239, 68, 68, 0.15);
+  }
+  
+  .delete-icon:active {
+    background: rgba(239, 68, 68, 0.25);
+  }
 }
 
 .field-class {
@@ -389,14 +436,14 @@ swiper-item {
 .audio-container {
   display: flex;
   align-items: center;
-  padding: 20rpx 32rpx;
-  min-height: 100rpx;
+  padding: 16rpx 20rpx;
+  min-height: 104rpx;
 }
 
 .audio-label {
   font-size: 28rpx;
   color: var(--text-secondary);
-  width: 185rpx;
+  width: 160rpx;
   flex-shrink: 0;
   font-weight: 500;
 }
@@ -421,7 +468,8 @@ swiper-item {
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-full);
-  padding: 16rpx 24rpx;
+  padding: 0 20rpx;
+  min-height: 90rpx;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -450,11 +498,16 @@ swiper-item {
 
 .mic-icon {
   color: var(--text-secondary) !important;
+  font-size: 32rpx;
+  display: flex;
+  align-items: center;
 }
 
 .record-text {
-  font-size: 26rpx;
+  font-size: 28rpx;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
 }
 
 .audio-icon {
@@ -471,12 +524,12 @@ swiper-item {
 }
 
 /* ============================================
-   Dark Mode
+   Dark Mode - System Preference
    ============================================ */
 @media (prefers-color-scheme: dark) {
-  .nav {
-    background-color: rgba(22, 27, 34, 0.9);
-    border-bottom-color: var(--border-color);
+  page {
+    --td-navbar-bg-color: #161B22;
+    --td-navbar-color: #F0F6FC;
   }
 
   .header {
@@ -535,4 +588,123 @@ swiper-item {
     background-color: var(--bg-card) !important;
     border-color: var(--border-color) !important;
   }
+
+  .delete-icon {
+    background: rgba(239, 68, 68, 0.15);
+  }
+  
+  .delete-icon:active {
+    background: rgba(239, 68, 68, 0.25);
+  }
+}
+
+/* ============================================
+   Dark Mode - Manual Theme Toggle (.theme-dark)
+   ============================================ */
+
+/* 导航栏 */
+.nav.theme-dark {
+  background-color: rgba(22, 27, 34, 0.95);
+  border-bottom-color: var(--border-color);
+}
+
+.nav.theme-dark .title {
+  color: var(--text-primary);
+}
+
+.nav.theme-dark .back-btn {
+  color: var(--text-primary) !important;
+}
+
+/* 头部区域 */
+.header.theme-dark {
+  color: var(--text-primary);
+}
+
+.header.theme-dark .header-word {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.header.theme-dark .header-subtitle {
+  color: var(--text-secondary);
+}
+
+.header.theme-dark .header-option {
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+
+.header.theme-dark .source {
+  background: rgba(93, 140, 245, 0.15);
+  color: var(--primary);
+}
+
+.header.theme-dark .source-name {
+  color: var(--text-muted);
+}
+
+/* Swiper 区域 */
+.swiper-component.theme-dark {
+  background-color: var(--bg-page);
+}
+
+/* 底部区域 */
+.footer.theme-dark {
+  background-color: var(--bg-card);
+  border-top-color: var(--border-color);
+}
+
+.footer.theme-dark .btn-cancel-inner {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.footer.theme-dark .btn-submit-inner {
+  background: var(--gradient-primary) !important;
+  color: #fff !important;
+}
+
+/* 弹出层 */
+.popup-container.theme-dark {
+  background: var(--bg-card) !important;
+  color: var(--text-primary);
+}
+
+.popup-container.theme-dark .popup-title {
+  color: var(--text-primary);
+}
+
+.popup-container.theme-dark .t-cell {
+  background-color: var(--bg-input) !important;
+}
+
+/* 提示信息 */
+.info-text.theme-dark {
+  color: var(--text-muted);
+  background-color: #0D1117;
+}
+
+.info-text.theme-dark .info-message {
+  color: var(--text-muted);
+}
+
+/* 指示点 */
+.custom-dots.theme-dark {
+  background-color: #0D1117;
+}
+
+.custom-dots.theme-dark .dot {
+  background-color: var(--border-color);
+}
+
+.custom-dots.theme-dark .dot.active {
+  background: var(--gradient-primary);
+}
+
+.custom-dots.theme-dark .add-icon {
+  color: var(--text-muted) !important;
 }

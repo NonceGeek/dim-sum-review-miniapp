@@ -1,6 +1,7 @@
+<view class="container-wrap theme-{{currentTheme}}">
 <t-navbar title="已处理任务" left-arrow bind:go-back="onGoBack" />
 <view style="height: {{headerHeight}}px;"></view>
-<view class="page theme-{{currentTheme}}">
+<view class="page">
   <scroll-view scroll-x enable-flex class="btn-group-scroll btn-group-fixed" style="top: {{headerHeight}}px; width: 100%">
     <view class="btn-group">
       <t-button theme="{{selected === 'all' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="all" size="small">
@@ -33,4 +34,5 @@
       </view>
     </t-cell-group>
   </view>
+</view>
 </view>

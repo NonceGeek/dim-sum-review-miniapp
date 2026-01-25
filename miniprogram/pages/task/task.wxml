@@ -1,7 +1,6 @@
-<view class="nav theme-{{currentTheme}}" style="padding-top: {{statusBarHeight + 25}}px;">
-  <van-icon name="arrow-left" size="20px" class="back-btn" bind:click="onBack" />
-  <text class="title">任务详情</text>
-</view>
+<view class="container-wrap theme-{{currentTheme}}">
+<t-navbar title="任务详情" left-arrow bind:go-back="onBack" />
+<view style="height: {{headerHeight}}px;"></view>
 <swiper indicator-dots="{{false}}" autoplay="{{false}}" indicator-type="expand" transformer-type="scaleAndFade" circular="false" interval="3000" duration="500" class="swiper-component" bindchange="onSwiperChange">
   <block wx:for="{{taskDetail}}" wx:for-item="task" wx:for-index="tIndex" wx:key="tIndex">
     <swiper-item>
@@ -81,10 +80,8 @@
                         <view class="audio-content">
                           <view class="audio-controls">
                             <view class="record-btn {{recording ? 'recording' : ''}}" bind:touchstart="{{status !== 'completed' || task.canEdit ? 'onStartRecord' : ''}}" bind:touchend="{{status !== 'completed' || task.canEdit ? 'onStopRecord' : ''}}" catchtap="onPlayAudio" data-url="{{blk.url}}" data-card-index="{{index}}" data-block-index="{{blkIndex}}">
-                              <van-icon name="{{status === 'completed' || blk.url ? 'play-circle-o' : 'volume-o'}}" size="20px" class="mic-icon" />
-                              <text class="record-text">
-                                {{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 按住重录' : '按住 说话'))}}
-                              </text>
+                              <van-icon name="{{status === 'completed' || blk.url ? 'play-circle-o' : 'volume-o'}}" size="20px" custom-class="mic-icon" />
+                              <text class="record-text">{{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 按住重录' : '按住 说话'))}}</text>
                             </view>
                           </view>
                           <!-- 删除按钮 -->
@@ -131,7 +128,7 @@
 <!-- 底部弹出选择框 -->
 <t-popup visible="{{ showPopup }}" placement="bottom" bind:visible-change="onPopupClose" close-on-overlay-click="{{true}}">
   <view class="popup-container">
-    <view style="text-align: center; font-size: 32rpx; margin-bottom: 40rpx;">选择要添加的内容</view>
+    <view class="popup-title">选择要添加的内容</view>
     <t-cell-group>
       <block wx:for="{{extraFields}}" wx:key="value">
         <t-cell title="{{item.label}}" bordered="{{false}}" hover arrow data-value="{{item.value}}" bind:tap="onPopupSelect" />
@@ -141,21 +138,22 @@
 </t-popup>
 <block wx:if="{{status !== 'completed' && taskDetail.length > 0}}">
   <view class="info-text">
-    <van-icon name="warning-o" />
+    <van-icon name="warning-o" custom-class="info-icon" />
     <text class="info-message">请向左滑动查看选项</text>
   </view>
 </block>
 <!-- 自定义指示点 -->
 <view class="custom-dots" wx:if="{{status !== 'completed'}}">
   <view wx:for="{{taskDetail}}" wx:for-index="index" wx:key="index" class="dot {{index === currentIndex ? 'active' : ''}}"></view>
-  <van-icon wx:if="{{corpus.canAdd}}" name="add" color="#DFE0E3" size="36px" bind:click="onAddClick" class="add-icon {{hidden ? 'hide' : ''}}" />
+  <van-icon wx:if="{{corpus.canAdd}}" name="add" size="36px" bind:click="onAddClick" custom-class="add-icon {{hidden ? 'hide' : ''}}" />
 </view>
 <!-- 底部按钮 -->
 <view class="footer" wx:if="{{status !== 'completed'}}">
-  <van-button type="default" round color="#181818" bind:click="onCancel" class="btn-cancel" custom-style="color: #DFE0E3;">
+  <van-button type="default" round bind:click="onCancel" class="btn-cancel" custom-class="btn-cancel-inner">
     不处理
   </van-button>
-  <van-button type="default" round color="#DFE0E3" bind:click="onSubmit" class="btn-submit" custom-style="color: #000;" disabled="{{!canSubmit}}">
+  <van-button type="default" round bind:click="onSubmit" class="btn-submit" custom-class="btn-submit-inner" disabled="{{!canSubmit}}">
     正确
   </van-button>
+</view>
 </view>

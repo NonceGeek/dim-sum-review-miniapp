@@ -84,6 +84,7 @@ Page({
     taskDetail: [] as any[],
     currentIndex: 0,
     statusBarHeight,
+    headerHeight: 0,
     hidden: false,
     violationType: "", //检查类型
     completedAt: "",
@@ -159,9 +160,16 @@ Page({
    */
   async onLoad(options: { taskId: string }) {
     const { taskId, status } = options;
+    
+    // Calculate Navbar Height
+    const rect = wx.getMenuButtonBoundingClientRect();
+    const { statusBarHeight: sysStatusBarHeight } = wx.getSystemInfoSync();
+    const navBarHeight = (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
+    
     this.setData({
       taskId,
       status,
+      headerHeight: navBarHeight,
     });
     console.log("[页面] onLoad options:", options);
     this.syncTheme();

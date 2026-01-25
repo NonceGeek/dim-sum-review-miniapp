@@ -1,5 +1,5 @@
 <view class="container-wrap theme-{{currentTheme}}">
-  <t-navbar title="{{active === 'mine' ? '我的' : '任务列表'}}" left-arrow bind:go-back="onGoBack" />
+  <t-navbar title="{{active === 'mine' ? '我的' : '任务列表'}}" />
   <!-- Add a space holder div because t-navbar is fixed -->
   <view style="height: {{headerHeight}}px;"></view>
   <view class="page">
