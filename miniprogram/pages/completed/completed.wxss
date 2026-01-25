@@ -149,8 +149,8 @@ page {
 }
 
 .more-view .btn-type {
-  color: var(--primary) !important;
-  border: none !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
   background: transparent !important;
 }
 

@@ -25,7 +25,7 @@
     <t-cell-group bordered="{{false}}">
       <t-cell wx:for="{{ completed }}" wx:for-item="item" wx:key="taskId" leftIcon="check-circle-filled" title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover />
       <view class="more-view" wx:if="{{ completed.length > 0 && !loadFinished }}">
-        <t-button shape="round" theme="default" variant="text" class="btn-type" bind:tap="onLoadMore">
+        <t-button shape="round" theme="default" variant="text" variant="outline" class="btn-type" bind:tap="onLoadMore">
           加载更多
         </t-button>
       </view>
