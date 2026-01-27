@@ -162,12 +162,13 @@ Page({
    */
   async onLoad(options: { taskId: string }) {
     const { taskId, status } = options;
-    
+
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight: sysStatusBarHeight } = wx.getSystemInfoSync();
-    const navBarHeight = (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
-    
+    const navBarHeight =
+      (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
+
     this.setData({
       taskId,
       status,
@@ -245,13 +246,7 @@ Page({
             canEdit: (corpusWrite?.canEdit as string[]).includes(source),
             cantonesePronunciations: [s.value],
             suggestions: s,
-            record: JSON.parse(
-              JSON.stringify(
-                data.status === "completed"
-                  ? s.editedPayload.structured_note
-                  : s.record,
-              ),
-            ),
+            record: JSON.parse(JSON.stringify(s.record)),
           };
         } else {
           return {
@@ -260,13 +255,7 @@ Page({
             source_name,
             canEdit: (corpusWrite?.canEdit as string[]).includes(source),
             suggestions: s,
-            record: JSON.parse(
-              JSON.stringify(
-                data.status === "completed"
-                  ? s.editedPayload.structured_note
-                  : s.record,
-              ),
-            ),
+            record: JSON.parse(JSON.stringify(s.record)),
           };
         }
       }) as ITaskDetail[];
