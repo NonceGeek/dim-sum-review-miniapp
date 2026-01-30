@@ -81,7 +81,7 @@
                           <view class="audio-controls">
                             <view class="record-btn {{recording ? 'recording' : ''}}" bind:touchstart="{{status !== 'completed' && task.canEdit ? 'onStartRecord' : ''}}" bind:touchmove="{{status !== 'completed' && task.canEdit ? 'onRecordTouchMove' : ''}}" bind:touchend="{{status !== 'completed' && task.canEdit ? 'onStopRecord' : ''}}" catchtap="onPlayAudio" data-url="{{blk.url}}" data-card-index="{{index}}" data-block-index="{{blkIndex}}">
                               <van-icon name="{{status === 'completed' || blk.url ? 'play-circle-o' : 'volume-o'}}" size="20px" custom-class="mic-icon" />
-                              <text class="record-text">{{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 长按录音' : '按住 说话'))}}</text>
+                              <text class="record-text">{{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 长按录音' : '长按 录音'))}}</text>
                             </view>
                           </view>
                           <!-- 删除按钮 -->
@@ -163,12 +163,12 @@
         <block wx:if="{{status === 'completed'}}">
           <view class="group-wrapper group-wrapper-no-style">
             <van-cell-group>
-              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell" title-width="160rpx" />
+              <van-field border="{{false}}" readonly label="处理时间：" size="large" custom-class="custom-cell" value="{{completedAt}}" title-width="160rpx"/>
             </van-cell-group>
           </view>
           <view class="group-wrapper group-wrapper-no-style">
             <van-cell-group>
-              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="140rpx" />
+              <van-field border="{{false}}" readonly label="状态：" size="large" custom-class="custom-cell" value="已处理" title-width="160rpx"/>
             </van-cell-group>
           </view>
         </block>

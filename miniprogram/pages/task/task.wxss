@@ -190,7 +190,10 @@ swiper-item {
 
 .custom-cell.van-cell {
   padding: 16rpx 18rpx !important;
+  /* 让整个 cell 垂直居中，适用于 textarea 类型 */
+  align-items: center !important;
 }
+
 
 .custom-cell .van-cell__value {
   text-align: left !important;

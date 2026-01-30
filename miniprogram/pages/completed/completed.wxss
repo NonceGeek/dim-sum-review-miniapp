@@ -175,7 +175,6 @@ page {
   }
 
   .btn-group-scroll {
-    background-color: rgba(22, 27, 34, 0.85);
     border-bottom-color: var(--border-color);
   }
   
