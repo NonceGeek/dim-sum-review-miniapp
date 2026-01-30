@@ -169,6 +169,7 @@ swiper-item {
   color: var(--text-primary) !important;
   border-radius: var(--radius-lg) !important;
   border: none !important;
+  min-height: 96rpx; /* iPad */
 }
 
 .custom-cell::after {
@@ -218,6 +219,8 @@ swiper-item {
 .custom-cell .van-field__control {
   color: var(--text-primary) !important;
   font-size: 32rpx !important;
+  line-height: 1.6;
+  min-height: 40rpx;
 }
 
 /* ============================================
