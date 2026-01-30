@@ -96,6 +96,11 @@
   transition: all 0.2s ease !important;
 }
 
+/* 去除 t-cell 下划线 */
+.custom-cell::after {
+  display: none !important;
+}
+
 .custom-cell:active {
   transform: scale(0.995);
   box-shadow: var(--shadow-md) !important;
@@ -110,6 +115,7 @@
 .custom-cell .t-cell__title {
   color: var(--text-primary) !important;
   font-weight: 500 !important;
+  font-size: 32rpx !important;
 }
 
 /* Cell 箭头 */
@@ -359,6 +365,23 @@ t-action-sheet {
   border-top: 1px solid var(--border-light) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+/* Dark 模式下 tab bar 选中状态颜色与 light 模式一致 */
+.theme-dark .t-tab-bar-item.t-is-active {
+  color: var(--primary) !important;
+}
+
+.theme-dark .t-tab-bar-item .t-tab-bar-item__content--checked .t-icon {
+  color: var(--primary) !important;
+}
+
+.theme-dark .t-tab-bar .t-tab-bar-item--active {
+  color: var(--primary) !important;
+}
+
+.theme-dark .t-tab-bar .t-tab-bar-item__content--checked .t-icon {
+  color: var(--primary) !important;
 }
 
 /* ============================================

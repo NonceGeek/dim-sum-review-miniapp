@@ -108,6 +108,11 @@ page {
   transition: all 0.2s ease !important;
 }
 
+/* 去除 t-cell 下划线 */
+.t-cell::after {
+  display: none !important;
+}
+
 .t-cell:active {
   transform: scale(0.995);
   box-shadow: var(--shadow-md) !important;
@@ -122,6 +127,7 @@ page {
 .t-cell .t-cell__title {
   color: var(--text-primary) !important;
   font-weight: 500 !important;
+  font-size: 32rpx !important;
 }
 
 /* Cell 箭头 */

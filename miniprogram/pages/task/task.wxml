@@ -4,11 +4,11 @@
 <swiper indicator-dots="{{false}}" autoplay="{{false}}" indicator-type="expand" transformer-type="scaleAndFade" circular="false" interval="3000" duration="500" class="swiper-component" bindchange="onSwiperChange">
   <block wx:for="{{taskDetail}}" wx:for-item="task" wx:for-index="tIndex" wx:key="tIndex">
     <swiper-item>
+      <!-- 固定在顶部的 header-word -->
+      <view class="header-word-fixed">{{task.data}}</view>
       <scroll-view scroll-y class="scroll">
         <!-- Header -->
         <view class="header">
-          <view class="header-word">{{task.data}}</view>
-          <view class="header-subtitle">{{task.sentenseText}}</view>
           <view class="header-option">
             <text class="source">选项{{tIndex + 1}}</text>
             <text class="source-name">{{ status === 'completed' ? "任务":"数据"}}来源：{{task.source_name}}</text>
@@ -20,82 +20,140 @@
             <t-collapse-panel value="card_{{index}}" header="{{cp.jyutping}}">
               <!-- 粤语 pronunciations -->
               <view class="group-wrapper">
-                <van-cell-group inset>
-                  <van-field label="粤音：" size="large" type="textarea" autosize label-class="field-class" custom-class="custom-cell" value="{{cp.jyutping}}" data-field="cantonesePronunciations" data-index="{{index}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入粤音" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                    <van-icon wx:if="{{(cp.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" bind:tap="onDeleteBlock" />
+                <van-cell-group>
+                  <van-field border="{{false}}" label="粤音：" size="large" type="textarea" autosize label-class="field-class" custom-class="custom-cell" value="{{cp.jyutping}}" data-field="cantonesePronunciations" data-index="{{index}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入粤音" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                    <van-icon wx:if="{{(cp.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" bind:tap="onDeleteBlock" />
                   </van-field>
                 </van-cell-group>
               </view>
               <block wx:for="{{cp.blocks}}" wx:for-item="blk" wx:for-index="blkIndex" wx:key="blkIndex">
                 <block wx:if="{{blk.type === 'phrase'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
-                      <van-field label="词组：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="phrase" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入词组" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                    <van-cell-group>
+                      <van-field border="{{false}}" label="词组：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="phrase" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入词组" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
                   </view>
                 </block>
                 <block wx:if="{{blk.type === 'definition'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
-                      <van-field label="解释：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="definition" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入解释" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                    <van-cell-group>
+                      <van-field border="{{false}}" label="解释：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="definition" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入解释" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
                   </view>
                 </block>
                 <block wx:if="{{blk.type === 'sentence'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
-                      <van-field label="例句：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="sentence" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入例句" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                    <van-cell-group>
+                      <van-field border="{{false}}" label="例句：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="sentence" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入例句" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
                   </view>
                 </block>
                 <block wx:if="{{blk.type === 'introduction'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
-                      <van-field label="介绍：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="introduction" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入介绍" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                    <van-cell-group>
+                      <van-field border="{{false}}" label="介绍：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="introduction" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入介绍" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
                   </view>
                 </block>
                 <block wx:if="{{blk.type === 'other'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
-                      <van-field label="其他：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="other" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入其他" title-width="85px" readonly="{{status === 'completed' || !task.canEdit}}">
-                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                    <van-cell-group>
+                      <van-field border="{{false}}" label="其他：" size="large" type="textarea" autosize custom-class="custom-cell" value="{{blk.content}}" data-field="other" data-parentIndex="{{index}}" data-index="{{blkIndex}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入其他" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                        <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                       </van-field>
                     </van-cell-group>
                   </view>
                 </block>
                 <block wx:if="{{blk.type === 'audio'}}">
                   <view class="group-wrapper">
-                    <van-cell-group inset>
+                    <van-cell-group>
                       <view class="audio-container custom-cell">
                         <view class="audio-label">音频：</view>
                         <view class="audio-content">
                           <view class="audio-controls">
-                            <view class="record-btn {{recording ? 'recording' : ''}}" bind:touchstart="{{status !== 'completed' || task.canEdit ? 'onStartRecord' : ''}}" bind:touchend="{{status !== 'completed' || task.canEdit ? 'onStopRecord' : ''}}" catchtap="onPlayAudio" data-url="{{blk.url}}" data-card-index="{{index}}" data-block-index="{{blkIndex}}">
+                            <view class="record-btn {{recording ? 'recording' : ''}}" bind:touchstart="{{status !== 'completed' && task.canEdit ? 'onStartRecord' : ''}}" bind:touchmove="{{status !== 'completed' && task.canEdit ? 'onRecordTouchMove' : ''}}" bind:touchend="{{status !== 'completed' && task.canEdit ? 'onStopRecord' : ''}}" catchtap="onPlayAudio" data-url="{{blk.url}}" data-card-index="{{index}}" data-block-index="{{blkIndex}}">
                               <van-icon name="{{status === 'completed' || blk.url ? 'play-circle-o' : 'volume-o'}}" size="20px" custom-class="mic-icon" />
-                              <text class="record-text">{{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 按住重录' : '按住 说话'))}}</text>
+                              <text class="record-text">{{status === 'completed' || !task.canEdit ? '点击播放' : (recording ? '松开 结束' : (blk.url ? '点击播放 / 长按录音' : '按住 说话'))}}</text>
                             </view>
                           </view>
                           <!-- 删除按钮 -->
                           <view class="audio-delete">
-                            <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
+                            <van-icon wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" data-block-index="{{blkIndex}}" bind:tap="onDeleteBlock" />
                           </view>
                         </view>
                       </view>
                     </van-cell-group>
                   </view>
                 </block>
+                <block wx:if="{{blk.type === 'emotion'}}">
+                  <view class="group-wrapper">
+                    <van-cell-group>
+                      <van-field
+                        border="{{false}}"
+                        label="情感："
+                        size="large"
+                        custom-class="custom-cell"
+                        value="{{blk.category}}"
+                        placeholder="请选择情感"
+                        title-width="140rpx"
+                        readonly
+                        clickable
+                        bind:click-input="onShowPicker"
+                        data-picker-type="emotion"
+                        data-card-index="{{index}}"
+                        data-block-index="{{blkIndex}}">
+                        <van-icon
+                          wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}"
+                          slot="button"
+                          name="cross"
+                          size="16px"
+                          custom-class="delete-icon"
+                          data-card-index="{{index}}"
+                          data-block-index="{{blkIndex}}"
+                          catchtap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                  <view class="group-wrapper">
+                    <van-cell-group>
+                      <van-field
+                        border="{{false}}"
+                        label="情感强度："
+                        size="large"
+                        custom-class="custom-cell"
+                        value="{{blk.intensity}}"
+                        placeholder="请选择情感强度"
+                        title-width="140rpx"
+                        readonly
+                        clickable
+                        bind:click-input="onShowPicker"
+                        data-picker-type="intensity"
+                        data-card-index="{{index}}"
+                        data-block-index="{{blkIndex}}">
+                        <van-icon
+                          wx:if="{{(blk.new === true || corpus.canDelete) && status !== 'completed' && task.canEdit}}"
+                          slot="button"
+                          name="cross"
+                          size="16px"
+                          custom-class="delete-icon"
+                          data-card-index="{{index}}"
+                          data-block-index="{{blkIndex}}"
+                          catchtap="onDeleteBlock" />
+                      </van-field>
+                    </van-cell-group>
+                  </view>
+                </block>
               </block>
               <!-- 原始内容的长按触发区域 - 只在最后一个 card 显示 -->
-              <view class="group-wrapper flex" wx:if="{{index === task.record.data.length - 1 && status !== 'completed' && task.canEdit}}" bind:longpress="onLongPressOriginal">
+              <view class="flex" wx:if="{{status !== 'completed' && task.canEdit}}" bind:longpress="onLongPressOriginal" data-index="{{index}}">
                 <view class="longpress-view">长按此处添加更多内容</view>
               </view>
             </t-collapse-panel>
@@ -103,20 +161,20 @@
         </t-collapse>
         <!-- 已完成状态信息 -->
         <block wx:if="{{status === 'completed'}}">
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell" title-width="85px" />
+          <view class="group-wrapper group-wrapper-no-style">
+            <van-cell-group>
+              <van-cell title="处理时间：" value="{{completedAt}}" size="large" custom-class="custom-cell" title-width="160rpx" />
             </van-cell-group>
           </view>
-          <view class="group-wrapper">
-            <van-cell-group inset>
-              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="85px" />
+          <view class="group-wrapper group-wrapper-no-style">
+            <van-cell-group>
+              <van-cell title="状态：" value="已处理" size="large" custom-class="custom-cell" title-width="140rpx" />
             </van-cell-group>
           </view>
         </block>
         <!-- 新增粤音按钮 -->
         <view class="btn-add-group" wx:if="{{status !== 'completed' && task.canEdit}}">
-          <t-button theme="default" variant="outline" shape="round" size="small" bind:tap="onAddNewCantonese">
+          <t-button theme="primary" shape="round" bind:tap="onAddNewCantonese" class="btn-submit-inner">
             <van-icon name="plus" custom-class="add-item-icon" />
             新增粤音
           </t-button>
@@ -136,6 +194,10 @@
     </t-cell-group>
   </view>
 </t-popup>
+<!-- 情感/强度选择器 -->
+<van-popup show="{{ showEmotionPicker }}" position="bottom" bind:close="onEmotionPickerClose">
+  <van-picker  show-toolbar title="{{ pickerType === 'emotion' ? '情感' : '情感强度' }}" columns="{{ pickerType === 'emotion' ? emotions : intensityLevels }}" bind:confirm="onEmotionConfirm" bind:cancel="onEmotionPickerClose" />
+</van-popup>
 <block wx:if="{{status !== 'completed' && taskDetail.length > 0}}">
   <view class="info-text">
     <van-icon name="warning-o" custom-class="info-icon" />
@@ -145,15 +207,15 @@
 <!-- 自定义指示点 -->
 <view class="custom-dots" wx:if="{{status !== 'completed'}}">
   <view wx:for="{{taskDetail}}" wx:for-index="index" wx:key="index" class="dot {{index === currentIndex ? 'active' : ''}}"></view>
-  <van-icon wx:if="{{corpus.canAdd}}" name="add" size="36px" bind:click="onAddClick" custom-class="add-icon {{hidden ? 'hide' : ''}}" />
+  <van-icon wx:if="{{corpus.canAdd && !hidden}}" name="add" size="36px" bind:click="onAddClick" custom-class="add-icon" />
 </view>
 <!-- 底部按钮 -->
 <view class="footer" wx:if="{{status !== 'completed'}}">
-  <van-button type="default" round bind:click="onCancel" class="btn-cancel" custom-class="btn-cancel-inner">
+  <t-button theme="default" shape="round" bind:tap="onCancel" class="btn-cancel btn-cancel-inner">
     不处理
-  </van-button>
-  <van-button type="default" round bind:click="onSubmit" class="btn-submit" custom-class="btn-submit-inner" disabled="{{!canSubmit}}">
+  </t-button>
+  <t-button theme="default" shape="round" bind:tap="onSubmit" class="btn-submit btn-submit-inner" disabled="{{!canSubmit}}">
     正确
-  </van-button>
+  </t-button>
 </view>
 </view>

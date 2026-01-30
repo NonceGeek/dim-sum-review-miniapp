@@ -101,8 +101,11 @@ Page({
       { label: "解释", value: "definition", placeholder: "请输入解释" },
       { label: "介绍", value: "introduction", placeholder: "请输入介绍" },
       { label: "音频", value: "audio", placeholder: "请输入音频" },
+      { label: "情感", value: "emotion", placeholder: "请输入情感及情感强度" },
       { label: "其他", value: "other", placeholder: "请输入其他" },
     ],
+    //长按添加内容选择index
+    longPressIndex: -1,
     expandedValues: [] as string[],
     // 录音相关状态
     recording: false,
@@ -111,11 +114,38 @@ Page({
     currentAudioPath: "",
     touchStartTime: 0, // 记录 touchstart 时间戳
     touchStartTimer: null as number | null, // touchstart 延迟定时器
+    touchStartX: 0, // 记录 touchstart 的 X 坐标
+    touchStartY: 0, // 记录 touchstart 的 Y 坐标
     justFinishedRecording: false, // 刚完成录音标志
     // 提交按钮状态
     canSubmit: false,
     // 编辑权限
     corpus: {} as { canEdit?: string[]; canAdd?: boolean; canDelete?: boolean },
+    // 情感选项
+    emotions: [
+      "愤怒（angry）",
+      "恐惧（fear）",
+      "高兴（happy）",
+      "中性（neutral）",
+      "悲伤（sad）",
+      "惊讶（surprise）",
+      "活泼（lively）",
+      "困惑（confused）",
+      "担心（worry）",
+      "厌恶（disgust）",
+      "焦虑（anxious）",
+      "正直（upright）",
+      "冷漠（clam）",
+      "温柔（gentle）",
+      "兴奋（excited）",
+      "稳重（steady）",
+    ],
+    intensityLevels: ["弱", "较弱", "一般", "较强", "强"],
+    // 情感选择器状态
+    showEmotionPicker: false,
+    pickerType: "", // "emotion" 或 "intensity"
+    currentEmotionCardIndex: -1,
+    currentEmotionBlockIndex: -1,
   },
 
   addBlock(type: string) {
@@ -147,6 +177,12 @@ Page({
         new: true,
         type: "introduction",
         content: "",
+      }),
+      emotion: () => ({
+        new: true,
+        type: "emotion",
+        category: "",
+        intensity: "",
       }),
       other: () => ({
         new: true,
@@ -262,6 +298,8 @@ Page({
 
       wx.hideLoading();
       console.log("entity:", entity);
+      console.log("resolvedAt 原始值:", data.resolvedAt, "类型:", typeof data.resolvedAt);
+
       this.setData(
         {
           taskDetail: entity,
@@ -367,18 +405,26 @@ Page({
     const currentIndex = this.data.currentIndex;
     const taskDetail = this.data.taskDetail;
 
+    // 检查情感数据完整性
+    const isEmotionValid = this.checkEmotion();
+    if (!isEmotionValid) {
+      return; // 验证失败，阻止提交
+    }
+
     // 深拷贝，避免修改原数据
     const preSubmit = JSON.parse(JSON.stringify(taskDetail[currentIndex]));
     console.log("preSubmit.suggestions:", preSubmit.suggestions);
 
     // 过滤掉空的blocks（既没有content也没有url）
     if (preSubmit.record && preSubmit.record.data) {
-      preSubmit.record.data = preSubmit.record.data.map((c) => ({
-        ...c,
-        blocks: c.blocks.filter(
-          (b) => (b.content && b.content.trim()) || (b.url && b.url.trim()),
-        ),
-      }));
+      preSubmit.record.data = preSubmit.record.data
+        .map((c) => ({
+          ...c,
+          blocks: c.blocks.filter(
+            (b) => (b.content && b.content.trim()) || (b.url && b.url.trim()),
+          ),
+        }))
+        .filter((c) => c.jyutping);
     }
 
     const submitData = { ...preSubmit.suggestions, record: preSubmit.record };
@@ -521,6 +567,17 @@ Page({
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex]),
     );
+
+    const verifyJyutping = currentTask.record.data.every((b) => b.jyutping);
+    if (!verifyJyutping) {
+      wx.showToast({
+        title: "请输入粤拼",
+        icon: "none",
+        duration: 2000,
+      });
+      return;
+    }
+
     if (!currentTask.record) {
       currentTask.record = { data: [] };
     } else if (!currentTask.record.data) {
@@ -549,6 +606,7 @@ Page({
     this.setData({
       showPopup: true,
       currentCustomId: "original",
+      longPressIndex: e.currentTarget.dataset.index,
     });
   },
   onOriginalBaseFieldChange(e: any) {
@@ -573,11 +631,11 @@ Page({
 
     // 粤拼字段验证：只允许输入英文和数字
     if (field === "cantonesePronunciations" && value) {
-      // 检查是否只包含英文字母和数字
-      const alphanumericRegex = /^[a-zA-Z0-9 ]+$/;
+      // 检查是否只包含英文字母和数字，逗号，英文句号，空格
+      const alphanumericRegex = /^[a-zA-Z0-9 ,.]+$/;
       if (!alphanumericRegex.test(value)) {
         wx.showToast({
-          title: "粤拼只能输入英文和数字",
+          title: "粤音只能输入英文和数字，英文逗号句号和空格",
           icon: "none",
           duration: 2000,
         });
@@ -597,6 +655,12 @@ Page({
     if (field === "cantonesePronunciations") {
       // 处理粤音
       currentTask.record.data[index].jyutping = value;
+    } else if (field === "emotionContent") {
+      // 处理情感描述
+      currentTask.record.data[parentindex].blocks[index]["content"] = value;
+    } else if (field === "emotionIntensity") {
+      // 处理情感强度
+      currentTask.record.data[parentindex].blocks[index]["intensity"] = value;
     } else if (index !== undefined && parentindex !== undefined) {
       // 处理数组字段
       currentTask.record.data[parentindex].blocks[index]["content"] = value;
@@ -622,7 +686,7 @@ Page({
   onPopupSelect(e: any) {
     const { value } = e.currentTarget.dataset;
     console.log("value:", value);
-    const { currentIndex, taskDetail } = this.data;
+    const { currentIndex, taskDetail, longPressIndex } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex]),
@@ -636,7 +700,7 @@ Page({
       return;
     }
 
-    currentTask.record.data.at(-1).blocks.push(this.addBlock(value));
+    currentTask.record.data[longPressIndex].blocks.push(this.addBlock(value));
     console.log("currentTask:", currentTask);
     updatedTaskDetail[currentIndex] = currentTask;
 
@@ -698,10 +762,16 @@ Page({
   // 开始录音
   onStartRecord(e: any) {
     const { cardIndex, blockIndex } = e.currentTarget.dataset;
+    const touch = e.touches[0];
+
     console.log("开始录音", cardIndex, blockIndex);
 
-    // 记录 touchstart 时间戳
-    this.setData({ touchStartTime: Date.now() });
+    // 记录 touchstart 时间戳和位置
+    this.setData({
+      touchStartTime: Date.now(),
+      touchStartX: touch.clientX,
+      touchStartY: touch.clientY,
+    });
 
     // 清除之前的定时器
     if (this.data.touchStartTimer) {
@@ -714,6 +784,45 @@ Page({
     }, 200) as unknown as number;
 
     this.setData({ touchStartTimer: timer });
+  },
+
+  // 录音按钮触摸移动，取消录音
+  onRecordTouchMove(e: any) {
+    const touch = e.touches[0];
+
+    // 计算移动距离
+    const deltaX = Math.abs(touch.clientX - this.data.touchStartX);
+    const deltaY = Math.abs(touch.clientY - this.data.touchStartY);
+
+    // 只有移动超过 15px 才认为是滑动，取消录音
+    if (deltaX > 15 || deltaY > 15) {
+      console.log("检测到滑动，取消录音", deltaX, deltaY);
+
+      // 清除延迟定时器，取消即将开始的录音
+      if (this.data.touchStartTimer) {
+        clearTimeout(this.data.touchStartTimer);
+        this.setData({ touchStartTimer: null });
+      }
+
+      // 如果正在录音，停止录音
+      if (this.data.recording) {
+        const recorderManager = (this as any).recorderManager;
+        if (recorderManager) {
+          recorderManager.stop();
+        }
+        this.setData({
+          recording: false,
+          recordTime: 0,
+        });
+        // 清除录音计时器
+        if (this.data.recordTimer) {
+          clearInterval(this.data.recordTimer);
+          this.setData({ recordTimer: null });
+        }
+        // 隐藏 toast
+        wx.hideToast();
+      }
+    }
   },
 
   checkAndStartRecord(cardIndex: number, blockIndex: number) {
@@ -742,6 +851,8 @@ Page({
   },
 
   doStartRecord(cardIndex: number, blockIndex: number) {
+    console.log("真正开始录音", cardIndex, blockIndex);
+
     this.setData({
       recording: true,
       recordTime: 0,
@@ -783,10 +894,11 @@ Page({
   // 停止录音
   onStopRecord(e: any) {
     const { cardIndex, blockIndex } = e.currentTarget.dataset;
-    console.log("停止录音", cardIndex, blockIndex);
+    console.log("停止录音被调用", cardIndex, blockIndex, "当前录音状态:", this.data.recording);
 
     // 清除 touchstart 延迟定时器
     if (this.data.touchStartTimer) {
+      console.log("清除延迟定时器");
       clearTimeout(this.data.touchStartTimer);
       this.setData({ touchStartTimer: null });
     }
@@ -938,5 +1050,133 @@ Page({
     );
 
     this.setData({ canSubmit: hasValidJyutping });
+  },
+
+  // 显示选择器
+  onShowPicker(e: any) {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    const { pickerType, cardIndex, blockIndex } = e.currentTarget.dataset;
+    console.log(
+      "显示选择器 - 类型:",
+      pickerType,
+      "cardIndex:",
+      cardIndex,
+      "blockIndex:",
+      blockIndex,
+    );
+
+    this.setData({
+      showEmotionPicker: true,
+      pickerType: pickerType,
+      currentEmotionCardIndex: cardIndex,
+      currentEmotionBlockIndex: blockIndex,
+    });
+  },
+
+  // 关闭选择器
+  onEmotionPickerClose() {
+    this.setData({
+      showEmotionPicker: false,
+      pickerType: "",
+      currentEmotionCardIndex: -1,
+      currentEmotionBlockIndex: -1,
+    });
+  },
+
+  // 确认选择
+  onEmotionConfirm(e: any) {
+    const { value } = e.detail;
+    const {
+      currentIndex,
+      taskDetail,
+      currentEmotionCardIndex,
+      currentEmotionBlockIndex,
+      pickerType,
+    } = this.data;
+
+    if (currentEmotionCardIndex === -1 || currentEmotionBlockIndex === -1) {
+      return;
+    }
+
+    const updatedTaskDetail = [...taskDetail];
+    const currentTask = JSON.parse(
+      JSON.stringify(updatedTaskDetail[currentIndex]),
+    );
+
+    if (!currentTask.record || !currentTask.record.data) {
+      return;
+    }
+
+    // 根据类型更新对应字段
+    if (pickerType === "emotion") {
+      currentTask.record.data[currentEmotionCardIndex].blocks[
+        currentEmotionBlockIndex
+      ].category = value;
+    } else if (pickerType === "intensity") {
+      currentTask.record.data[currentEmotionCardIndex].blocks[
+        currentEmotionBlockIndex
+      ].intensity = value;
+    }
+
+    updatedTaskDetail[currentIndex] = currentTask;
+
+    this.setData(
+      {
+        taskDetail: updatedTaskDetail,
+        showEmotionPicker: false,
+        pickerType: "",
+        currentEmotionCardIndex: -1,
+        currentEmotionBlockIndex: -1,
+      },
+      () => {
+        this.checkCanSubmit();
+      },
+    );
+  },
+  checkEmotion() {
+    const { currentIndex, taskDetail } = this.data;
+    const currentTask = taskDetail[currentIndex];
+
+    if (!currentTask || !currentTask.record || !currentTask.record.data) {
+      return;
+    }
+
+    // 检查是否所有 block 都有完整的情感数据（要么都填，要么都不填）
+    const allBlocksValid = currentTask.record.data
+      .map((c: any) => ({
+        ...c,
+        blocks: c.blocks.filter(
+          (b: any) =>
+            (b.content && b.content.trim()) || (b.url && b.url.trim()),
+        ),
+      }))
+      .filter((c: any) => c.jyutping)
+      .every((card: any) =>
+        card.blocks.every((block: any) => {
+          if (block.category) {
+            return block.intensity !== undefined && block.intensity !== "";
+          }
+          if (block.intensity) {
+            return block.category !== undefined && block.category !== "";
+          }
+          return true;
+        }),
+      );
+
+    console.log("所有 block 验证结果:", allBlocksValid);
+
+    if (!allBlocksValid) {
+      wx.showToast({
+        title: "请完整填写情感和情感强度",
+        icon: "none",
+        duration: 2000,
+      });
+      return false;
+    }
+
+    return true;
   },
 });

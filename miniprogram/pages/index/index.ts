@@ -290,7 +290,7 @@ Page({
     this.setData({
       theme: params.theme,
       currentTheme: params.theme,
-      tabBarColor: params.theme === 'dark' ? ['#8B949E', '#5D8CF5'] : ['#94A3B8', '#4A7CF3'],
+      tabBarColor: params.theme === 'dark' ? ['#8B949E', '#4A7CF3'] : ['#94A3B8', '#4A7CF3'],
     });
   },
 });
