@@ -98,8 +98,8 @@ swiper-item {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  margin-top: 36rpx;
-  padding: 16rpx 32rpx;
+  margin-top: 52rpx;
+  padding: 50rpx 32rpx;
   min-height: auto;
   display: block;
   backdrop-filter: blur(20px);
@@ -402,7 +402,7 @@ swiper-item {
 }
 
 .add-item-icon {
-  color: var(--bg-card) !important;
+  color: #fff !important;
   margin-right: 8rpx;
 }
 
@@ -497,7 +497,7 @@ swiper-item {
   border: none;
   border-radius: var(--radius-full);
   margin: 20rpx 0;
-  color: var(--bg-card);
+  color: #fff;
   text-align: center;
   font-size: 28rpx;
   display: flex;

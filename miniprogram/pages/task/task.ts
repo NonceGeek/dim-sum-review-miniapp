@@ -1,3 +1,4 @@
+import ENV from "../../config/setting";
 import { ITaskDetail } from "../../types/task";
 import { add8Hours } from "../../utils/date";
 import request, { public_request } from "../../utils/http";
@@ -298,7 +299,12 @@ Page({
 
       wx.hideLoading();
       console.log("entity:", entity);
-      console.log("resolvedAt 原始值:", data.resolvedAt, "类型:", typeof data.resolvedAt);
+      console.log(
+        "resolvedAt 原始值:",
+        data.resolvedAt,
+        "类型:",
+        typeof data.resolvedAt,
+      );
 
       this.setData(
         {
@@ -894,7 +900,13 @@ Page({
   // 停止录音
   onStopRecord(e: any) {
     const { cardIndex, blockIndex } = e.currentTarget.dataset;
-    console.log("停止录音被调用", cardIndex, blockIndex, "当前录音状态:", this.data.recording);
+    console.log(
+      "停止录音被调用",
+      cardIndex,
+      blockIndex,
+      "当前录音状态:",
+      this.data.recording,
+    );
 
     // 清除 touchstart 延迟定时器
     if (this.data.touchStartTimer) {
@@ -939,34 +951,112 @@ Page({
     filePath: string,
     duration: number,
   ) {
-    console.log("临时录音路径:", filePath);
+    console.log("开始上传音频到OSS:", filePath);
 
-    const { currentIndex, taskDetail } = this.data;
-    const updatedTaskDetail = [...taskDetail];
-    const currentTask = JSON.parse(
-      JSON.stringify(updatedTaskDetail[currentIndex]),
-    );
-
-    if (!currentTask.record || !currentTask.record.data) {
-      return;
-    }
-
-    // iOS 临时文件可以直接播放，不需要保存
-    currentTask.record.data[cardIndex].blocks[blockIndex].url = filePath;
-    currentTask.record.data[cardIndex].blocks[blockIndex].duration = Math.floor(
-      duration / 1000,
-    );
-
-    updatedTaskDetail[currentIndex] = currentTask;
-
-    this.setData({
-      taskDetail: updatedTaskDetail,
+    wx.showLoading({
+      title: "上传中...",
+      mask: true,
     });
 
-    wx.showToast({
-      title: "录音完成",
-      icon: "success",
-      duration: 1500,
+    const token = wx.getStorageSync("accessToken") || "";
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + -1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const dateStr = `${year}${month}${day}`;
+    const timestamp = Date.now();
+    const taskId = this.data.taskId || "unknown";
+    wx.uploadFile({
+      url: `${ENV.API_BASE_URL}/upload`,
+      filePath: filePath,
+      name: "file",
+      formData: {
+        taskId: taskId,
+        filename: `${dateStr}_${taskId}_${timestamp}.mp3`,
+      },
+      header: {
+        Authorization: `Bearer ${token}`,
+      },
+      success: (uploadRes) => {
+        wx.hideLoading();
+
+        const statusCode = uploadRes.statusCode;
+        console.log("上传响应:", uploadRes);
+
+        if (statusCode === 200 || statusCode === 201) {
+          let data;
+          try {
+            data = JSON.parse(uploadRes.data);
+          } catch (e) {
+            console.error("解析响应失败:", uploadRes.data);
+            wx.showToast({
+              title: "上传失败",
+              icon: "error",
+              duration: 2000,
+            });
+            return;
+          }
+
+          // 获取服务器返回的音频URL
+          const serverUrl = data.url || data.data?.url;
+
+          if (!serverUrl) {
+            console.error("服务器未返回URL:", data);
+            wx.showToast({
+              title: "上传失败",
+              icon: "error",
+              duration: 2000,
+            });
+            return;
+          }
+
+          console.log("服务器返回的音频URL:", serverUrl);
+
+          const { currentIndex, taskDetail } = this.data;
+          const updatedTaskDetail = [...taskDetail];
+          const currentTask = JSON.parse(
+            JSON.stringify(updatedTaskDetail[currentIndex]),
+          );
+
+          if (!currentTask.record || !currentTask.record.data) {
+            console.error("record或record.data不存在");
+            return;
+          }
+
+          // 使用服务器返回的真实URL
+          currentTask.record.data[cardIndex].blocks[blockIndex].url = serverUrl;
+          currentTask.record.data[cardIndex].blocks[blockIndex].duration =
+            Math.floor(duration / 1000);
+
+          updatedTaskDetail[currentIndex] = currentTask;
+
+          this.setData({
+            taskDetail: updatedTaskDetail,
+          });
+
+          wx.showToast({
+            title: "录音完成",
+            icon: "success",
+            duration: 1500,
+          });
+        } else {
+          console.error("上传失败，状态码:", statusCode);
+          wx.showToast({
+            title: "上传失败",
+            icon: "error",
+            duration: 2000,
+          });
+        }
+      },
+      fail: (err) => {
+        wx.hideLoading();
+        console.error("上传失败:", err);
+        wx.showToast({
+          title: "上传失败",
+          icon: "error",
+          duration: 2000,
+        });
+      },
     });
   },
 
