@@ -961,7 +961,7 @@ Page({
     const token = wx.getStorageSync("accessToken") || "";
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + -1).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
     const day = String(now.getDate()).padStart(2, "0");
     const dateStr = `${year}${month}${day}`;
     const timestamp = Date.now();
@@ -972,7 +972,7 @@ Page({
       name: "file",
       formData: {
         taskId: taskId,
-        filename: `${dateStr}_${taskId}_${timestamp}.mp3`,
+        fileName: `${dateStr}_${taskId}_${timestamp}.mp3`,
       },
       header: {
         Authorization: `Bearer ${token}`,
