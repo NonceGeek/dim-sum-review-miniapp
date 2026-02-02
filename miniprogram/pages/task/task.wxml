@@ -106,7 +106,7 @@
                         title-width="140rpx"
                         readonly
                         clickable
-                        bind:click-input="onShowPicker"
+                        bind:click-input="{{status !== 'completed' && task.canEdit ? 'onShowPicker' :''}}"
                         data-picker-type="emotion"
                         data-card-index="{{index}}"
                         data-block-index="{{blkIndex}}">
@@ -134,7 +134,7 @@
                         title-width="140rpx"
                         readonly
                         clickable
-                        bind:click-input="onShowPicker"
+                        bind:click-input="{{status !== 'completed' && task.canEdit ? 'onShowPicker': ''}}"
                         data-picker-type="intensity"
                         data-card-index="{{index}}"
                         data-block-index="{{blkIndex}}">

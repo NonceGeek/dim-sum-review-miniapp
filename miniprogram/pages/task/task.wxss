@@ -484,6 +484,11 @@ swiper-item {
   background: transparent !important;
 }
 
+/* 去除选中区域上下白线 */
+.van-picker__frame {
+  display: none !important;
+}
+
 .van-picker-column__item {
   color: var(--text-secondary) !important;
   opacity: 0.4;
