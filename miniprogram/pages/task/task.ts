@@ -427,7 +427,11 @@ Page({
         .map((c) => ({
           ...c,
           blocks: c.blocks.filter(
-            (b) => (b.content && b.content.trim()) || (b.url && b.url.trim()),
+            (b) =>
+              (b.content && b.content.trim()) ||
+              (b.url && b.url.trim()) ||
+              b.category ||
+              b.intensity,
           ),
         }))
         .filter((c) => c.jyutping);
@@ -1199,7 +1203,7 @@ Page({
     if (!currentTask.record || !currentTask.record.data) {
       return;
     }
-
+    console.log('currentTask.record.data[currentEmotionCardIndex].blocks[currentEmotionBlockIndex]:', currentTask.record.data[currentEmotionCardIndex].blocks[currentEmotionBlockIndex])
     // 根据类型更新对应字段
     if (pickerType === "emotion") {
       currentTask.record.data[currentEmotionCardIndex].blocks[
@@ -1212,7 +1216,7 @@ Page({
     }
 
     updatedTaskDetail[currentIndex] = currentTask;
-
+    console.log('updatedTaskDetail[currentIndex]:', updatedTaskDetail)
     this.setData(
       {
         taskDetail: updatedTaskDetail,

@@ -435,9 +435,23 @@ swiper-item {
 }
 
 /* ============================================
-   Vant Picker 样式
+   Vant Popup & Picker 样式
    ============================================ */
+.van-popup {
+  background-color: var(--bg-card) !important;
+}
+
 .van-picker {
+  background-color: var(--bg-card) !important;
+}
+
+/* Picker 列容器 */
+.van-picker__columns {
+  background-color: var(--bg-card) !important;
+}
+
+/* Picker 单列容器 */
+.van-picker-column {
   background-color: var(--bg-card) !important;
 }
 
@@ -736,7 +750,19 @@ swiper-item {
     background: rgba(239, 68, 68, 0.25);
   }
 
+  .van-popup {
+    background-color: var(--bg-card) !important;
+  }
+
   .van-picker {
+    background-color: var(--bg-card) !important;
+  }
+
+  .van-picker__columns {
+    background-color: var(--bg-card) !important;
+  }
+
+  .van-picker-column {
     background-color: var(--bg-card) !important;
   }
 
@@ -866,8 +892,20 @@ swiper-item {
   background-color: var(--bg-input) !important;
 }
 
-/* Vant Picker - 手动主题 */
+/* Vant Popup & Picker - 手动主题 */
+.van-popup.theme-dark {
+  background-color: var(--bg-card) !important;
+}
+
 .van-picker.theme-dark {
+  background-color: var(--bg-card) !important;
+}
+
+.van-picker.theme-dark .van-picker__columns {
+  background-color: var(--bg-card) !important;
+}
+
+.van-picker.theme-dark .van-picker-column {
   background-color: var(--bg-card) !important;
 }
 
