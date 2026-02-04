@@ -6,6 +6,9 @@
     </view>
     <view class="title">Dim Sum Review</view>
     <view class="subtitle">粤语数据标注校验平台</view>
+    <view class="info">
+      本小程序仅供已通过审核的内部标注员使用。未获得标注员资格的用户请勿登录。
+    </view>
   </view>
   <view class="login-box">
     <button class="login-btn" type="primary" bindtap="handleLogin" loading="{{loading}}">

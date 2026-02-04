@@ -76,11 +76,16 @@
   letter-spacing: -1rpx;
 }
 
-.subtitle {
+.subtitle, .info {
   font-size: 32rpx;
   color: var(--text-secondary);
   font-weight: 400;
 }
+
+.info {
+  margin: 20rpx 0 0 0;
+}
+
 
 .login-box {
   width: 100%;
