@@ -34,6 +34,8 @@ interface IAppOption {
   tryLogin(retries: number): Promise<string>;
   doLogin(): Promise<string>;
   logout(): void;
+  doSendSms(phone: string): Promise<any>;
+  doPhoneLogin(phone: string, code: string): Promise<string>;
   
   // 主题相关
   initTheme(): Promise<void>;

@@ -120,10 +120,60 @@
 
 /* 底部提示 */
 .login-hint {
-  margin-top: 40rpx;
+  margin: 40rpx 0;
   text-align: center;
   font-size: 24rpx;
   color: var(--text-muted);
+}
+
+/* ============================================
+   手机号登录弹窗样式
+   ============================================ */
+.phone-login-popup {
+  padding: 48rpx 32rpx 32rpx;
+  background: var(--bg-page);
+}
+
+.popup-header {
+  text-align: center;
+  margin-bottom: 48rpx;
+}
+
+.popup-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.popup-content {
+  margin-bottom: 48rpx;
+}
+
+.input-group {
+  margin-bottom: 32rpx;
+}
+
+.code-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.code-input {
+  flex: 1;
+}
+
+.send-code-btn {
+  flex-shrink: 0;
+  min-width: 180rpx;
+}
+
+.popup-footer {
+  margin-top: 32rpx;
+}
+
+.submit-btn {
+  width: 100%;
 }
 
 /* ============================================

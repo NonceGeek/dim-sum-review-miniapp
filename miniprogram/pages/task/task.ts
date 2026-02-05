@@ -28,7 +28,7 @@ function getSourceInfo(
   const category = categories.find((cat) => cat.name === source);
   return {
     source,
-    source_name: category ? category.nickname : SOURCE_NAME_DEFAULT,
+    source_name: category ? category.nickname : category.name,
   };
 }
 
@@ -537,7 +537,18 @@ Page({
       source: id,
       source_name: name,
       new: true,
+      canEdit: true,
+      record: {
+        data: [
+          {
+            new: true,
+            jyutping: "",
+            blocks: [this.addBlock("phrase"), this.addBlock("sentence")],
+          },
+        ],
+      },
     };
+
     const newTaskDetail = this.data.taskDetail;
     newTaskDetail.push(data);
     console.log("new:", newTaskDetail);
@@ -987,7 +998,7 @@ Page({
         const statusCode = uploadRes.statusCode;
         console.log("上传响应:", uploadRes);
 
-        if (statusCode === 200 || statusCode === 201) {
+        if (statusCode === 200) {
           let data;
           try {
             data = JSON.parse(uploadRes.data);
@@ -1046,7 +1057,7 @@ Page({
         } else {
           console.error("上传失败，状态码:", statusCode);
           wx.showToast({
-            title: "上传失败",
+            title: uploadRes.data.error || "上传失败",
             icon: "error",
             duration: 2000,
           });
@@ -1203,7 +1214,12 @@ Page({
     if (!currentTask.record || !currentTask.record.data) {
       return;
     }
-    console.log('currentTask.record.data[currentEmotionCardIndex].blocks[currentEmotionBlockIndex]:', currentTask.record.data[currentEmotionCardIndex].blocks[currentEmotionBlockIndex])
+    console.log(
+      "currentTask.record.data[currentEmotionCardIndex].blocks[currentEmotionBlockIndex]:",
+      currentTask.record.data[currentEmotionCardIndex].blocks[
+        currentEmotionBlockIndex
+      ],
+    );
     // 根据类型更新对应字段
     if (pickerType === "emotion") {
       currentTask.record.data[currentEmotionCardIndex].blocks[
@@ -1216,7 +1232,7 @@ Page({
     }
 
     updatedTaskDetail[currentIndex] = currentTask;
-    console.log('updatedTaskDetail[currentIndex]:', updatedTaskDetail)
+    console.log("updatedTaskDetail[currentIndex]:", updatedTaskDetail);
     this.setData(
       {
         taskDetail: updatedTaskDetail,

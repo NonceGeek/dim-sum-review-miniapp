@@ -5,8 +5,8 @@ import { public_request } from "./utils/http";
 let loginPromise: Promise<string> | null = null;
 
 // 主题类型定义
-export type ThemeMode = 'auto' | 'light' | 'dark';
-export type ThemeValue = 'light' | 'dark';
+export type ThemeMode = "auto" | "light" | "dark";
+export type ThemeValue = "light" | "dark";
 
 App({
   globalData: {
@@ -21,14 +21,14 @@ App({
 
   onLaunch(options: any) {
     console.log("小程序启动参数:", options);
-    
+
     // 初始化主题
     this.initTheme();
-    
+
     // 监听系统主题变化
     wx.onThemeChange((result) => {
-      console.log('系统主题变化:', result.theme);
-      if (this.globalData.themeMode === 'auto') {
+      console.log("系统主题变化:", result.theme);
+      if (this.globalData.themeMode === "auto") {
         this.applyTheme(result.theme as ThemeValue);
       }
     });
@@ -39,25 +39,25 @@ App({
    */
   async initTheme() {
     try {
-      const savedMode = await this.getStorage('themeMode') as ThemeMode;
+      const savedMode = (await this.getStorage("themeMode")) as ThemeMode;
       const systemInfo = wx.getSystemInfoSync();
-      const systemTheme = (systemInfo.theme || 'light') as ThemeValue;
-      
-      if (savedMode && ['auto', 'light', 'dark'].includes(savedMode)) {
+      const systemTheme = (systemInfo.theme || "light") as ThemeValue;
+
+      if (savedMode && ["auto", "light", "dark"].includes(savedMode)) {
         this.globalData.themeMode = savedMode;
-        if (savedMode === 'auto') {
+        if (savedMode === "auto") {
           this.applyTheme(systemTheme);
         } else {
           this.applyTheme(savedMode as ThemeValue);
         }
       } else {
         // 默认跟随系统
-        this.globalData.themeMode = 'auto';
+        this.globalData.themeMode = "auto";
         this.applyTheme(systemTheme);
       }
     } catch (e) {
-      console.error('初始化主题失败:', e);
-      this.applyTheme('light');
+      console.error("初始化主题失败:", e);
+      this.applyTheme("light");
     }
   },
 
@@ -66,29 +66,30 @@ App({
    */
   applyTheme(theme: ThemeValue) {
     this.globalData.theme = theme;
-    
+
     // 设置页面根节点的主题类
     const pages = getCurrentPages();
     pages.forEach((page: any) => {
-      if (typeof page.onThemeChange === 'function') {
+      if (typeof page.onThemeChange === "function") {
         page.onThemeChange({ theme });
       } else if (page.setData) {
         page.setData({ currentTheme: theme });
       }
     });
-    
+
     // 设置导航栏样式
-    const navBarStyle = theme === 'dark' 
-      ? { backgroundColor: '#161B22', frontColor: '#ffffff' }
-      : { backgroundColor: '#FFFFFF', frontColor: '#000000' };
-    
+    const navBarStyle =
+      theme === "dark"
+        ? { backgroundColor: "#161B22", frontColor: "#ffffff" }
+        : { backgroundColor: "#FFFFFF", frontColor: "#000000" };
+
     wx.setNavigationBarColor({
-      frontColor: navBarStyle.frontColor as '#ffffff' | '#000000',
+      frontColor: navBarStyle.frontColor as "#ffffff" | "#000000",
       backgroundColor: navBarStyle.backgroundColor,
-      animation: { duration: 300, timingFunc: 'easeInOut' }
+      animation: { duration: 300, timingFunc: "easeInOut" },
     });
-    
-    console.log('主题已应用:', theme);
+
+    console.log("主题已应用:", theme);
   },
 
   /**
@@ -110,16 +111,16 @@ App({
    */
   async setThemeMode(mode: ThemeMode) {
     this.globalData.themeMode = mode;
-    await this.setStorage('themeMode', mode);
-    
-    if (mode === 'auto') {
+    await this.setStorage("themeMode", mode);
+
+    if (mode === "auto") {
       const systemInfo = wx.getSystemInfoSync();
-      this.applyTheme((systemInfo.theme || 'light') as ThemeValue);
+      this.applyTheme((systemInfo.theme || "light") as ThemeValue);
     } else {
       this.applyTheme(mode as ThemeValue);
     }
-    
-    console.log('主题模式已设置:', mode);
+
+    console.log("主题模式已设置:", mode);
   },
 
   // 封装异步获取 storage
@@ -155,7 +156,10 @@ App({
         if (ENV.IS_REVIEW) {
           console.log("审核模式，使用 mock token");
           const mockToken = "review-token";
-          const mockUser: { nickname: string; avatar: string } = { nickname: "审核用户", avatar: "" };
+          const mockUser: { nickname: string; avatar: string } = {
+            nickname: "审核用户",
+            avatar: "",
+          };
           this.globalData.accessToken = mockToken;
           this.globalData.userInfo = mockUser as any;
           await Promise.all([
@@ -199,7 +203,7 @@ App({
     }
   },
 
-  // 执行登录
+  // 执行微信登录
   doLogin(): Promise<string> {
     wx.showLoading({ title: "登录中..." });
     return new Promise((resolve, reject) => {
@@ -218,31 +222,14 @@ App({
             success: async (resp) => {
               wx.hideLoading();
 
-              console.log("登录接口返回", resp.data); // 审核模式排查用
-
-              const { accessToken, refreshToken, user, allowedCorpora } =
-                (resp.data as any) || {};
-              if (!accessToken)
-                return reject(new Error("登录失败：未返回 token"));
-
-              const categories = await public_request("/corpus_categories");
-              // 更新全局状态
-              this.globalData.accessToken = accessToken;
-              this.globalData.refreshToken = refreshToken;
-              this.globalData.userInfo = user;
-              this.globalData.allowedCorpora = allowedCorpora;
-              this.globalData.categories = categories;
-              // 异步存储
-              await Promise.all([
-                this.setStorage("accessToken", accessToken),
-                this.setStorage("refreshToken", refreshToken),
-                this.setStorage("userInfo", user),
-                this.setStorage("allowedCorpora", allowedCorpora),
-                this.setStorage("categories", categories),
-              ]);
-
-              console.log("登录成功", user);
-              resolve(accessToken);
+              console.log("返回结果：", resp);
+              if (resp.statusCode !== 200) {
+                return reject(new Error(resp.data.error as string));
+              } else {
+                console.log("登录接口返回", resp.data); // 审核模式排查用
+                await this.handleLoginSuccess(resp.data);
+                resolve(this.globalData.accessToken);
+              }
             },
             fail: (err) => {
               wx.hideLoading();
@@ -256,6 +243,61 @@ App({
         },
       });
     });
+  },
+
+  // 执行手机号登录
+  doPhoneLogin(phone: string, smsCode: string): Promise<string> {
+    wx.showLoading({ title: "登录中..." });
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${ENV.API_BASE_URL}/auth/login`,
+        method: "POST",
+        data: { phoneNumber: phone, verificationCode: smsCode },
+        timeout: 15000,
+        success: async (resp) => {
+          wx.hideLoading();
+
+          console.log("手机号登录返回结果：", resp);
+          if (resp.statusCode !== 200) {
+            return reject(new Error(resp.data.error as string));
+          } else {
+            console.log("登录接口返回", resp.data);
+            await this.handleLoginSuccess(resp.data);
+            resolve(this.globalData.accessToken);
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading();
+          reject(err);
+        },
+      });
+    });
+  },
+
+  // 处理登录成功后的公共逻辑
+  async handleLoginSuccess(data: any) {
+    const { accessToken, refreshToken, user, allowedCorpora } = data || {};
+    if (!accessToken) throw new Error("登录失败：未返回 token");
+
+    const categories = await public_request("/corpus_categories");
+
+    // 更新全局状态
+    this.globalData.accessToken = accessToken;
+    this.globalData.refreshToken = refreshToken;
+    this.globalData.userInfo = user;
+    this.globalData.allowedCorpora = allowedCorpora;
+    this.globalData.categories = categories;
+
+    // 异步存储
+    await Promise.all([
+      this.setStorage("accessToken", accessToken),
+      this.setStorage("refreshToken", refreshToken),
+      this.setStorage("userInfo", user),
+      this.setStorage("allowedCorpora", allowedCorpora),
+      this.setStorage("categories", categories),
+    ]);
+
+    console.log("登录成功", user);
   },
 
   logout() {
@@ -273,6 +315,31 @@ App({
 
     wx.reLaunch({
       url: "/pages/login/login",
+    });
+  },
+  doSendSms(phone: string): Promise<any> {
+    wx.showLoading({ title: "发送验证码中..." });
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${ENV.API_BASE_URL}/auth/send-sms`,
+        method: "POST",
+        data: { phoneNumber: phone },
+        timeout: 15000, // 审核环境可能较慢
+        success: async (resp) => {
+          wx.hideLoading();
+
+          console.log("返回结果：", resp);
+          if (resp.statusCode !== 200) {
+            return reject(new Error(resp.data.error as string));
+          } else {
+            resolve(resp.data);
+          }
+        },
+        fail: (err) => {
+          wx.hideLoading();
+          reject(err);
+        },
+      });
     });
   },
 });

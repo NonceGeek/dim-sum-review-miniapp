@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "登录",
-  "navigationStyle": "custom"
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-button": "tdesign-miniprogram/button/button",
+    "t-count-down": "tdesign-miniprogram/count-down/count-down"
+  }
 }
