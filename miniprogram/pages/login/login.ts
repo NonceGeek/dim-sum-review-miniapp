@@ -50,7 +50,7 @@ Page({
     } catch (err: any) {
       console.error("Login failed", err);
       wx.showToast({
-        title: err.message || "登录失败",
+        title: String(err) || "登录失败",
         icon: "none",
         duration: 2000,
       });
@@ -122,7 +122,7 @@ Page({
     } catch (err: any) {
       console.error("发送验证码失败", err);
       wx.showToast({
-        title: err.message || "发送失败",
+        title: String(err) || "发送失败",
         icon: "none",
         duration: 2000,
       });
@@ -187,7 +187,7 @@ Page({
     } catch (err: any) {
       console.error("手机号登录失败", err);
       wx.showToast({
-        title: err || "登录失败",
+        title: String(err) || "登录失败",
         icon: "none",
         duration: 2000,
       });

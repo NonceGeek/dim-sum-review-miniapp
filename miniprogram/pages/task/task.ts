@@ -319,6 +319,12 @@ Page({
       );
     } catch (err) {
       console.error("[页面] 请求异常:", err);
+      wx.hideLoading();
+      wx.showToast({
+        title: String(err) || "加载失败",
+        icon: "none",
+        duration: 2000,
+      });
     }
   },
   onSwiperChange(e) {
@@ -1057,7 +1063,7 @@ Page({
         } else {
           console.error("上传失败，状态码:", statusCode);
           wx.showToast({
-            title: uploadRes.data.error || "上传失败",
+            title: String(uploadRes.data.error) || "上传失败",
             icon: "error",
             duration: 2000,
           });
