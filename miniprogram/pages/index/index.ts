@@ -92,20 +92,41 @@ Page({
     }
 
     // 获取用户信息
-    const userInfo = app.globalData.userInfo || { nickname: '用户' };
-    this.setData({
-      userInfo: userInfo as any,
-    });
-
-    // 登录完成再发请求
-    const { page } = options;
-    const p = Number(page) || 0;
-
+    const userInfo = app.globalData.userInfo ||
+      wx.getStorageSync("userInfo") || { nickname: "用户" };
+    console.log("init userInfo:", userInfo);
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight: sysStatusBarHeight } = wx.getSystemInfoSync();
     const navBarHeight =
       (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
+
+
+    if (
+      (userInfo.role &&
+        (userInfo.role === "RESEARCHER" ||
+          ["TAGGER_PARTNER", "TAGGER_OUTSOURCING"].includes(userInfo.role))) ||
+      userInfo.isSystemAdmin
+    ) {
+      this.setData({
+        userInfo: userInfo as any,
+      });
+    } else {
+      this.setData({
+        headerHeight: navBarHeight,
+        userInfo: userInfo as any,
+      });
+      wx.showToast({
+        title: "没有权限访问，请联系管理员",
+        icon: "none",
+        duration: 4000,
+      });
+      return;
+    }
+
+    // 登录完成再发请求
+    const { page } = options;
+    const p = Number(page) || 0;
 
     this.setData({
       uncompletedPage: p + 1,
@@ -240,7 +261,11 @@ Page({
       });
     } catch (err) {
       console.error("fetchUncompletedTasks 失败", err);
-      wx.showToast({ title: err.error || "加载失败", icon: "none", duration: 2000 });
+      wx.showToast({
+        title: err.error || String(err) || "加载失败",
+        icon: "none",
+        duration: 4000,
+      });
     } finally {
       wx.hideLoading();
     }

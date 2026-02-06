@@ -9,6 +9,8 @@ interface UserInfo {
   nickname: string;
   avatar?: string;
   openid?: string;
+  role?: string;
+  isSystemAdmin?: boolean;
 }
 
 // App 全局数据类型

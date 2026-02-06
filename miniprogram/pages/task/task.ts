@@ -69,12 +69,12 @@ function getAuthCorpus(data) {
       canAdd: true,
       canDelete: true,
     };
-  } else if (role.toUpperCase() === "RESEARCHER") {
+  } else if (role === "RESEARCHER") {
     return {
       canEdit: corpusFromData,
       canAdd: true,
     };
-  } else if (/^TAGGER_[A-Z]*$/.test(role.toUpperCase())) {
+  } else if ( ["TAGGER_PARTNER", "TAGGER_OUTSOURCING"].includes(role)) {
     return {
       canEdit: [
         ...categoryWrite.filter((x) => new Set(corpusFromData).has(x)),

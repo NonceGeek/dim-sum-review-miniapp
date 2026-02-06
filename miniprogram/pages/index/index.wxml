@@ -44,12 +44,12 @@
           <view class="profile-card">
             <view class="avatar-wrapper">
               <view class="avatar">
-                <text class="avatar-text">{{userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
+                <text class="avatar-text">{{userInfo.name ? userInfo.name[0] : userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
               </view>
             </view>
             <view class="user-info">
-              <text class="user-name">{{userInfo.nickname || '用户'}}</text>
-              <text class="user-role">标注员</text>
+              <text class="user-name">{{userInfo.name || userInfo.nickname || '用户'}}</text>
+              <text class="user-role">{{userInfo.isSystemAdmin ? "超级管理员" : userInfo.role === 'RESEARCHER' ? '研究员': userInfo.role === 'TAGGER_PARTNER' || userInfo.role ==='TAGGER_OUTSOURCING' ? '标注员': userInfo.role === 'LEARNER' ? '学者' : '无'}}</text>
             </view>
           </view>
         </view>
