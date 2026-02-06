@@ -19,16 +19,25 @@ function getSourceInfo(
   corpusName: string,
   categories: any[],
 ) {
+  console.log("kind:", kind, lexiconBaseCorpusName, corpusName);
+  console.log("category:", categories);
   const source =
     kind === "llm"
       ? SOURCE_NAME_DEFAULT
       : kind === "baseline"
         ? lexiconBaseCorpusName
         : corpusName;
+  console.log("source:", source);
   const category = categories.find((cat) => cat.name === source);
+  console.log("category:", category);
   return {
     source,
-    source_name: category ? category.nickname : category.name,
+    source_name:
+      source === "llm"
+        ? SOURCE_NAME_DEFAULT
+        : category
+          ? (category.nickname || category.name)
+          : source,
   };
 }
 

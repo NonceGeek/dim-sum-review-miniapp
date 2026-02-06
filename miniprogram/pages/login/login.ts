@@ -11,6 +11,7 @@ Page({
     codeButtonText: "发送验证码",
     sendingCode: false,
     logining: false,
+    agreedToTerms: false,
   },
 
   onLoad() {
@@ -193,5 +194,27 @@ Page({
       });
       this.setData({ logining: false });
     }
+  },
+
+  // 协议复选框变化
+  onAgreementChange(e: any) {
+    const checked = e.detail.value.length > 0;
+    this.setData({
+      agreedToTerms: checked,
+    });
+  },
+
+  // 跳转到用户服务协议
+  goToTerms() {
+    wx.navigateTo({
+      url: "/pages/webview/webview?url=https://search.aidimsum.com/terms",
+    });
+  },
+
+  // 跳转到隐私政策
+  goToPrivacy() {
+    wx.navigateTo({
+      url: "/pages/webview/webview?url=https://search.aidimsum.com/privacy",
+    });
   },
 });

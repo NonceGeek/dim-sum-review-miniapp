@@ -77,15 +77,28 @@
             </t-button>
           </view>
         </view>
+
+        <!-- 协议复选框 -->
+        <view class="agreement-box">
+          <checkbox-group bind:change="onAgreementChange">
+            <label class="agreement-label">
+              <checkbox value="agreed" checked="{{agreedToTerms}}" class="agreement-checkbox"/>
+              <text class="agreement-text">我已阅读并同意</text>
+              <text class="agreement-link" bind:tap="goToTerms">《用户服务协议》</text>
+              <text class="agreement-text">和</text>
+              <text class="agreement-link" bind:tap="goToPrivacy">《隐私政策》</text>
+            </label>
+          </checkbox-group>
+        </view>
       </view>
 
       <view class="popup-footer">
         <t-button
-          class="submit-btn"
+          class="login-btn"
           theme="primary"
           size="large"
           bind:tap="confirmPhoneLogin"
-          disabled="{{!phone || !code}}"
+          disabled="{{!phone || !code || !agreedToTerms}}"
           loading="{{logining}}"
         >
           登录

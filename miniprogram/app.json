@@ -3,7 +3,8 @@
     "pages/index/index",
     "pages/login/login",
     "pages/task/task",
-    "pages/completed/completed"
+    "pages/completed/completed",
+    "pages/webview/webview"
   ],
   "window": {
     "navigationBarTitleText": "Dim Sum Review",
