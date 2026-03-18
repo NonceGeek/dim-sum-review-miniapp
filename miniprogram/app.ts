@@ -17,10 +17,14 @@ App({
     themeMode: "auto" as ThemeMode, // 用户设置：auto/light/dark
     theme: "light" as ThemeValue, // 实际应用的主题：light/dark
     categories: [],
+    writeCorpora: [] as IDataset[],
   },
 
   onLaunch(options: any) {
     console.log("小程序启动参数:", options);
+
+    // 从 storage 恢复全局数据（解决热启动问题）
+    this.restoreGlobalData();
 
     // 初始化主题
     this.initTheme();
@@ -32,6 +36,44 @@ App({
         this.applyTheme(result.theme as ThemeValue);
       }
     });
+
+    // 检查是否有新的小程序版本
+    this.updateNotification();
+  },
+
+  /**
+   * 从 storage 恢复全局数据
+   * 解决小程序热启动时 globalData 丢失的问题
+   */
+  restoreGlobalData() {
+    try {
+      const accessToken = wx.getStorageSync("accessToken");
+      const refreshToken = wx.getStorageSync("refreshToken");
+      const userInfo = wx.getStorageSync("userInfo");
+      const allowedCorpora = wx.getStorageSync("allowedCorpora");
+      const categories = wx.getStorageSync("categories");
+      const writeCorpora = wx.getStorageSync("writeCorpora");
+
+      // 恢复数据到 globalData
+      if (accessToken) this.globalData.accessToken = accessToken;
+      if (refreshToken) this.globalData.refreshToken = refreshToken;
+      if (userInfo) this.globalData.userInfo = userInfo;
+      if (allowedCorpora) this.globalData.allowedCorpora = allowedCorpora;
+      if (categories) this.globalData.categories = categories;
+      if (writeCorpora) this.globalData.writeCorpora = writeCorpora;
+
+      if (accessToken || userInfo || allowedCorpora || categories) {
+        console.log("✅ 从 storage 恢复全局数据:", {
+          hasToken: !!accessToken,
+          hasUser: !!userInfo,
+          allowedCorporaCount: allowedCorpora?.length || 0,
+          categoriesCount: categories?.length || 0,
+          writeCorporaCount: writeCorpora?.length || 0,
+        });
+      }
+    } catch (error) {
+      console.error("恢复全局数据失败:", error);
+    }
   },
 
   /**
@@ -287,6 +329,21 @@ App({
     this.globalData.userInfo = user;
     this.globalData.allowedCorpora = allowedCorpora;
     this.globalData.categories = categories;
+    const writeCorpora: IDataset[] = allowedCorpora
+      .filter((item: ICorpusItem) => item.permission === "WRITE")
+      .map((cop: ICorpusItem) => {
+        const findCategory = categories.find(
+          (cat: any) => cat.name === cop.category_name,
+        );
+        return {
+          label: findCategory?.nickname || findCategory?.name,
+          value: cop.category_name,
+        };
+      });
+    this.globalData.writeCorpora = [
+      { label: "全部", value: "all" } as IDataset,
+      ...writeCorpora,
+    ];
 
     // 异步存储
     await Promise.all([
@@ -295,6 +352,7 @@ App({
       this.setStorage("userInfo", user),
       this.setStorage("allowedCorpora", allowedCorpora),
       this.setStorage("categories", categories),
+      this.setStorage("writeCorpora", this.globalData.writeCorpora),
     ]);
 
     console.log("登录成功", user);
@@ -306,12 +364,14 @@ App({
     this.globalData.refreshToken = "";
     this.globalData.allowedCorpora = [];
     this.globalData.categories = [];
+    this.globalData.writeCorpora = [];
 
     wx.removeStorage({ key: "userInfo" });
     wx.removeStorage({ key: "accessToken" });
     wx.removeStorage({ key: "refreshToken" });
     wx.removeStorage({ key: "allowedCorpora" });
     wx.removeStorage({ key: "categories" });
+    wx.removeStorage({ key: "writeCorpora" });
 
     wx.reLaunch({
       url: "/pages/login/login",
@@ -339,6 +399,34 @@ App({
           wx.hideLoading();
           reject(err);
         },
+      });
+    });
+  },
+  updateNotification() {
+    const updateManager = wx.getUpdateManager();
+
+    updateManager.onCheckForUpdate(function (res) {
+      console.log("是否有新版本：", res.hasUpdate);
+    });
+
+    updateManager.onUpdateReady(function () {
+      wx.showModal({
+        title: "更新提示",
+        content: "新版本已准备好，请重新登录",
+        success(res) {
+          if (res.confirm) {
+            wx.removeStorageSync("accessToken");
+            wx.removeStorageSync("refreshToken");
+            updateManager.applyUpdate();
+          }
+        },
+      });
+    });
+
+    updateManager.onUpdateFailed(function () {
+      wx.showToast({
+        title: "更新失败",
+        icon: "none",
       });
     });
   },

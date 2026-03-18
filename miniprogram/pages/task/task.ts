@@ -36,7 +36,7 @@ function getSourceInfo(
       source === "llm"
         ? SOURCE_NAME_DEFAULT
         : category
-          ? (category.nickname || category.name)
+          ? category.nickname || category.name
           : source,
   };
 }
@@ -74,7 +74,7 @@ function getAuthCorpus(data) {
       canEdit: corpusFromData,
       canAdd: true,
     };
-  } else if ( ["TAGGER_PARTNER", "TAGGER_OUTSOURCING"].includes(role)) {
+  } else if (["TAGGER_PARTNER", "TAGGER_OUTSOURCING"].includes(role)) {
     return {
       canEdit: [
         ...categoryWrite.filter((x) => new Set(corpusFromData).has(x)),
@@ -283,7 +283,6 @@ Page({
           data.context.corpusName,
           categories,
         );
-
         if (data.violationType === "phonetic_mismatch") {
           return {
             data: data.context.text,
@@ -666,18 +665,18 @@ Page({
     }
 
     // 粤拼字段验证：只允许输入英文和数字
-    if (field === "cantonesePronunciations" && value) {
-      // 检查是否只包含英文字母和数字，逗号，英文句号，空格
-      const alphanumericRegex = /^[a-zA-Z0-9 ,.]+$/;
-      if (!alphanumericRegex.test(value)) {
-        wx.showToast({
-          title: "粤音只能输入英文和数字，英文逗号句号和空格",
-          icon: "none",
-          duration: 2000,
-        });
-        return; // 阻止更新
-      }
-    }
+    // if (field === "cantonesePronunciations" && value) {
+    //   // 检查是否只包含英文字母和数字，逗号，英文句号，空格
+    //   const alphanumericRegex = /^[a-zA-Z0-9 ,.]+$/;
+    //   if (!alphanumericRegex.test(value)) {
+    //     wx.showToast({
+    //       title: "粤音只能输入英文和数字，英文逗号句号和空格",
+    //       icon: "none",
+    //       duration: 2000,
+    //     });
+    //     return; // 阻止更新
+    //   }
+    // }
 
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
@@ -687,8 +686,9 @@ Page({
     if (!currentTask.record || !currentTask.record.data) {
       return;
     }
-
-    if (field === "cantonesePronunciations") {
+    if (field === "originText") {
+      currentTask.record.text = value;
+    } else if (field === "cantonesePronunciations") {
       // 处理粤音
       currentTask.record.data[index].jyutping = value;
     } else if (field === "emotionContent") {
@@ -1169,7 +1169,10 @@ Page({
       (card: any) => card.jyutping && card.jyutping.trim() !== "",
     );
 
-    this.setData({ canSubmit: hasValidJyutping });
+    const hasOriginText =
+      currentTask.record.text && currentTask.record.text.trim() !== "";
+
+    this.setData({ canSubmit: hasValidJyutping && hasOriginText });
   },
 
   // 显示选择器
@@ -1303,5 +1306,12 @@ Page({
     }
 
     return true;
+  },
+  onConfirm() {
+    wx.showToast({
+      title: "请联系管理员，确认是否有该数据来源权限",
+      icon: "none",
+      duration: 4000,
+    });
   },
 });

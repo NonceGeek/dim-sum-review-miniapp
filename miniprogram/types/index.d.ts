@@ -1,11 +1,12 @@
 // types/index.d.ts - 全局类型定义
 
 // 主题类型
-type ThemeMode = 'auto' | 'light' | 'dark';
-type ThemeValue = 'light' | 'dark';
+type ThemeMode = "auto" | "light" | "dark";
+type ThemeValue = "light" | "dark";
 
 // 用户信息类型
 interface UserInfo {
+  id: string;
   nickname: string;
   avatar?: string;
   openid?: string;
@@ -21,16 +22,17 @@ interface GlobalData {
   allowedCorpora: string[];
   themeMode: ThemeMode;
   theme: ThemeValue;
+  writeCorpora: { label: string; value: string }[];
 }
 
 // App 实例选项类型
 interface IAppOption {
   globalData: GlobalData;
-  
+
   // Storage 方法
   getStorage(key: string): Promise<any>;
   setStorage(key: string, data: any): Promise<void>;
-  
+
   // 登录相关
   ensureLogin(retries?: number): Promise<string>;
   tryLogin(retries: number): Promise<string>;
@@ -38,7 +40,7 @@ interface IAppOption {
   logout(): void;
   doSendSms(phone: string): Promise<any>;
   doPhoneLogin(phone: string, code: string): Promise<string>;
-  
+
   // 主题相关
   initTheme(): Promise<void>;
   applyTheme(theme: ThemeValue): void;

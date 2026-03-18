@@ -9,9 +9,11 @@ Page({
     page: 0,
     loadFinished: false,
     headerHeight: 0,
+    datasets: [] as { label: string; value: string }[],
   },
 
   async onLoad(options) {
+    const app = getApp<IAppOption>();
     const { page } = options;
     const p = Number(page) || 0;
 
@@ -19,13 +21,17 @@ Page({
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight } = wx.getSystemInfoSync();
     // Navbar height calculation: (capsule top - status bar) * 2 + capsule height + status bar
-    const navBarHeight = (rect.top - statusBarHeight) * 2 + rect.height + statusBarHeight;
-    
+    const navBarHeight =
+      (rect.top - statusBarHeight) * 2 + rect.height + statusBarHeight;
+    const datasets =
+      app.globalData.writeCorpora || wx.getStorageSync("writeCorpora") || [];
+
     this.setData({
       page: p + 1,
       headerHeight: navBarHeight,
+      datasets,
     });
-    
+
     this.syncTheme();
     await this.fetchTasks();
   },
@@ -36,7 +42,7 @@ Page({
 
   syncTheme() {
     const app = getApp<any>();
-    const currentTheme = app.getTheme() || 'light';
+    const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
 
@@ -44,7 +50,7 @@ Page({
     wx.showLoading({ title: "加载中..." });
     try {
       let { completed, total, page, selected } = this.data;
-      
+
       // 是否已经加载完
       if (total && completed.length >= total) {
         this.setData({
@@ -63,14 +69,14 @@ Page({
       }
 
       const reassigninglist = data.items.filter(
-        (d: any) => d.status !== "reassigning"
+        (d: any) => d.status !== "reassigning",
       );
       const newList = [...completed, ...reassigninglist];
 
       const filterData =
         selected === "all"
           ? newList
-          : newList.filter((ori) => ori.violationType === selected);
+          : newList.filter((ori) => ori.context.corpusName === selected);
 
       this.setData({
         completed: filterData,
@@ -91,7 +97,7 @@ Page({
     const data =
       type === "all"
         ? ori_completed
-        : ori_completed.filter((ori) => ori.violationType === type);
+        : ori_completed.filter((ori) => ori.context.corpusName === type);
 
     this.setData({
       completed: data,

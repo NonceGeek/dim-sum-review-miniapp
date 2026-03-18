@@ -1,0 +1,29 @@
+<view class="container-wrap theme-{{currentTheme}}">
+
+  <view class="page">
+    <!-- Tabs 选项卡 -->
+    <t-tabs value="{{activeTab}}" bind:change="onTabChange" space-evenly sticky>
+      <t-tab-panel value="all" label="全部" />
+      <t-tab-panel value="processed" label="已处理" />
+      <t-tab-panel value="unprocessed" label="未处理" />
+    </t-tabs>
+
+
+    <!-- 内容区域 -->
+    <view class="content-wrapper">
+      <t-cell-group bordered="{{false}}" class="custom-cell-group">
+        <t-cell wx:for="{{ currentTasks }}" wx:for-item="item" wx:key="id" leftIcon="{{ item.status === 'completed' ? 'check-circle-filled': 'help-circle'}}"
+          title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}"
+          data-task-status="{{ item.status }}" hover class="custom-cell" />
+        <view class="more-view" wx:if="{{ currentTasks.length > 0 && (activeTab === 'all' && !allLoadFinished || activeTab === 'processed' && !processedLoadFinished || activeTab === 'unprocessed' && !unprocessedLoadFinished) }}">
+          <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
+            加载更多
+          </t-button>
+        </view>
+        <view class="container" wx:if="{{ currentTasks.length === 0 }}">
+          <t-empty icon="info" description="暂无数据" />
+        </view>
+      </t-cell-group>
+    </view>
+  </view>
+</view>

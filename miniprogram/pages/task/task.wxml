@@ -18,6 +18,14 @@
         <t-collapse value="{{expandedValues}}" bind:change="onCollapseChange" theme="card">
           <block wx:for="{{task.record.data}}" wx:for-item="cp" wx:for-index="index" wx:key="index">
             <t-collapse-panel value="card_{{index}}" header="{{cp.jyutping}}">
+               <!-- 原文 -->
+              <view class="group-wrapper">
+                <van-cell-group>
+                  <van-field border="{{false}}" label="原文：" size="large" type="textarea" autosize label-class="field-class" custom-class="custom-cell" value="{{task.record.text}}" data-field="originText" data-index="{{index}}" bind:change="onOriginalBaseFieldChange" placeholder="请输入原文" title-width="140rpx" readonly="{{status === 'completed' || !task.canEdit}}">
+                    <van-icon wx:if="{{corpus.canDelete && status !== 'completed' && task.canEdit}}" slot="icon" name="cross" size="16px" custom-class="delete-icon" data-card-index="{{index}}" />
+                  </van-field>
+                </van-cell-group>
+              </view>
               <!-- 粤语 pronunciations -->
               <view class="group-wrapper">
                 <van-cell-group>
@@ -211,10 +219,10 @@
 </view>
 <!-- 底部按钮 -->
 <view class="footer" wx:if="{{status !== 'completed'}}">
-  <t-button theme="default" shape="round" bind:tap="onCancel" class="btn-cancel btn-cancel-inner">
+  <t-button theme="default" shape="round" bind:tap="{{taskDetail[currentIndex].canEdit ? 'onCancel': 'onConfirm'}}" class="btn-cancel btn-cancel-inner">
     不处理
   </t-button>
-  <t-button theme="default" shape="round" bind:tap="onSubmit" class="btn-submit btn-submit-inner" disabled="{{!canSubmit}}">
+  <t-button theme="default" shape="round" bind:tap="{{taskDetail[currentIndex].canEdit ? 'onSubmit': 'onConfirm'}}" class="btn-submit btn-submit-inner" disabled="{{!canSubmit}}">
     正确
   </t-button>
 </view>

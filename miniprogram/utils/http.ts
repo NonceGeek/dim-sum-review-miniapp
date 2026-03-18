@@ -43,11 +43,22 @@ function request(url: string, options: any = {}): Promise<any> {
           if (retryCount >= 3) {
             console.error("[request] 重试 3 次仍失败");
             wx.showToast({
-              title: "登录已过期，请重新进入小程序",
+              title: "登录已过期，请重新登录",
               icon: "none",
-              duration: 3000,
+              duration: 2000,
             });
-            return reject(new Error("登录过期，请重新进入小程序"));
+
+            // 清空 token 并跳转到登录页
+            wx.removeStorageSync("accessToken");
+            wx.removeStorageSync("refreshToken");
+
+            setTimeout(() => {
+              wx.reLaunch({
+                url: "/pages/login/login",
+              });
+            }, 2000);
+
+            return reject(new Error("登录过期，请重新登录"));
           }
 
           handleTokenExpired(

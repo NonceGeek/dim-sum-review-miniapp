@@ -4,7 +4,9 @@
     "pages/login/login",
     "pages/task/task",
     "pages/completed/completed",
-    "pages/webview/webview"
+    "pages/webview/webview",
+    "pages/dashboard/dashboard",
+    "pages/others/others"
   ],
   "window": {
     "navigationBarTitleText": "Dim Sum Review",

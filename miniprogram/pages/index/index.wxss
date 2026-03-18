@@ -284,6 +284,11 @@
   color: #047857;
 }
 
+.dashboard-icon {
+  background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+  color: #1D4ED8;
+}
+
 
 .setting-label {
   font-size: 32rpx;
@@ -356,6 +361,11 @@ t-action-sheet {
   color: #34D399;
 }
 
+.theme-dark .dashboard-icon {
+  background: linear-gradient(135deg, #1E3B8A 0%, #1D4ED8 100%);
+  color: #60A5FA;
+} 
+
 
 /* ============================================
    底部 Tab Bar
@@ -368,7 +378,7 @@ t-action-sheet {
 }
 
 /* Dark 模式下 tab bar 选中状态颜色与 light 模式一致 */
-.theme-dark .t-tab-bar-item.t-is-active {
+.theme-dark .t-tab-bar-item .t-tab-bar-item__content--checked .t-tab-bar-item__text {
   color: var(--primary) !important;
 }
 
@@ -376,7 +386,7 @@ t-action-sheet {
   color: var(--primary) !important;
 }
 
-.theme-dark .t-tab-bar .t-tab-bar-item--active {
+.theme-dark .t-tab-bar .t-tab-bar-item__content--checked .t-tab-bar-item__text{
   color: var(--primary) !important;
 }
 

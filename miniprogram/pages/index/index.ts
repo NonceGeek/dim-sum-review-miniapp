@@ -38,7 +38,8 @@ Page({
     themeModeText: '跟随系统',
     showThemeSheet: false,
     themeOptions: THEME_OPTIONS,
-    tabBarColor: ['#94A3B8', '#4A7CF3'],
+    tabBarColor: ["#94A3B8", "#4A7CF3"],
+    datasets: [] as { label: string; value: string }[],
   },
 
   onClick(event: any) {
@@ -64,10 +65,8 @@ Page({
     let data =
       type === "all"
         ? ori_uncompleted
-        : ori_uncompleted.filter((ori) => ori.violationType === type);
-    if (type === "data_review") {
-      data = ori_uncompleted.filter((ori) => ori.taskType === type);
-    }
+        : ori_uncompleted.filter((ori) => ori.context.corpusName === type);
+
     this.setData({
       uncompleted: data,
       unselected: type,
@@ -95,12 +94,14 @@ Page({
     const userInfo = app.globalData.userInfo ||
       wx.getStorageSync("userInfo") || { nickname: "用户" };
     console.log("init userInfo:", userInfo);
+    const datasets =
+      app.globalData.writeCorpora || wx.getStorageSync("writeCorpora") || [];
+    console.log("datasets:", datasets);
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight: sysStatusBarHeight } = wx.getSystemInfoSync();
     const navBarHeight =
       (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
-
 
     if (
       (userInfo.role &&
@@ -108,8 +109,10 @@ Page({
           ["TAGGER_PARTNER", "TAGGER_OUTSOURCING"].includes(userInfo.role))) ||
       userInfo.isSystemAdmin
     ) {
+      console.log("avatar:", userInfo.avatar);
       this.setData({
         userInfo: userInfo as any,
+        datasets,
       });
     } else {
       this.setData({
@@ -249,11 +252,8 @@ Page({
       let filterData =
         unselected === "all"
           ? newList
-          : newList.filter((ori) => ori.violationType === unselected);
+          : newList.filter((ori) => ori.context.corpusName === unselected);
 
-      if (unselected === "data_review") {
-        filterData = newList.filter((ori) => ori.taskType === unselected);
-      }
       this.setData({
         uncompleted: filterData,
         ori_uncompleted: newList,

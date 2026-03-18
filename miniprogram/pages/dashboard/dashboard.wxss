@@ -1,0 +1,395 @@
+/* pages/dashboard/dashboard.wxss */
+
+page {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+
+  /* TDesign Picker CSS 变量覆盖 */
+  --td-picker-bg-color: var(--bg-card);
+  --td-picker-title-color: var(--text-primary);
+  --td-picker-cancel-color: var(--text-secondary);
+  --td-picker-confirm-color: var(--primary);
+  --td-bg-color-container: var(--bg-card);
+  --td-bg-color-page: var(--bg-page);
+  --td-text-color-primary: var(--text-primary);
+  --td-text-color-secondary: var(--text-secondary);
+  --td-text-color-placeholder: var(--text-muted);
+  --td-font-gray-1: var(--text-primary);
+  --td-font-gray-2: var(--text-secondary);
+}
+
+/* ============================================
+   TDesign Cell 样式
+   ============================================ */
+.t-cell {
+  background-color: var(--bg-card) !important;
+}
+
+.t-cell .t-cell__title,
+.t-cell__title-text {
+  color: var(--text-primary) !important;
+}
+
+.t-cell .t-cell__note {
+  color: var(--text-secondary) !important;
+}
+
+.t-cell .t-cell__left-icon,
+.t-cell .t-icon {
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   语料集 Cell Group - header-option 风格
+   ============================================ */
+.dataset-cell-group {
+  background-color: var(--bg-card) !important;
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border-light) !important;
+  margin: 24rpx !important;
+  padding: 20rpx 24rpx !important;
+}
+
+/* 悬浮在顶部 - fixed 定位 */
+.fixed-header-wrapper {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 100 !important;
+  background-color: var(--bg-page);
+}
+
+/* 内容区域加顶部间距 */
+.content-wrapper {
+  padding-top: 250rpx;
+}
+
+.dataset-cell-group .t-cell {
+  background-color: transparent !important;
+  padding: 0 !important;
+  align-items: center !important;
+  margin-bottom: 12rpx !important;
+}
+
+.dataset-cell-group .t-cell:last-child {
+  margin-bottom: 0 !important;
+}
+
+.dataset-cell-group .t-cell::after {
+  display: none !important;
+}
+
+/* ============================================
+   头像样式
+   ============================================ */
+.avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* t-avatar 默认无图片时：跟随主题的背景 + 白色文字 */
+.avatar .t-avatar {
+  background-color: var(--primary-light) !important;
+  color: var(--text-primary) !important;
+  font-size: 28rpx !important;
+  font-weight: 500 !important;
+}
+
+/* t-avatar 有图片时 */
+.avatar .t-avatar__image {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ============================================
+   TDesign Picker 样式加强
+   ============================================ */
+.t-picker {
+  background-color: var(--bg-card) !important;
+}
+
+.t-picker__toolbar {
+  background-color: var(--bg-card) !important;
+}
+
+.t-picker__title {
+  color: var(--text-primary) !important;
+}
+
+.t-picker__cancel {
+  color: var(--text-secondary) !important;
+}
+
+.t-picker__confirm {
+  color: var(--primary) !important;
+}
+
+.t-picker__main {
+  background-color: var(--bg-card) !important;
+}
+
+/* Picker 遮罩 */
+.t-picker__mask--top,
+.t-picker__mask--bottom {
+  background: linear-gradient(
+    180deg,
+    var(--bg-card) 0,
+    transparent 100%
+  ) !important;
+}
+
+/* Picker 指示器 */
+.t-picker__indicator {
+  background-color: var(--bg-input) !important;
+}
+
+/* ============================================
+   TDesign Picker Item 样式
+   ============================================ */
+.t-picker-item {
+  background-color: var(--bg-card) !important;
+}
+
+.t-picker-item__item {
+  color: var(--text-primary) !important;
+}
+
+.t-picker-item__item--selected {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.stats {
+  padding: 0 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: 16rpx;
+  padding: 24rpx;
+  text-align: center;
+  border: 1px solid var(--border-light);
+}
+
+.stat-value {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-height: 54rpx;
+  line-height: 54rpx;
+}
+
+.stat-title {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+
+/* ============================================
+   可搜索选择器样式
+   ============================================ */
+.searchable-picker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+.picker-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: maskFadeIn 0.3s ease-out;
+}
+
+@keyframes maskFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.picker-container {
+  position: relative;
+  width: 100%;
+  max-height: 80vh;
+  background-color: var(--bg-card);
+  border-radius: 24rpx 24rpx 0 0;
+  animation: slideUp 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 24rpx;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.picker-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.picker-close {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: var(--bg-input);
+}
+
+.close-icon {
+  font-size: 48rpx;
+  color: var(--text-secondary);
+  line-height: 1;
+  font-weight: 300;
+}
+
+.search-box {
+  padding: 24rpx 32rpx;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-input);
+  border-radius: 12rpx;
+  padding: 16rpx 24rpx;
+  gap: 16rpx;
+}
+
+.search-icon {
+  font-size: 32rpx;
+  color: var(--text-muted);
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  background: transparent;
+}
+
+.clear-icon {
+  font-size: 24rpx;
+  color: var(--text-muted);
+  padding: 8rpx;
+  margin: -8rpx;
+}
+
+.picker-options {
+  flex: 1;
+  min-height: 300rpx;
+  max-height: 600rpx;
+}
+
+.option-list {
+  padding: 12rpx 0;
+}
+
+.option-item {
+  padding: 24rpx 32rpx;
+  transition: background-color 0.2s;
+}
+
+.option-item-selected {
+  background-color: var(--bg-input);
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.option-label {
+  font-size: 28rpx;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.option-item-selected .option-label {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.option-check {
+  font-size: 32rpx;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.no-result {
+  padding: 80rpx 32rpx;
+  text-align: center;
+}
+
+.no-result-text {
+  font-size: 28rpx;
+  color: var(--text-muted);
+}
+
+/* ============================================
+   完成率颜色样式
+   ============================================ */
+.completion-rate {
+  font-weight: 500;
+}
+
+.completion-rate.rate-green {
+  color: #00a870;
+}
+
+.completion-rate.rate-orange {
+  color: #d97706;
+}
+
+.completion-rate.rate-yellow {
+  color: #eab308;
+}
+
+.completion-rate.rate-red {
+  color: #e34d59;
+}
+
+/* ============================================
+   深色模式适配
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  page {
+    --td-font-gray-1: var(--text-primary);
+    --td-font-gray-2: var(--text-secondary);
+  }
+}

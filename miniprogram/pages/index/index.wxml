@@ -6,20 +6,8 @@
     <block wx:if="{{ active === 'uncompleted' }}">
       <scroll-view class="btn-group-scroll btn-group-fixed" scroll-x enable-flex style="top: {{headerHeight}}px; width: 100%">
         <view class="btn-group">
-          <t-button theme="{{unselected === 'all' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="all" size="small">
-            全部
-          </t-button>
-          <t-button theme="{{unselected === 'phonetic_mismatch' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="phonetic_mismatch" size="small">
-            注音检查
-          </t-button>
-          <t-button theme="{{unselected === 'grammar_violation' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="grammar_violation" size="small">
-            语法检查
-          </t-button>
-          <t-button theme="{{unselected === 'llm_generic_violation' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="llm_generic_violation" size="small">
-            通用LLM检查
-          </t-button>
-          <t-button theme="{{unselected === 'data_review' ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="data_review" size="small">
-            巡检
+          <t-button wx:for="{{datasets}}" wx:key="value" theme="{{unselected === item.value ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="{{item.value}}" size="small">
+            {{item.label}}
           </t-button>
         </view>
       </scroll-view>
@@ -43,9 +31,7 @@
         <view class="profile-section">
           <view class="profile-card">
             <view class="avatar-wrapper">
-              <view class="avatar">
-                <text class="avatar-text">{{userInfo.name ? userInfo.name[0] : userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
-              </view>
+              <t-avatar class="avatar" image="{{userInfo.avatar}}" />
             </view>
             <view class="user-info">
               <text class="user-name">{{userInfo.name || userInfo.nickname || '用户'}}</text>
@@ -77,6 +63,18 @@
                   <t-icon name="check" size="48rpx" color="inherit" />
                 </view>
                 <text class="setting-label">已处理任务</text>
+              </view>
+              <view class="setting-right">
+                <view class="arrow-icon">›</view>
+              </view>
+            </navigator>
+            <!-- 任务看板 -->
+            <navigator url="/pages/dashboard/dashboard" class="setting-item" hover-class="setting-item-hover">
+              <view class="setting-left">
+                <view class="setting-icon dashboard-icon">
+                  <t-icon name="assignment-checked" size="48rpx" color="inherit" />
+                </view>
+                <text class="setting-label">任务看板</text>
               </view>
               <view class="setting-right">
                 <view class="arrow-icon">›</view>

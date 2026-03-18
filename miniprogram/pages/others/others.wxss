@@ -1,0 +1,117 @@
+/* pages/others/others.wxss */
+
+.page {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  padding-bottom: 32rpx;
+}
+
+/* ============================================
+   TDesign Tabs 样式
+   ============================================ */
+.t-tabs {
+  background-color: var(--bg-card) !important;
+  border-bottom: 1px solid var(--border-light) !important;
+}
+
+/* ============================================
+   Content Wrapper 样式
+   ============================================ */
+.content-wrapper {
+  padding: 24rpx;
+}
+
+/* ============================================
+   TDesign Cell Group 样式
+   ============================================ */
+.custom-cell-group {
+  margin: 0 12rpx;
+}
+
+/* 自定义 Cell 样式 */
+.custom-cell {
+  margin-bottom: 16rpx !important;
+  border-radius: var(--radius-lg) !important;
+  background-color: var(--bg-card) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 去除 t-cell 下划线 */
+.custom-cell::after {
+  display: none !important;
+}
+
+.custom-cell:active {
+  transform: scale(0.995);
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Cell 左侧图标 */
+.custom-cell .t-cell__left-icon {
+  color: var(--primary) !important;
+}
+
+/* Cell 标题 */
+.custom-cell .t-cell__title {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: 32rpx !important;
+}
+
+/* Cell 箭头 */
+.custom-cell .t-cell__right-icon {
+  color: var(--text-placeholder) !important;
+}
+
+.custom-cell .t-cell__title {
+  color: var(--text-primary) !important;
+}
+
+.custom-cell .t-cell__note {
+  color: var(--text-secondary) !important;
+}
+
+.custom-cell .t-cell__left-icon {
+  color: var(--primary) !important;
+}
+
+/* ============================================
+   加载更多按钮
+   ============================================ */
+.more-view {
+  padding: 32rpx 0;
+  display: flex;
+  justify-content: center;
+}
+
+.more-view .btn-type {
+  min-width: 200rpx;
+}
+
+/* ============================================
+   空状态容器
+   ============================================ */
+.container {
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: var(--bg-page);
+}
+
+.container .t-empty__description {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   深色模式适配
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  page {
+    background-color: var(--bg-page);
+  }
+}
