@@ -665,24 +665,23 @@ Page({
     }
 
     // 粤拼字段验证：只允许输入英文和数字
-    // if (field === "cantonesePronunciations" && value) {
-    //   // 检查是否只包含英文字母和数字，逗号，英文句号，空格
-    //   const alphanumericRegex = /^[a-zA-Z0-9 ,.]+$/;
-    //   if (!alphanumericRegex.test(value)) {
-    //     wx.showToast({
-    //       title: "粤音只能输入英文和数字，英文逗号句号和空格",
-    //       icon: "none",
-    //       duration: 2000,
-    //     });
-    //     return; // 阻止更新
-    //   }
-    // }
+    if (field === "cantonesePronunciations" && value) {
+      // 检查是否只包含英文字母和数字，所有符号，空格
+      const alphanumericRegex =  /^[a-zA-Z0-9\s\p{P}\p{S}]+$/u;
+      if (!alphanumericRegex.test(value)) {
+        wx.showToast({
+          title: "粤音只能输入英文和数字及所有符号",
+          icon: "none",
+          duration: 2000,
+        });
+        return; // 阻止更新
+      }
+    }
 
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
       JSON.stringify(updatedTaskDetail[currentIndex]),
     );
-
     if (!currentTask.record || !currentTask.record.data) {
       return;
     }
@@ -701,6 +700,7 @@ Page({
       // 处理数组字段
       currentTask.record.data[parentindex].blocks[index]["content"] = value;
     }
+    // console.log('currentTask:', currentTask)
 
     updatedTaskDetail[currentIndex] = currentTask;
 

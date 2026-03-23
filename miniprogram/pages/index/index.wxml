@@ -31,7 +31,7 @@
         <view class="profile-section">
           <view class="profile-card">
             <view class="avatar-wrapper">
-              <t-avatar class="avatar" image="{{userInfo.avatar}}" />
+              <t-image class="avatar" src="{{userInfo.avatar}}" shape="circle" aria-label="avatar"/>
             </view>
             <view class="user-info">
               <text class="user-name">{{userInfo.name || userInfo.nickname || '用户'}}</text>
