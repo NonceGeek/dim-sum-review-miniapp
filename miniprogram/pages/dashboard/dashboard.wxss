@@ -62,7 +62,7 @@ page {
 
 /* 内容区域加顶部间距 */
 .content-wrapper {
-  padding-top: 250rpx;
+  padding-top: 230rpx;
 }
 
 .dataset-cell-group .t-cell {
@@ -96,7 +96,7 @@ page {
 /* t-avatar 默认无图片时：跟随主题的背景 + 白色文字 */
 .avatar .t-avatar {
   background-color: var(--primary-light) !important;
-  color: var(--text-primary) !important;
+  color: #fff !important;
   font-size: 28rpx !important;
   font-weight: 500 !important;
 }

@@ -315,7 +315,7 @@ swiper-item {
   font-size: 32rpx !important;
 }
 
-.btn-submit-inner.van-button--disabled {
+.btn-submit-inner.t-button--disabled {
   opacity: 0.5 !important;
   box-shadow: none !important;
 }

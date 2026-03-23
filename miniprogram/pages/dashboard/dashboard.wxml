@@ -54,7 +54,7 @@
 </view>
 
 <view class="content-wrapper">
-<t-row gutter="16" class="stats">
+<!-- <t-row gutter="16" class="stats">
   <t-col span="8">
     <view class="stat-card">
       <view class="stat-value">{{summary.totalCorpusCount}}</view>
@@ -94,7 +94,7 @@
       <view class="stat-title">完成率</view>
     </view>
   </t-col>
-</t-row>
+</t-row> -->
 
 <t-cell-group class="dataset-cell-group" theme="card">
   <t-cell title="统计" hover>

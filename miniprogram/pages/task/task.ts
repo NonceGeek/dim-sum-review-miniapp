@@ -667,7 +667,7 @@ Page({
     // 粤拼字段验证：只允许输入英文和数字
     if (field === "cantonesePronunciations" && value) {
       // 检查是否只包含英文字母和数字，所有符号，空格
-      const alphanumericRegex =  /^[a-zA-Z0-9\s\p{P}\p{S}]+$/u;
+      const alphanumericRegex = /^[a-zA-Z0-9\s\p{P}\p{S}]+$/u;
       if (!alphanumericRegex.test(value)) {
         wx.showToast({
           title: "粤音只能输入英文和数字及所有符号",
@@ -1169,8 +1169,9 @@ Page({
       (card: any) => card.jyutping && card.jyutping.trim() !== "",
     );
 
-    const hasOriginText =
-      currentTask.record.text && currentTask.record.text.trim() !== "";
+    const hasOriginText = Boolean(
+      currentTask.record.text && currentTask.record.text.trim() !== "",
+    );
 
     this.setData({ canSubmit: hasValidJyutping && hasOriginText });
   },

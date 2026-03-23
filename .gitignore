@@ -1,2 +1,4 @@
 /node_modules
 /review-miniapp
+
+.DS_Store
