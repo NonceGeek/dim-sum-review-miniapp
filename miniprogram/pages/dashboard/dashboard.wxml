@@ -1,144 +1,131 @@
-<view class="fixed-header-wrapper">
-  <t-cell-group class="dataset-cell-group" theme="card">
-    <t-cell title="语料集" arrow hover note="{{datasetText}}" bind:click="onDatasetPicker" />
-  </t-cell-group>
-  <t-cell-group class="dataset-cell-group" theme="card">
-    <t-cell title="用户" arrow hover note="{{userText}}" bind:click="onUserPicker" />
-  </t-cell-group>
-</view>
+<view class="container-wrap theme-{{currentTheme}}">
+  <view class="fixed-header-wrapper">
+    <t-cell-group class="dataset-cell-group" theme="card">
+      <t-cell title="语料集" arrow hover note="{{datasetText}}" bind:click="onDatasetPicker" />
+    </t-cell-group>
+    <t-cell-group class="dataset-cell-group" theme="card">
+      <t-cell title="用户" arrow hover note="{{userText}}" bind:click="onUserPicker" />
+    </t-cell-group>
+  </view>
 
-<!-- 可搜索的用户选择器 -->
-<view class="searchable-picker" wx:if="{{userVisible}}">
-  <view class="picker-mask" bindtap="onUserPickerCancel"></view>
-  <view class="picker-container">
-    <view class="picker-header">
-      <text class="picker-title">选择用户</text>
-      <view class="picker-close" bindtap="onUserPickerCancel">
-        <text class="close-icon">×</text>
+  <!-- 可搜索的用户选择器 -->
+  <view class="searchable-picker" wx:if="{{userVisible}}">
+    <view class="picker-mask" bindtap="onUserPickerCancel"></view>
+    <view class="picker-container">
+      <view class="picker-header">
+        <text class="picker-title">选择用户</text>
+        <view class="picker-close" bindtap="onUserPickerCancel">
+          <text class="close-icon">×</text>
+        </view>
       </view>
-    </view>
 
-    <!-- 搜索框 -->
-    <view class="search-box">
-      <view class="search-input-wrapper">
-        <t-icon name="search" size="48rpx" color="inherit" />
-        <input class="search-input" placeholder="搜索用户名称" value="{{userSearchKeyword}}" bindinput="onUserSearchInput"
-          confirm-type="search" />
-        <text class="clear-icon" wx:if="{{userSearchKeyword}}" bindtap="onClearUserSearch">✕</text>
+      <!-- 搜索框 -->
+      <view class="search-box">
+        <view class="search-input-wrapper">
+          <t-icon name="search" size="48rpx" color="inherit" />
+          <input class="search-input" placeholder="搜索用户名称" value="{{userSearchKeyword}}" bindinput="onUserSearchInput"
+            confirm-type="search" />
+          <text class="clear-icon" wx:if="{{userSearchKeyword}}" bindtap="onClearUserSearch">✕</text>
+        </view>
       </view>
-    </view>
 
-    <!-- 选项列表 -->
-    <scroll-view class="picker-options" scroll-y enhanced show-scrollbar="{{false}}">
-      <view class="option-list">
-        <view class="option-item {{userValue === item.value ? 'option-item-selected' : ''}}" wx:for="{{filteredUsers}}"
-          wx:key="value" bindtap="onSelectUser" data-value="{{item.value}}" data-label="{{item.label}}">
-          <view class="option-content">
-            <text class="option-label">{{item.label}}</text>
-            <text class="option-check" wx:if="{{userValue === item.value}}">✓</text>
+      <!-- 选项列表 -->
+      <scroll-view class="picker-options" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="option-list">
+          <view class="option-item {{userValue === item.userId ? 'option-item-selected' : ''}}"
+            wx:for="{{filteredUsers}}" wx:key="value" bindtap="onSelectUser" data-value="{{item.userId}}"
+            data-label="{{item.username}}">
+            <view class="option-content">
+              <block wx:if="{{item.avatar}}">
+                <t-image class="option-avatar" shape="circle" src="{{item.avatar}}" alt="{{item.username}}"
+                  width="80rpx" height="80rpx" />
+              </block>
+              <block wx:else>
+                <t-avatar class="option-avatar" shape="circle" size="small">{{item.username[0]}}</t-avatar>
+              </block>
+              <text class="option-label">{{item.username}}</text>
+              <text class="option-check" wx:if="{{userValue === item.userId}}">✓</text>
+            </view>
+          </view>
+
+          <!-- 无搜索结果 -->
+          <view class="no-result" wx:if="{{filteredUsers.length === 0 && userSearchKeyword}}">
+            <text class="no-result-text">未找到相关用户</text>
+          </view>
+
+          <!-- 无数据 -->
+          <view class="no-result" wx:if="{{users.length === 0}}">
+            <text class="no-result-text">暂无用户数据</text>
           </view>
         </view>
-
-        <!-- 无搜索结果 -->
-        <view class="no-result" wx:if="{{filteredUsers.length === 0 && userSearchKeyword}}">
-          <text class="no-result-text">未找到相关用户</text>
-        </view>
-
-        <!-- 无数据 -->
-        <view class="no-result" wx:if="{{users.length === 0}}">
-          <text class="no-result-text">暂无用户数据</text>
-        </view>
-      </view>
-    </scroll-view>
+      </scroll-view>
+    </view>
   </view>
+  <block wx:if="{{loading}}">
+  </block>
+  <block wx:else>
+    <view class="content-wrapper">
+      <t-cell-group wx:if="{{userValue === 'all'}}" class="dataset-cell-group" theme="card">
+        <t-cell title="统计" hover>
+          <view class="avatar" slot="left-icon">
+            <t-avatar shape="circle" size="small">统</t-avatar>
+          </view>
+        </t-cell>
+        <t-cell title="总语料数" hover note="{{summary.totalCorpusCount}}" />
+        <t-cell title="总任务数" hover note="{{summary.totalCount}}" />
+        <t-cell title="已处理" hover note="{{summary.processedCount}}" />
+        <t-cell title="未处理" hover note="{{summary.unprocessedCount}}" />
+        <t-cell title="完成率" hover>
+          <view slot="note"
+            class="completion-rate {{summary.completionRate > 75 ? 'rate-green' : summary.completionRate > 50 ? 'rate-orange' : summary.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
+            {{summary.completionRate}}%
+          </view>
+        </t-cell>
+      </t-cell-group>
+
+      <block wx:for="{{items}}" wx:key="value" wx:for-item="item">
+        <t-cell-group class="dataset-cell-group" theme="card" bind:tap="onHandleUserTaskList"
+          data-user-id="{{item.assigneeRef}}" data-dataset-name="{{item.corpusId}}">
+          <t-cell wx:if="{{item.assigneeRef !== currentUserId}}" title="{{item.assigneeRefName}}" hover arrow>
+            <view class="avatar" slot="left-icon">
+              <block wx:if="{{item.assigneeRefAvatar}}">
+                <t-image shape="circle" src="{{item.assigneeRefAvatar}}" alt="{{item.assigneeRefName}}" width="80rpx"
+                  height="80rpx" />
+              </block>
+              <block wx:else>
+                <t-avatar shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar>
+              </block>
+            </view>
+          </t-cell>
+          <t-cell wx:else title="{{item.assigneeRefName}}（自己）" hover>
+            <view class="avatar" slot="left-icon">
+              <block wx:if="{{item.assigneeRefAvatar}}">
+                <t-image shape="circle" src="{{item.assigneeRefAvatar}}" alt="{{item.assigneeRefName}}" width="80rpx"
+                  height="80rpx" />
+              </block>
+              <block wx:else>
+                <t-avatar shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar>
+              </block>
+            </view>
+          </t-cell>
+          <t-cell wx:if="{{datasetValue === 'all'}}" title="语料集" hover note="{{item.corpusName}}" />
+          <t-cell title="总任务数" hover note="{{item.totalCount}}" />
+          <t-cell title="已处理" hover note="{{item.processedCount}}" />
+          <t-cell title="未处理" hover note="{{item.unprocessedCount}}" />
+          <t-cell title="完成率" hover>
+            <view slot="note"
+              class="completion-rate {{item.completionRate > 75 ? 'rate-green' : item.completionRate > 50 ? 'rate-orange' : item.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
+              {{item.completionRate}}%
+            </view>
+          </t-cell>
+        </t-cell-group>
+      </block>
+
+    </view>
+  </block>
+
+  <t-picker visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
+    confirmBtn="确认" usingCustomNavbar bindchange="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
+    <t-picker-item options="{{datasets}}"></t-picker-item>
+  </t-picker>
 </view>
-
-<view class="content-wrapper">
-<!-- <t-row gutter="16" class="stats">
-  <t-col span="8">
-    <view class="stat-card">
-      <view class="stat-value">{{summary.totalCorpusCount}}</view>
-      <view class="stat-title">总语料数</view>
-    </view>
-  </t-col>
-  <t-col span="8">
-    <view class="stat-card">
-      <view class="stat-value">{{summary.totalCount}}</view>
-      <view class="stat-title">总任务数</view>
-    </view>
-  </t-col>
-  <t-col span="8">
-  </t-col>
-</t-row>
-
-<t-row gutter="16" class="stats">
-  <t-col span="8">
-    <view class="stat-card">
-      <view class="stat-value">{{summary.processedCount}}</view>
-      <view class="stat-title">已处理数</view>
-    </view>
-  </t-col>
-
-  <t-col span="8">
-    <view class="stat-card">
-      <view class="stat-value">{{summary.unprocessedCount}}</view>
-      <view class="stat-title">未处理数</view>
-    </view>
-  </t-col>
-
-  <t-col span="8">
-    <view class="stat-card">
-      <view class="stat-value completion-rate {{summary.completionRate > 75 ? 'rate-green' : summary.completionRate > 50 ? 'rate-orange' : summary.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
-        {{summary.completionRate}}%
-      </view>
-      <view class="stat-title">完成率</view>
-    </view>
-  </t-col>
-</t-row> -->
-
-<t-cell-group class="dataset-cell-group" theme="card">
-  <t-cell title="统计" hover>
-    <view class="avatar" slot="left-icon">
-      <t-avatar shape="round">统</t-avatar>
-    </view>
-  </t-cell>
-  <t-cell title="总语料数" hover note="{{summary.totalCorpusCount}}" />
-  <t-cell title="总任务数" hover note="{{summary.totalCount}}" />
-  <t-cell title="已处理" hover note="{{summary.processedCount}}" />
-  <t-cell title="未处理" hover note="{{summary.unprocessedCount}}" />
-  <t-cell title="完成率" hover>
-    <view slot="note" class="completion-rate {{summary.completionRate > 75 ? 'rate-green' : summary.completionRate > 50 ? 'rate-orange' : summary.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
-      {{summary.completionRate}}%
-    </view>
-  </t-cell>
-</t-cell-group>
-
-<block wx:for="{{items}}" wx:key="value" wx:for-item="item">
-<t-cell-group class="dataset-cell-group" theme="card" bind:tap="onHandleUserTaskList" data-user-id="{{item.assigneeRef}}" data-dataset-name="{{item.corpusId}}">
-  <t-cell wx:if="{{item.assigneeRef !== currentUserId}}" title="{{item.nickname}}" hover arrow>
-    <view class="avatar" slot="left-icon">
-      <t-avatar shape="round" image="{{item.avatar}}">{{item.nickname}}</t-avatar>
-    </view>
-  </t-cell>
-  <t-cell wx:else title="{{item.nickname}}（自己）" hover>
-    <view class="avatar" slot="left-icon">
-      <t-avatar shape="round" image="{{item.avatar}}">{{item.nickname}}</t-avatar>
-    </view>
-  </t-cell>
-  <t-cell wx:if="{{datasetValue === 'all'}}" title="语料集" hover note="{{item.corpusName}}" />
-  <t-cell title="总任务数" hover note="{{item.totalCount}}" />
-  <t-cell title="已处理" hover note="{{item.processedCount}}" />
-  <t-cell title="未处理" hover note="{{item.unprocessedCount}}" />
-  <t-cell title="完成率" hover>
-    <view slot="note" class="completion-rate {{item.completionRate > 75 ? 'rate-green' : item.completionRate > 50 ? 'rate-orange' : item.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
-      {{item.completionRate}}%
-    </view>
-  </t-cell>
-</t-cell-group>
-</block>
-</view>
-
-<t-picker visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
-  confirmBtn="确认" usingCustomNavbar bindchange="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
-  <t-picker-item options="{{datasets}}"></t-picker-item>
-</t-picker>

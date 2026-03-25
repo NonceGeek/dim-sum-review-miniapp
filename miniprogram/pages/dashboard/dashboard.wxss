@@ -84,9 +84,8 @@ page {
    头像样式
    ============================================ */
 .avatar {
-  width: 64rpx;
-  height: 64rpx;
-  border-radius: var(--radius-full);
+  width: 80rpx;
+  height: 80rpx;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -393,3 +392,25 @@ page {
     --td-font-gray-2: var(--text-secondary);
   }
 }
+
+.option-avatar {
+  margin-right: 10rpx;
+}
+
+/* ============================================
+   空状态样式
+   ============================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+  min-height: 400rpx;
+}
+
+.empty-text {
+  margin-top: 24rpx;
+  font-size: 28rpx;
+  color: var(--text-muted);
+} 

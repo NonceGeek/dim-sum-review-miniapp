@@ -22,14 +22,23 @@ Page({
     userVisible: false,
     userValue: "all",
     userText: "全部",
-    users: [] as { label: string; value: string; avatar: string }[],
+    users: [] as { username: string; userId: string; avatar: string }[],
     userSearchKeyword: "",
-    filteredUsers: [] as { label: string; value: string }[],
+    filteredUsers: [] as { username: string; userId: string }[],
     summary: {} as TaskSummary,
     items: [] as ItemSummary[],
     currentUserId: "",
+    loading: false,
+  },
+  onShow() {
+    this.syncTheme();
   },
 
+  syncTheme() {
+    const app = getApp<any>();
+    const currentTheme = app.getTheme() || "light";
+    this.setData({ currentTheme });
+  },
   /**
    * 生命周期函数--监听页面加载
    */
@@ -162,7 +171,7 @@ Page({
     const { users } = this.data;
 
     const filtered = users.filter((user) =>
-      user.label.toLowerCase().includes(keyword),
+      user.username.toLowerCase().includes(keyword),
     );
 
     this.setData({
@@ -185,34 +194,46 @@ Page({
    * 选择用户
    */
   onSelectUser(e: any) {
+    console.log("e.currentTarget.dataset:", e.currentTarget.dataset);
     const { value, label } = e.currentTarget.dataset;
-    this.setData({
-      userValue: value,
-      userText: label,
-      userVisible: false,
-      userSearchKeyword: "",
-    });
+    const isDeselect = this.data.userValue === value;
+    this.setData(
+      {
+        userValue: isDeselect ? "all" : value,
+        userText: isDeselect ? "全部" : label,
+        userVisible: false,
+        userSearchKeyword: "",
+      },
+      async () => {
+        await this.loadUsersByDataset(this.data.datasetValue);
+      },
+    );
 
     console.log("已选择用户:", { value, label });
-
-    // TODO: 根据选择的用户加载相关数据
   },
 
   /**
    * 用户选择器取消事件
    */
   onUserPickerCancel() {
-    this.setData({
-      userVisible: false,
-      userSearchKeyword: "",
-    });
+    this.setData(
+      {
+        userVisible: false,
+        userSearchKeyword: "",
+        userValue: "all",
+        userText: "全部",
+      },
+      async () => {
+        await this.loadUsersByDataset(this.data.datasetValue);
+      },
+    );
   },
 
   async loadUsersByDataset(datasetName: string) {
+    this.setData({ loading: true });
     wx.showLoading({
       title: "加载中...",
       mask: true,
-      duration: 2000,
     });
     let corpusNames = "";
     const datasets =
@@ -225,9 +246,45 @@ Page({
     } else {
       corpusNames = datasetName;
     }
-    const data = await request(`/tasks/stats?corpusName=${corpusNames}`);
+    // 先不带 assigneeRef 请求，获取所有用户列表
+    const data = await request(`/task/stats?corpusName=${corpusNames}`);
     console.log("data:", data);
 
+    // 获取所有用户信息
+    const userIds = data.items.map((item: ItemSummary) => item.assigneeRef).join(",");
+    const userlist = await request(`/users/public?userIds=${userIds}`);
+
+    // 格式化 items 并关联用户信息
+    let items = data.items
+      .map((item: ItemSummary) => {
+        const user = userlist.users.find((u: any) => u.userId === item.assigneeRef);
+        return {
+          ...item,
+          corpusName: datasets.find((d) => d.value === item.corpusId)?.label || "",
+          assigneeRefName: user?.username || "",
+          assigneeRefAvatar: user?.avatar || "",
+          completionRate: formatPercent(item.completionRate),
+          totalCorpusCount: formatNumber(item.totalCorpusCount),
+          totalCount: formatNumber(item.totalCount),
+          processedCount: formatNumber(item.processedCount),
+          unprocessedCount: formatNumber(item.unprocessedCount),
+        };
+      })
+      .sort((a: any, b: any) => b.completionRate - a.completionRate);
+
+    // 如果选择了特定用户，筛选该用户的 items
+    const { userValue } = this.data;
+    if (userValue && userValue !== "all") {
+      items = items.filter((item: any) => item.assigneeRef === userValue);
+    }
+
+    // 构建用户列表
+    const users = [
+      { userId: "all", username: "全部" },
+      ...userlist.users,
+    ];
+
+    // 格式化 summary
     const summary = {
       ...data.summary,
       completionRate: formatPercent(data.summary.completionRate),
@@ -237,25 +294,13 @@ Page({
       unprocessedCount: formatNumber(data.summary.unprocessedCount),
     };
 
-    const items = data.items.map((item: ItemSummary) => ({
-      ...item,
-      corpusName: datasets.find((d) => d.value === item.corpusId)?.label || "",
-      completionRate: formatPercent(item.completionRate),
-      totalCorpusCount: formatNumber(item.totalCorpusCount),
-      totalCount: formatNumber(item.totalCount),
-      processedCount: formatNumber(item.processedCount),
-      unprocessedCount: formatNumber(item.unprocessedCount),
-    }));
     console.log("items:", items);
-    const users = data.items.map((item) => ({
-      label: item.nickname || "",
-      value: item.assigneeRef,
-      avatar: item.avatar || "",
-    }));
     this.setData({
       summary,
       items,
       users,
+      filteredUsers: users,
+      loading: false,
     });
     wx.hideLoading();
   },

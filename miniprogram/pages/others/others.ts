@@ -237,7 +237,7 @@ Page({
 
       // 获取任务数据
       const data = await request(
-        `/tasks?corpusName=${dataset}&actorRef=${userInfo?.id}&assigneeRef=${user}&status=${status}&page=${page}&size=10`,
+        `/task/list?corpusName=${dataset}&actorRef=${userInfo?.id}&assigneeRef=${user}&status=${status}&page=${page}&size=10`,
       );
 
       // 防御性检查：确保返回数据格式正确
