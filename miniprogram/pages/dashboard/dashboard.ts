@@ -216,17 +216,25 @@ Page({
    * 用户选择器取消事件
    */
   onUserPickerCancel() {
-    this.setData(
-      {
+    const { userValue } = this.data;
+    if (userValue !== "all") {
+      this.setData(
+        {
+          userVisible: false,
+          userSearchKeyword: "",
+          userValue: "all",
+          userText: "全部",
+        },
+        async () => {
+          await this.loadUsersByDataset(this.data.datasetValue);
+        },
+      );
+    } else {
+      this.setData({
         userVisible: false,
         userSearchKeyword: "",
-        userValue: "all",
-        userText: "全部",
-      },
-      async () => {
-        await this.loadUsersByDataset(this.data.datasetValue);
-      },
-    );
+      });
+    }
   },
 
   async loadUsersByDataset(datasetName: string) {
@@ -251,16 +259,21 @@ Page({
     console.log("data:", data);
 
     // 获取所有用户信息
-    const userIds = data.items.map((item: ItemSummary) => item.assigneeRef).join(",");
+    const userIds = data.items
+      .map((item: ItemSummary) => item.assigneeRef)
+      .join(",");
     const userlist = await request(`/users/public?userIds=${userIds}`);
 
     // 格式化 items 并关联用户信息
     let items = data.items
       .map((item: ItemSummary) => {
-        const user = userlist.users.find((u: any) => u.userId === item.assigneeRef);
+        const user = userlist.users.find(
+          (u: any) => u.userId === item.assigneeRef,
+        );
         return {
           ...item,
-          corpusName: datasets.find((d) => d.value === item.corpusId)?.label || "",
+          corpusName:
+            datasets.find((d) => d.value === item.corpusId)?.label || "",
           assigneeRefName: user?.username || "",
           assigneeRefAvatar: user?.avatar || "",
           completionRate: formatPercent(item.completionRate),
@@ -279,10 +292,7 @@ Page({
     }
 
     // 构建用户列表
-    const users = [
-      { userId: "all", username: "全部" },
-      ...userlist.users,
-    ];
+    const users = [{ userId: "all", username: "全部" }, ...userlist.users];
 
     // 格式化 summary
     const summary = {
