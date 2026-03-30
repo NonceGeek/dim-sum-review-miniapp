@@ -11,7 +11,63 @@
    ============================================ */
 .t-tabs {
   background-color: var(--bg-card) !important;
-  border-bottom: 1px solid var(--border-light) !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+/* ============================================
+   搜索框样式
+   ============================================ */
+.search-wrapper {
+  position: sticky;
+  top: 88rpx;
+  z-index: 998;
+  padding: 24rpx 24rpx 24rpx 24rpx;
+  background-color: var(--bg-page);
+  border: none !important;
+}
+
+/* 搜索框输入框样式 */
+.search-placeholder {
+  background: var(--bg-input) !important;
+  margin-bottom: 0;
+}
+
+/* 搜索框组件样式 */
+.search-wrapper .t-search {
+  border: none !important;
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.search-wrapper .t-search::after {
+  display: none !important;
+  height: 0 !important;
+  border-bottom: none !important;
+}
+
+/* 深色模式下的搜索框样式 */
+.theme-dark .search-wrapper .t-search {
+  background: var(--bg-card) !important;
+  border: none !important;
+}
+
+.theme-dark .search-wrapper .t-search::after,
+.theme-dark .search-wrapper .t-search::before {
+  display: none !important;
+}
+
+.theme-dark .search-wrapper .t-search .t-icon {
+  color: var(--bg-card) !important;
+}
+
+.search-wrapper .t-search input {
+  color: #0D1117 !important;
+}
+
+.theme-dark .search-wrapper .t-search input::placeholder {
+  color: var(--bg-input) !important;
 }
 
 /* ============================================
@@ -19,13 +75,14 @@
    ============================================ */
 .content-wrapper {
   padding: 24rpx;
+  border: none !important;
+  background-color: var(--bg-page);
 }
 
-/* ============================================
-   TDesign Cell Group 样式
-   ============================================ */
+/* TDesign Cell Group 样式 */
 .custom-cell-group {
   margin: 0 12rpx;
+  border: none !important;
 }
 
 /* 自定义 Cell 样式 */

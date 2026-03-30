@@ -97,7 +97,7 @@
               </block>
             </view>
           </t-cell>
-          <t-cell wx:else title="{{item.assigneeRefName}}（自己）" hover>
+          <t-cell wx:else title="{{item.assigneeRefName}}（自己）" hover arrow>
             <view class="avatar" slot="left-icon">
               <block wx:if="{{item.assigneeRefAvatar}}">
                 <t-image shape="circle" src="{{item.assigneeRefAvatar}}" alt="{{item.assigneeRefName}}" width="80rpx"

@@ -7,7 +7,7 @@
     <view class="title">Dim Sum Review</view>
     <view class="subtitle">粤语数据标注校验平台</view>
     <view class="info">
-      本小程序仅供已通过审核的内部标注员使用。未获得标注员资格的用户请勿登录。
+      本小程序仅供已通过审核的内部标注员使用，未获得标注员资格的用户请勿登录。
     </view>
   </view>
   <view class="login-box">
@@ -19,16 +19,15 @@
       手机号登录
     </button>
     <view class="login-hint">如果网页端通过手机号注册，请使用手机号快速登录</view>
+    <view class="login-hint">点击登录即表示您已阅读并同意Dimsum<text class="agreement-link" bind:tap="goToTerms">《用户服务协议》</text>
+      <text class="agreement-text">和</text>
+      <text class="agreement-link" bind:tap="goToPrivacy">《隐私政策》</text>
+    </view>
   </view>
 
   <!-- 手机号登录弹窗 -->
-  <t-popup
-    visible="{{showPhonePopup}}"
-    placement="bottom"
-    bind:visible-change="onPopupClose"
-    close-on-overlay-click="{{true}}"
-    rounded="{{true}}"
-  >
+  <t-popup visible="{{showPhonePopup}}" placement="bottom" bind:visible-change="onPopupClose"
+    close-on-overlay-click="{{true}}" rounded="{{true}}">
     <view class="phone-login-popup theme-{{currentTheme}}">
       <view class="popup-header">
         <view class="popup-title">手机号登录</view>
@@ -37,42 +36,18 @@
       <view class="popup-content">
         <!-- 手机号输入 -->
         <view class="input-group">
-          <t-input
-            placeholder="请输入手机号"
-            value="{{phone}}"
-            bind:change="onPhoneChange"
-            type="number"
-            maxlength="11"
-            clearable="{{true}}"
-          />
+          <t-input placeholder="请输入手机号" value="{{phone}}" bind:change="onPhoneChange" type="number" maxlength="11"
+            clearable="{{true}}" />
         </view>
 
         <!-- 验证码输入 -->
         <view class="input-group">
           <view class="code-input-row">
-            <t-input
-              class="code-input"
-              placeholder="请输入验证码"
-              value="{{code}}"
-              bind:change="onCodeChange"
-              type="number"
-              maxlength="6"
-              clearable="{{true}}"
-            />
-            <t-button
-              class="send-code-btn"
-              size="medium"
-              variant="outline"
-              bind:tap="sendCode"
-              disabled="{{counting || !phone}}"
-              loading="{{sendingCode}}"
-            >
-              <t-count-down
-                wx:if="{{counting}}"
-                time="{{60000}}"
-                format="ss秒"
-                bind:finish="onCountDownFinish"
-              />
+            <t-input class="code-input" placeholder="请输入验证码" value="{{code}}" bind:change="onCodeChange" type="number"
+              maxlength="6" clearable="{{true}}" />
+            <t-button class="send-code-btn" size="medium" variant="outline" bind:tap="sendCode"
+              disabled="{{counting || !phone}}" loading="{{sendingCode}}">
+              <t-count-down wx:if="{{counting}}" time="{{60000}}" format="ss秒" bind:finish="onCountDownFinish" />
               <text wx:else>{{codeButtonText}}</text>
             </t-button>
           </view>
@@ -82,7 +57,7 @@
         <view class="agreement-box">
           <checkbox-group bind:change="onAgreementChange">
             <label class="agreement-label">
-              <checkbox value="agreed" checked="{{agreedToTerms}}" class="agreement-checkbox"/>
+              <checkbox value="agreed" checked="{{agreedToTerms}}" class="agreement-checkbox" />
               <text class="agreement-text">我已阅读并同意</text>
               <text class="agreement-link" bind:tap="goToTerms">《用户服务协议》</text>
               <text class="agreement-text">和</text>
@@ -93,14 +68,8 @@
       </view>
 
       <view class="popup-footer">
-        <t-button
-          class="login-btn"
-          theme="primary"
-          size="large"
-          bind:tap="confirmPhoneLogin"
-          disabled="{{!phone || !code || !agreedToTerms}}"
-          loading="{{logining}}"
-        >
+        <t-button class="login-btn" theme="primary" size="large" bind:tap="confirmPhoneLogin"
+          disabled="{{!phone || !code || !agreedToTerms}}" loading="{{logining}}">
           登录
         </t-button>
       </view>

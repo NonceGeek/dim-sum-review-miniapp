@@ -8,14 +8,27 @@
       <t-tab-panel value="unprocessed" label="未处理" />
     </t-tabs>
 
+    <!-- 搜索框 -->
+    <view class="search-wrapper">
+      <t-search
+        value="{{searchKeyword}}"
+        placeholder="搜索任务关键词"
+        shape="round"
+        t-class="search-placeholder"
+        t-class-left="search-content"
+        bind:change="onSearchChange"
+        bind:submit="onSearchSubmit"
+        bind:clear="onSearchClear"
+      />
+    </view>
 
     <!-- 内容区域 -->
     <view class="content-wrapper">
       <t-cell-group bordered="{{false}}" class="custom-cell-group">
-        <t-cell wx:for="{{ currentTasks }}" wx:for-item="item" wx:key="id" leftIcon="{{ item.status === 'completed' ? 'check-circle-filled': 'help-circle'}}"
+        <t-cell wx:for="{{ currentTasks }}" wx:for-item="item" wx:key="index" leftIcon="{{ item.status === 'completed' ? 'check-circle-filled': 'help-circle'}}"
           title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}"
-          data-task-status="{{ item.status }}" hover class="custom-cell" />
-        <view class="more-view" wx:if="{{ currentTasks.length > 0 && (activeTab === 'all' && !allLoadFinished || activeTab === 'processed' && !processedLoadFinished || activeTab === 'unprocessed' && !unprocessedLoadFinished) }}">
+          data-task-status="{{ item.status }}" hover class="custom-cell" arrow/>
+        <view class="more-view" wx:if="{{ currentTasks.length > 0 && ((activeTab === 'all' && !allLoadFinished) || (activeTab === 'processed' && !processedLoadFinished) || (activeTab === 'unprocessed' && !unprocessedLoadFinished)) }}">
           <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
             加载更多
           </t-button>

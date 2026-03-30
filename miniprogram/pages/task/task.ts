@@ -156,6 +156,8 @@ Page({
     pickerType: "", // "emotion" 或 "intensity"
     currentEmotionCardIndex: -1,
     currentEmotionBlockIndex: -1,
+    // 是否是自己的task
+    isOwner: false,
   },
 
   addBlock(type: string) {
@@ -207,22 +209,29 @@ Page({
    * 生命周期函数--监听页面加载
    */
   async onLoad(options: { taskId: string }) {
-    const { taskId, status } = options;
+    const { taskId, status, userId } = options;
 
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
     const { statusBarHeight: sysStatusBarHeight } = wx.getSystemInfoSync();
     const navBarHeight =
       (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
+    const { id } = wx.getStorageSync("userInfo");
+    const isOwner = userId === id;
 
-    this.setData({
-      taskId,
-      status,
-      headerHeight: navBarHeight,
-    });
-    console.log("[页面] onLoad options:", options);
-    this.syncTheme();
-    await this.getTask(taskId);
+    this.setData(
+      {
+        taskId,
+        status,
+        headerHeight: navBarHeight,
+        isOwner,
+      },
+      async () => {
+        console.log("[页面] onLoad options:", options);
+        this.syncTheme();
+        await this.getTask(taskId);
+      },
+    );
   },
 
   async onReady() {
@@ -262,6 +271,7 @@ Page({
       title: "加载中...",
     });
     console.log("status:", this.data.status);
+    const { isOwner } = this.data;
     try {
       const categories =
         wx.getStorageSync("categories") || app.globalData.categories || [];
@@ -288,7 +298,8 @@ Page({
             data: data.context.text,
             source,
             source_name,
-            canEdit: (corpusWrite?.canEdit as string[]).includes(source),
+            canEdit:
+              (corpusWrite?.canEdit as string[]).includes(source) && isOwner,
             cantonesePronunciations: [s.value],
             suggestions: s,
             record: JSON.parse(JSON.stringify(s.record)),
@@ -298,7 +309,8 @@ Page({
             data: data.context.text,
             source,
             source_name,
-            canEdit: (corpusWrite?.canEdit as string[]).includes(source),
+            canEdit:
+              (corpusWrite?.canEdit as string[]).includes(source) && isOwner,
             suggestions: s,
             record: JSON.parse(JSON.stringify(s.record)),
           };

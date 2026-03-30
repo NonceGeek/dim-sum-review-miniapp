@@ -218,7 +218,7 @@
   <van-icon wx:if="{{corpus.canAdd && !hidden}}" name="add" size="36px" bind:click="onAddClick" custom-class="add-icon" />
 </view>
 <!-- 底部按钮 -->
-<view class="footer" wx:if="{{status !== 'completed'}}">
+<view class="footer" wx:if="{{status !== 'completed' && isOwner}}">
   <t-button theme="default" shape="round" bind:tap="{{taskDetail[currentIndex].canEdit ? 'onCancel': 'onConfirm'}}" class="btn-cancel btn-cancel-inner">
     不处理
   </t-button>

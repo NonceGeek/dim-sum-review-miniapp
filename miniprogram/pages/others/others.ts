@@ -20,6 +20,7 @@ Page({
   data: {
     activeTab: "all", // 当前激活的 tab: all, processed, unprocessed
     currentTasks: [] as any[], // 当前显示的任务列表
+    searchKeyword: "", // 搜索关键词
     headerHeight: 0,
     statusBarHeight,
     currentTheme: "light" as "light" | "dark",
@@ -36,14 +37,56 @@ Page({
     allPage: 0,
     allTotal: 0,
     allLoadFinished: false,
+    allLoading: false,
     processedTasks: [] as any[],
     processedPage: 0,
     processedTotal: 0,
     processedLoadFinished: false,
+    processedLoading: false,
     unprocessedTasks: [] as any[],
     unprocessedPage: 0,
     unprocessedTotal: 0,
     unprocessedLoadFinished: false,
+    unprocessedLoading: false,
+  },
+
+  /**
+   * 重置并重新加载指定 tab 的数据
+   */
+  resetAndFetchTab(tab: "all" | "processed" | "unprocessed") {
+    const stateMap = {
+      all: {
+        pageKey: "allPage",
+        tasksKey: "allTasks",
+        loadFinishedKey: "allLoadFinished",
+        loadingKey: "allLoading",
+      },
+      processed: {
+        pageKey: "processedPage",
+        tasksKey: "processedTasks",
+        loadFinishedKey: "processedLoadFinished",
+        loadingKey: "processedLoading",
+      },
+      unprocessed: {
+        pageKey: "unprocessedPage",
+        tasksKey: "unprocessedTasks",
+        loadFinishedKey: "unprocessedLoadFinished",
+        loadingKey: "unprocessedLoading",
+      },
+    };
+
+    const config = stateMap[tab];
+    this.setData(
+      {
+        [config.pageKey]: 1,
+        [config.tasksKey]: [],
+        [config.loadFinishedKey]: false,
+        [config.loadingKey]: false,
+      },
+      () => {
+        this.fetchTasks(tab);
+      },
+    );
   },
 
   /**
@@ -51,12 +94,80 @@ Page({
    */
   onTabChange(event: any) {
     const { value } = event.detail;
-    this.setData({
-      activeTab: value,
-    });
+    const { searchKeyword } = this.data;
 
-    // 更新当前显示的任务列表
-    this.updateCurrentTasks();
+    // 如果之前有搜索关键词，切换tab时清空搜索并重新加载数据
+    if (searchKeyword && searchKeyword.trim()) {
+      this.setData(
+        {
+          activeTab: value,
+        },
+        () => {
+          this.resetAndFetchTab(value);
+        },
+      );
+    } else {
+      // 如果没有搜索关键词，只更新显示
+      this.setData(
+        {
+          activeTab: value,
+        },
+        () => {
+          this.updateCurrentTasks();
+        },
+      );
+    }
+  },
+
+  /**
+   * 搜索框内容变化
+   */
+  onSearchChange(event: any) {
+    const { value } = event.detail;
+    this.setData({
+      searchKeyword: value,
+    });
+  },
+
+  /**
+   * 搜索提交
+   */
+  async onSearchSubmit() {
+    const { activeTab } = this.data;
+    this.resetAndFetchTab(activeTab);
+  },
+
+  /**
+   * 清空搜索
+   */
+  onSearchClear() {
+    this.setData(
+      {
+        searchKeyword: "",
+        allTasks: [] as any[],
+        allPage: 1,
+        allTotal: 0,
+        allLoadFinished: false,
+        allLoading: false,
+        processedTasks: [] as any[],
+        processedPage: 1,
+        processedTotal: 0,
+        processedLoadFinished: false,
+        processedLoading: false,
+        unprocessedTasks: [] as any[],
+        unprocessedPage: 1,
+        unprocessedTotal: 0,
+        unprocessedLoadFinished: false,
+        unprocessedLoading: false,
+      },
+      async () => {
+        await Promise.all([
+          this.fetchTasks("all"),
+          this.fetchTasks("processed"),
+          this.fetchTasks("unprocessed"),
+        ]);
+      },
+    );
   },
 
   /**
@@ -73,45 +184,43 @@ Page({
     } else if (activeTab === "unprocessed") {
       tasks = unprocessedTasks;
     }
+
     console.log("taskssss:", tasks);
     this.setData({
       currentTasks: tasks,
     });
   },
 
-  // /**
-  //  * 点击任务卡片
-  //  */
-  // onClick(event: any) {
-  //   console.log("event:", event);
-  //   const { taskId, taskStatus } = event.target.dataset;
-  //   wx.navigateTo({
-  //     url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}`,
-  //   });
-  // },
+  /**
+   * 点击任务卡片
+   */
+  onClick(event: any) {
+    console.log("event:", event);
+    const { taskId, taskStatus } = event.target.dataset;
+    wx.navigateTo({
+      url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}&userId=${this.data.user}`,
+    });
+  },
 
   /**
    * 加载更多
    */
   async onClickMore() {
     const { activeTab } = this.data;
+    const pageKeyMap = {
+      all: "allPage",
+      processed: "processedPage",
+      unprocessed: "unprocessedPage",
+    };
 
-    if (activeTab === "all") {
-      this.setData({
-        allPage: this.data.allPage + 1,
-      });
-      await this.fetchTasks("all");
-    } else if (activeTab === "processed") {
-      this.setData({
-        processedPage: this.data.processedPage + 1,
-      });
-      await this.fetchTasks("processed");
-    } else if (activeTab === "unprocessed") {
-      this.setData({
-        unprocessedPage: this.data.unprocessedPage + 1,
-      });
-      await this.fetchTasks("unprocessed");
-    }
+    this.setData(
+      {
+        [pageKeyMap[activeTab]]: this.data[pageKeyMap[activeTab]] + 1,
+      },
+      async () => {
+        await this.fetchTasks(activeTab);
+      },
+    );
   },
 
   /**
@@ -172,6 +281,9 @@ Page({
       headerHeight: navBarHeight,
       dataset: datasetName,
       user: userId,
+      allPage: 1,
+      processedPage: 1,
+      unprocessedPage: 1,
     });
 
     // 获取任务数据 - 并行加载三种状态的数据
@@ -190,13 +302,29 @@ Page({
    * @param type 任务类型: all | processed | unprocessed
    */
   async fetchTasks(type: "all" | "processed" | "unprocessed") {
+    // 防重入检查
+    let isLoading = false;
+    if (type === "all") {
+      if (this.data.allLoading) return;
+      isLoading = this.data.allLoading;
+      this.setData({ allLoading: true });
+    } else if (type === "processed") {
+      if (this.data.processedLoading) return;
+      isLoading = this.data.processedLoading;
+      this.setData({ processedLoading: true });
+    } else if (type === "unprocessed") {
+      if (this.data.unprocessedLoading) return;
+      isLoading = this.data.unprocessedLoading;
+      this.setData({ unprocessedLoading: true });
+    }
+
     wx.showLoading({ title: "加载中..." });
     try {
       const userInfo =
         app.globalData.userInfo || wx.getStorageSync("userInfo") || null;
-      const { dataset, user } = this.data;
+      const { dataset, user, searchKeyword } = this.data;
 
-      let page = 0;
+      let page = 1;
       let currentTasks: any[] = [];
       let total = 0;
 
@@ -235,10 +363,14 @@ Page({
             ? "completed"
             : "created,notified,in_progress";
 
+      // 构建请求URL，包含搜索关键词
+      let url = `/task/list?corpusName=${dataset}&actorRef=${userInfo?.id}&assigneeRef=${user}&status=${status}&page=${page}&pageSize=10`;
+      if (searchKeyword && searchKeyword.trim()) {
+        url += `&q=${encodeURIComponent(searchKeyword.trim())}`;
+      }
+
       // 获取任务数据
-      const data = await request(
-        `/task/list?corpusName=${dataset}&actorRef=${userInfo?.id}&assigneeRef=${user}&status=${status}&page=${page}&size=10`,
-      );
+      const data = await request(url);
 
       // 防御性检查：确保返回数据格式正确
       if (!data || !Array.isArray(data.items)) {
@@ -255,6 +387,7 @@ Page({
           {
             allTasks: newList,
             allTotal: data.pagination?.total || 0,
+            allLoadFinished: newList.length >= (data.pagination?.total || 0),
           },
           () => {
             this.updateCurrentTasks();
@@ -265,6 +398,8 @@ Page({
           {
             processedTasks: newList,
             processedTotal: data.pagination?.total || 0,
+            processedLoadFinished:
+              newList.length >= (data.pagination?.total || 0),
           },
           () => {
             this.updateCurrentTasks();
@@ -275,6 +410,8 @@ Page({
           {
             unprocessedTasks: newList,
             unprocessedTotal: data.pagination?.total || 0,
+            unprocessedLoadFinished:
+              newList.length >= (data.pagination?.total || 0),
           },
           () => {
             this.updateCurrentTasks();
@@ -290,6 +427,13 @@ Page({
       });
     } finally {
       wx.hideLoading();
+      if (type === "all") {
+        this.setData({ allLoading: false });
+      } else if (type === "processed") {
+        this.setData({ processedLoading: false });
+      } else if (type === "unprocessed") {
+        this.setData({ unprocessedLoading: false });
+      }
     }
   },
 

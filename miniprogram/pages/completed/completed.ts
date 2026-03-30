@@ -81,7 +81,8 @@ Page({
       this.setData({
         completed: filterData,
         ori_completed: newList,
-        total: data.pagination?.total - reassigninglist.length || 0,
+        total: data.pagination?.total,
+        loadFinished: filterData.length >= data.pagination?.total
       });
     } catch (err) {
       console.error("fetchTasks 失败", err);
