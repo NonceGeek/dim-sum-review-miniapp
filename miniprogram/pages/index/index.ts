@@ -281,7 +281,7 @@ Page({
     } catch (err) {
       console.error("fetchUncompletedTasks 失败", err);
       wx.showToast({
-        title: err.error || String(err) || "加载失败",
+        title: err.errMsg || err?.error || "加载失败",
         icon: "none",
         duration: 4000,
       });

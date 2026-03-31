@@ -59,11 +59,16 @@
 }
 
 .theme-dark .search-wrapper .t-search .t-icon {
-  color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+.search-wrapper .t-search .t-search__input-box{
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
 }
 
 .search-wrapper .t-search input {
-  color: #0D1117 !important;
+  color: var(--text-primary) !important;
 }
 
 .theme-dark .search-wrapper .t-search input::placeholder {
