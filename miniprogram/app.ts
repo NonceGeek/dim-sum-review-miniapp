@@ -3,6 +3,7 @@ import ENV from "./config/setting";
 import { public_request } from "./utils/http";
 
 let loginPromise: Promise<string> | null = null;
+let updateListenerRegistered = false;
 
 // 主题类型定义
 export type ThemeMode = "auto" | "light" | "dark";
@@ -37,8 +38,11 @@ App({
       }
     });
 
-    // 检查是否有新的小程序版本
-    this.updateNotification();
+    // 监听小程序版本更新（只注册一次）
+    if (!updateListenerRegistered) {
+      this.setupUpdateListener();
+      updateListenerRegistered = true;
+    }
   },
 
   /**
@@ -402,12 +406,8 @@ App({
       });
     });
   },
-  updateNotification() {
+  setupUpdateListener() {
     const updateManager = wx.getUpdateManager();
-
-    updateManager.onCheckForUpdate(function (res) {
-      console.log("是否有新版本：", res.hasUpdate);
-    });
 
     updateManager.onUpdateReady(function () {
       wx.showModal({

@@ -1,6 +1,9 @@
 import request from "../../utils/http";
+import ENV from "../../config/setting";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
+const { miniProgram } = wx.getAccountInfoSync();
+console.log("version:", miniProgram.envVersion, miniProgram.version);
 
 // 主题模式选项
 const THEME_OPTIONS = [
@@ -40,6 +43,7 @@ Page({
     themeOptions: THEME_OPTIONS,
     tabBarColor: ["#94A3B8", "#4A7CF3"],
     datasets: [] as { label: string; value: string }[],
+    version: miniProgram.version || `${ENV.VERSION}`,
   },
 
   onClick(event: any) {
@@ -276,7 +280,7 @@ Page({
         uncompleted: filterData,
         ori_uncompleted: newList,
         uncompletedTotal: data.pagination?.total,
-        uncompletedLoadFinished: filterData.length >= data.pagination?.total
+        uncompletedLoadFinished: filterData.length >= data.pagination?.total,
       });
     } catch (err) {
       console.error("fetchUncompletedTasks 失败", err);

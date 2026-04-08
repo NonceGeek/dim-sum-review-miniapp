@@ -9,12 +9,12 @@ import ENV from "../config/setting";
 
 let isRefreshing = false;
 let refreshQueue: Function[] = [];
-const app = getApp<{ globalData: { accessToken?: string } }>();
 
 function request(url: string, options: any = {}): Promise<any> {
   return new Promise((resolve, reject) => {
+    const app = getApp<{ globalData: { accessToken?: string } }>();
     const token =
-      wx.getStorageSync("accessToken") || app.globalData.accessToken || "";
+      wx.getStorageSync("accessToken") || app?.globalData?.accessToken || "";
 
     wx.request({
       url: `${ENV.API_BASE_URL}${url}`,

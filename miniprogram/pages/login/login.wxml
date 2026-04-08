@@ -19,10 +19,15 @@
       手机号登录
     </button>
     <view class="login-hint">如果网页端通过手机号注册，请使用手机号快速登录</view>
-    <view class="login-hint">点击登录即表示您已阅读并同意Dimsum<text class="agreement-link" bind:tap="goToTerms">《用户服务协议》</text>
-      <text class="agreement-text">和</text>
-      <text class="agreement-link" bind:tap="goToPrivacy">《隐私政策》</text>
+    <view class="login-hint">
+      <checkbox-group bind:change="onAgreementChange">
+        <checkbox value="agreed" checked="{{agreedToTerms}}" class="agreement-checkbox" style="transform: scale(0.7)" />
+        我已阅读并同意Dimsum<text class="agreement-link" bind:tap="goToTerms">《用户服务协议》</text>
+        <text class="agreement-text">和</text>
+        <text class="agreement-link" bind:tap="goToPrivacy">《隐私政策》</text>
+      </checkbox-group>
     </view>
+    <view class="login-hint">Version: {{version}}</view>
   </view>
 
   <!-- 手机号登录弹窗 -->

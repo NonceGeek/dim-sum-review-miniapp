@@ -88,6 +88,7 @@
             退出登录
           </t-button>
         </view>
+        <view class="version-hint">Version: {{version}}</view>
       </view>
       <!-- 主题选择弹窗 -->
       <t-action-sheet visible="{{showThemeSheet}}" items="{{themeOptions}}" bind:selected="onThemeSelect" bind:cancel="onThemeSheetClose" bind:close="onThemeSheetClose" />

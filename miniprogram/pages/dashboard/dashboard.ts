@@ -1,15 +1,6 @@
 import { formatNumber, formatPercent } from "../../utils/number";
 import request from "../../utils/http";
 
-const app = getApp<{
-  globalData: {
-    allowedCorpora: ICorpusItem[];
-    categories: any[];
-    writeCorpora: { label: string; value: string }[];
-    userInfo: UserInfo | null;
-  };
-}>();
-
 Page({
   /**
    * 页面的初始数据
@@ -35,7 +26,7 @@ Page({
   },
 
   syncTheme() {
-    const app = getApp<any>();
+    const app = getApp<IAppOption>();
     const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
@@ -44,6 +35,7 @@ Page({
    */
   async onLoad() {
     try {
+      const app = getApp<IAppOption>();
       // 直接使用登录后组装的 writeCorpora，不需要每次重新计算
       const datasets =
         app?.globalData?.writeCorpora ||
@@ -97,7 +89,7 @@ Page({
     } catch (error) {
       console.error("加载语料集失败:", error);
       wx.showToast({
-        title: "加载语料集失败",
+        title: error.errMsg || error.message || "加载数据失败",
         icon: "none",
       });
     }
@@ -244,6 +236,7 @@ Page({
       mask: true,
     });
     let corpusNames = "";
+    const app = getApp<IAppOption>();
     const datasets =
       app?.globalData?.writeCorpora || wx.getStorageSync("writeCorpora") || [];
     if (datasetName === "all") {
@@ -258,12 +251,30 @@ Page({
     const data = await request(`/task/stats?corpusName=${corpusNames}`);
     console.log("data:", data);
 
+    if (!data || !Array.isArray(data.items)) {
+      console.error("/task/stats API 返回数据格式错误:", data);
+      throw new Error(data?.message || "任务统计数据加载失败");
+    }
     // 获取所有用户信息
-    const userIds = data.items
-      .map((item: ItemSummary) => item.assigneeRef)
-      .join(",");
-    const userlist = await request(`/users/public?userIds=${userIds}`);
+    const userIdsArray = [
+      ...new Set(data.items.map((item: ItemSummary) => item.assigneeRef)),
+    ];
 
+    if (!userIdsArray || !userIdsArray.length) {
+      throw new Error("用户数据异常");
+    }
+
+    if (userIdsArray.length > 100) {
+      throw new Error("用户数据异常，最多支持100个用户查询，请联系管理员");
+    }
+    const userIds = userIdsArray.join(",");
+
+    let userlist = await request(`/users/public?userIds=${userIds}`);
+
+    if (!userlist || !Array.isArray(userlist.users)) {
+      console.error("/users/public API 返回数据格式错误:", data);
+      throw new Error(data?.message || "用户详情数据加载失败");
+    }
     // 格式化 items 并关联用户信息
     let items = data.items
       .map((item: ItemSummary) => {
@@ -271,7 +282,8 @@ Page({
           (u: any) => u.userId === item.assigneeRef,
         );
         return {
-          ...item,
+          assigneeRef: item.assigneeRef,
+          corpusId: item.corpusId,
           corpusName:
             datasets.find((d) => d.value === item.corpusId)?.label || "",
           assigneeRefName: user?.username || "",
@@ -292,7 +304,10 @@ Page({
     }
 
     // 构建用户列表
-    const users = [{ userId: "all", username: "全部" }, ...userlist.users];
+    const users = [
+      { userId: "all", username: "全部" },
+      ...(userlist.users || []),
+    ];
 
     // 格式化 summary
     const summary = {
@@ -305,6 +320,7 @@ Page({
     };
 
     console.log("items:", items);
+    console.log("summary:", summary);
     this.setData({
       summary,
       items,

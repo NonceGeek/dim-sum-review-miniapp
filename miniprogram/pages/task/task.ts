@@ -4,12 +4,6 @@ import { add8Hours } from "../../utils/date";
 import request, { public_request } from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
-const app = getApp<{
-  globalData: {
-    allowedCorpora?: { category_name: string; permission: string }[];
-    categories: [];
-  };
-}>();
 
 const SOURCE_NAME_DEFAULT = "llm";
 // should test when use baseline: lexiconBaseCorpusName
@@ -53,6 +47,7 @@ function getAuthCorpus(data) {
   });
   const { role, isSystemAdmin } = wx.getStorageSync("userInfo");
 
+  const app = getApp<IAppOption>();
   const allowedCorpora =
     wx.getStorageSync("allowedCorpora") || app.globalData.allowedCorpora || [];
   console.log("allowedCorpora:", allowedCorpora);
@@ -217,7 +212,8 @@ Page({
     const navBarHeight =
       (rect.top - sysStatusBarHeight) * 2 + rect.height + sysStatusBarHeight;
     const { id } = wx.getStorageSync("userInfo");
-    const isOwner = userId === id;
+    console.log("userId:", userId);
+    const isOwner = userId ? userId === id : true;
 
     this.setData(
       {
@@ -273,6 +269,8 @@ Page({
     console.log("status:", this.data.status);
     const { isOwner } = this.data;
     try {
+      const app = getApp<IAppOption>();
+
       const categories =
         wx.getStorageSync("categories") || app.globalData.categories || [];
       const data = await request(`/task/${taskId}`);
@@ -489,9 +487,10 @@ Page({
       });
     } else {
       wx.hideLoading();
-      wx.showToast({
+      wx.showModal({
         title: "提交失败",
-        icon: "error",
+        content: data?.details?.reason || "",
+        showCancel: false,
       });
     }
   },

@@ -1,7 +1,7 @@
 import request from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
-const app = getApp<IAppOption>();
+
 // 主题模式选项
 const THEME_OPTIONS = [
   { label: "跟随系统", value: "auto" },
@@ -224,25 +224,10 @@ Page({
   },
 
   /**
-   * 初始化主题
-   */
-  initTheme() {
-    const app = getApp<any>();
-    const themeMode = app.getThemeMode() || "auto";
-    const currentTheme = app.getTheme() || "light";
-
-    this.setData({
-      themeMode,
-      currentTheme,
-      themeModeText: THEME_MODE_TEXT[themeMode],
-    });
-  },
-
-  /**
    * 同步主题状态
    */
   syncTheme() {
-    const app = getApp<any>();
+    const app = getApp<IAppOption>();
     const themeMode = app.getThemeMode();
     const currentTheme = app.getTheme();
 
@@ -262,14 +247,10 @@ Page({
    * 页面加载
    */
   async onLoad(options: { datasetName?: string; userId?: string }) {
-    const app = getApp<IAppOption>();
 
     // 接收上一页面带来的参数
     const { datasetName, userId } = options;
     console.log("接收到的参数:", datasetName, userId);
-
-    // 初始化主题
-    this.initTheme();
 
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
@@ -320,6 +301,7 @@ Page({
 
     wx.showLoading({ title: "加载中..." });
     try {
+      const app = getApp<IAppOption>();
       const userInfo =
         app.globalData.userInfo || wx.getStorageSync("userInfo") || null;
       const { dataset, user, searchKeyword } = this.data;

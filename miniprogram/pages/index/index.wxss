@@ -425,3 +425,9 @@ t-action-sheet {
     border: 1px solid var(--border-color);
   }
 }
+
+.version-hint {
+  display: flex;
+  justify-content: center;
+  color: var(--text-primary);
+}

@@ -1,4 +1,5 @@
-const app = getApp<IAppOption>();
+import ENV from "../../config/setting";
+const { miniProgram } = wx.getAccountInfoSync();
 
 Page({
   data: {
@@ -12,6 +13,7 @@ Page({
     sendingCode: false,
     logining: false,
     agreedToTerms: false,
+    version: miniProgram.version || `${ENV.VERSION}`,
   },
 
   onLoad() {
@@ -31,10 +33,21 @@ Page({
   async handleLogin() {
     if (this.data.loading) return;
 
+    console.log("handleLogin agreedToTerms:", this.data.agreedToTerms);
+    if (!this.data.agreedToTerms) {
+      wx.showToast({
+        title: "请先阅读并同意用户协议",
+        icon: "none",
+        duration: 2000,
+      });
+      return;
+    }
+
     this.setData({ loading: true });
 
     try {
       // Reuse the existing doLogin method which handles wx.login + backend request
+      const app = getApp<IAppOption>();
       await app.doLogin();
 
       wx.showToast({
@@ -63,6 +76,7 @@ Page({
   handlePhoneLogin() {
     this.setData({
       showPhonePopup: true,
+      agreedToTerms: false,
     });
   },
 
@@ -70,6 +84,7 @@ Page({
   onPopupClose(e: any) {
     this.setData({
       showPhonePopup: e.detail.visible,
+      agreedToTerms: false,
     });
   },
 
@@ -89,6 +104,7 @@ Page({
 
   // 发送验证码
   async sendCode() {
+    const app = getApp<IAppOption>();
     const { phone, counting } = this.data;
 
     if (counting) return;
@@ -140,6 +156,7 @@ Page({
 
   // 确认手机号登录
   async confirmPhoneLogin() {
+    const app = getApp<IAppOption>();
     const { phone, code, logining } = this.data;
 
     if (logining) return;
@@ -198,6 +215,7 @@ Page({
 
   // 协议复选框变化
   onAgreementChange(e: any) {
+    console.log("e:", e);
     const checked = e.detail.value.length > 0;
     this.setData({
       agreedToTerms: checked,
