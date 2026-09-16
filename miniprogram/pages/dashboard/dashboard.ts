@@ -25,6 +25,40 @@ Page({
     this.syncTheme();
   },
 
+  /** 下拉时复用首页同步的语料库权限，重新请求当前筛选条件下的看板数据。 */
+  async onPullDownRefresh() {
+    const app = getApp<IAppOption>();
+
+    try {
+      const datasets =
+        app.globalData.writeCorpora ||
+        wx.getStorageSync("writeCorpora") ||
+        [];
+      const selectedDataset = datasets.find(
+        (dataset) => dataset.value === this.data.datasetValue,
+      );
+      const datasetValue = selectedDataset ? this.data.datasetValue : "all";
+
+      this.setData({
+        datasets,
+        datasetValue,
+        datasetText: selectedDataset?.label || "全部",
+      });
+
+      await this.loadUsersByDataset(datasetValue);
+    } catch (error: any) {
+      console.error("刷新任务看板失败:", error);
+      wx.showToast({
+        title: error?.message || "刷新失败",
+        icon: "none",
+      });
+    } finally {
+      wx.hideLoading();
+      wx.stopPullDownRefresh();
+      this.setData({ loading: false });
+    }
+  },
+
   syncTheme() {
     const app = getApp<IAppOption>();
     const currentTheme = app.getTheme() || "light";

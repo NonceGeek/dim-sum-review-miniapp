@@ -1,6 +1,6 @@
 // app.ts
 import ENV from "./config/setting";
-import { public_request } from "./utils/http";
+import request, { public_request } from "./utils/http";
 
 let loginPromise: Promise<string> | null = null;
 let updateListenerRegistered = false;
@@ -14,10 +14,10 @@ App({
     userInfo: null,
     accessToken: "",
     refreshToken: "",
-    allowedCorpora: [],
+    allowedCorpora: [] as ICorpusItem[],
     themeMode: "auto" as ThemeMode, // 用户设置：auto/light/dark
     theme: "light" as ThemeValue, // 实际应用的主题：light/dark
-    categories: [],
+    categories: [] as any[],
     writeCorpora: [] as IDataset[],
   },
 
@@ -327,12 +327,43 @@ App({
 
     const categories = await public_request("/corpus_categories");
 
-    // 更新全局状态
+    // 登录响应已带有最新权限；这里不额外请求 profile 接口。
     this.globalData.accessToken = accessToken;
     this.globalData.refreshToken = refreshToken;
     this.globalData.userInfo = user;
-    this.globalData.allowedCorpora = allowedCorpora;
     this.globalData.categories = categories;
+    await this.applyAllowedCorpora(allowedCorpora);
+    await Promise.all([
+      this.setStorage("accessToken", accessToken),
+      this.setStorage("refreshToken", refreshToken),
+      this.setStorage("userInfo", user),
+      this.setStorage("categories", categories),
+    ]);
+
+    console.log("登录成功", user);
+  },
+
+  /**
+   * 使用当前登录态获取最新可访问语料库，并同步内存与本地缓存。
+   */
+  async syncAllowedCorpora() {
+    if (!this.globalData.accessToken && !wx.getStorageSync("accessToken")) {
+      return;
+    }
+
+    const profile = await request("/user/profile");
+    console.log("profile 接口返回:", profile);
+    const allowedCorpora = profile?.allowedCorpora;
+    if (!Array.isArray(allowedCorpora)) {
+      throw new Error("profile 接口未返回有效的 allowedCorpora");
+    }
+    await this.applyAllowedCorpora(allowedCorpora);
+  },
+
+  /** 登录和定时同步共用，确保 allowedCorpora 与 writeCorpora 始终一致。 */
+  async applyAllowedCorpora(allowedCorpora: ICorpusItem[]) {
+    this.globalData.allowedCorpora = allowedCorpora;
+    const categories = this.globalData.categories || [];
     const writeCorpora: IDataset[] = allowedCorpora
       .filter((item: ICorpusItem) => item.permission === "WRITE")
       .map((cop: ICorpusItem) => {
@@ -349,17 +380,11 @@ App({
       ...writeCorpora,
     ];
 
-    // 异步存储
+    // 同步缓存，让下次热启动和各页面读取到同一份权限数据。
     await Promise.all([
-      this.setStorage("accessToken", accessToken),
-      this.setStorage("refreshToken", refreshToken),
-      this.setStorage("userInfo", user),
       this.setStorage("allowedCorpora", allowedCorpora),
-      this.setStorage("categories", categories),
       this.setStorage("writeCorpora", this.globalData.writeCorpora),
     ]);
-
-    console.log("登录成功", user);
   },
 
   logout() {

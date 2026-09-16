@@ -10,5 +10,6 @@
     "t-avatar": "tdesign-miniprogram/avatar/avatar",
     "t-image": "tdesign-miniprogram/image/image"
   },
+  "enablePullDownRefresh": true,
   "navigationBarTitleText": "任务看板"
 }

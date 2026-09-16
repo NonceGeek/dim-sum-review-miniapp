@@ -1,7 +1,7 @@
 {
-  "libVersion": "3.13.1",
+  "libVersion": "3.16.2",
   "condition": {},
-  "projectname": "dim-sum-review-miniapp",
+  "projectname": "review-app",
   "setting": {
     "urlCheck": true,
     "coverView": false,

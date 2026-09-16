@@ -13,6 +13,7 @@
     "t-action-sheet": "tdesign-miniprogram/action-sheet/action-sheet",
     "t-image": "tdesign-miniprogram/image/image"
   },
+  "enablePullDownRefresh": true,
   "navigationBarTitleText": "首页",
   "navigationStyle": "custom",
   "navigationBarBackgroundColor": "@backgroundColor",

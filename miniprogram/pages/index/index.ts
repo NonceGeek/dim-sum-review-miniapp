@@ -54,12 +54,16 @@ Page({
     });
   },
 
-  onChange(event: any) {
+  async onChange(event: any) {
     console.log("event:", event.detail.value);
     const { value } = event.detail;
     this.setData({
       active: value,
     });
+
+    if (value === "uncompleted") {
+      await this.refreshAllowedCorpora();
+    }
   },
 
   onButtonClick(event: any) {
@@ -146,6 +150,44 @@ Page({
   onShow() {
     // 每次显示页面时同步主题状态
     this.syncTheme();
+  },
+
+  /** 点击任务首页或下拉刷新时，获取当前用户最新的语料库权限。 */
+  async refreshAllowedCorpora() {
+    const app = getApp<IAppOption>();
+    try {
+      await app.syncAllowedCorpora();
+      this.setData({
+        datasets: app.globalData.writeCorpora,
+        unselected: "all",
+        uncompleted: this.data.ori_uncompleted,
+      });
+    } catch (error) {
+      console.error("刷新 allowedCorpora 失败:", error);
+      wx.showToast({
+        title: "语料库权限刷新失败",
+        icon: "none",
+      });
+    }
+  },
+
+  async onPullDownRefresh() {
+    this.setData({
+      uncompleted: [],
+      ori_uncompleted: [],
+      uncompletedTotal: 0,
+      uncompletedPage: 1,
+      uncompletedLoadFinished: false,
+    });
+
+    try {
+      await Promise.all([
+        this.refreshAllowedCorpora(),
+        this.fetchUncompletedTasks(),
+      ]);
+    } finally {
+      wx.stopPullDownRefresh();
+    }
   },
 
   /**

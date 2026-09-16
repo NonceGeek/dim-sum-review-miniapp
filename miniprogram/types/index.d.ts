@@ -19,7 +19,8 @@ interface GlobalData {
   userInfo: UserInfo | null;
   accessToken: string;
   refreshToken: string;
-  allowedCorpora: string[];
+  allowedCorpora: ICorpusItem[];
+  categories: any[];
   themeMode: ThemeMode;
   theme: ThemeValue;
   writeCorpora: { label: string; value: string }[];
@@ -40,6 +41,8 @@ interface IAppOption {
   logout(): void;
   doSendSms(phone: string): Promise<any>;
   doPhoneLogin(phone: string, code: string): Promise<string>;
+  syncAllowedCorpora(): Promise<void>;
+  applyAllowedCorpora(allowedCorpora: ICorpusItem[]): Promise<void>;
 
   // 主题相关
   initTheme(): Promise<void>;
