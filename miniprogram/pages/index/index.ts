@@ -54,16 +54,12 @@ Page({
     });
   },
 
-  async onChange(event: any) {
+  onChange(event: any) {
     console.log("event:", event.detail.value);
     const { value } = event.detail;
     this.setData({
       active: value,
     });
-
-    if (value === "uncompleted") {
-      await this.refreshAllowedCorpora();
-    }
   },
 
   onButtonClick(event: any) {
@@ -152,7 +148,7 @@ Page({
     this.syncTheme();
   },
 
-  /** 点击任务首页或下拉刷新时，获取当前用户最新的语料库权限。 */
+  /** 首页下拉刷新时，获取当前用户最新的语料库权限。 */
   async refreshAllowedCorpora() {
     const app = getApp<IAppOption>();
     try {
