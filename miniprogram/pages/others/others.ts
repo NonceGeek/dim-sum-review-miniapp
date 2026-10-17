@@ -1,3 +1,4 @@
+import { getTaskType, TASK_TYPE_OPTIONS } from "../../components/task-list/task-type";
 import request from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
@@ -187,7 +188,24 @@ Page({
 
     console.log("taskssss:", tasks);
     this.setData({
-      currentTasks: tasks,
+      currentTasks: tasks.map((task) => {
+        const context = task.context || {};
+        const app = getApp<IAppOption>();
+        const corpora = app.globalData.writeCorpora || wx.getStorageSync("writeCorpora") || [];
+        const categories = app.globalData.categories || wx.getStorageSync("categories") || [];
+        const corpus = corpora.find((item: any) => item.value === context.corpusName);
+        const category = categories.find((item: any) => item.name === context.corpusName);
+        return {
+          ...task,
+          cardType: getTaskType(task),
+          cardTypeLabel: TASK_TYPE_OPTIONS.find((item) => item.value === getTaskType(task))?.label
+            || task.taskType || (task.status === "completed" ? "已处理任务" : "待处理任务"),
+          cardCorpusLabel: corpus?.label || category?.nickname || context.corpusName || "",
+          cardTitle: context.text || context.problemChar || context.sentenceText || "任务",
+          cardContext: [context.category?.parent?.name, context.category?.name].filter(Boolean).join(" / "),
+          cardHint: task.suggestions?.find((item: any) => item.explanation)?.explanation || "",
+        };
+      }),
     });
   },
 
@@ -196,7 +214,7 @@ Page({
    */
   onClick(event: any) {
     console.log("event:", event);
-    const { taskId, taskStatus } = event.target.dataset;
+    const { taskId, taskStatus } = event.currentTarget.dataset;
     wx.navigateTo({
       url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}&userId=${this.data.user}`,
     });
@@ -230,6 +248,10 @@ Page({
     const app = getApp<IAppOption>();
     const themeMode = app.getThemeMode();
     const currentTheme = app.getTheme();
+    wx.setNavigationBarColor({
+      frontColor: currentTheme === "dark" ? "#ffffff" : "#000000",
+      backgroundColor: currentTheme === "dark" ? "#161B22" : "#FFFFFF",
+    });
 
     if (
       this.data.themeMode !== themeMode ||
@@ -299,7 +321,6 @@ Page({
       this.setData({ unprocessedLoading: true });
     }
 
-    wx.showLoading({ title: "加载中..." });
     try {
       const app = getApp<IAppOption>();
       const userInfo =
@@ -333,7 +354,7 @@ Page({
         } else if (type === "unprocessed") {
           this.setData({ unprocessedLoadFinished: true });
         }
-        wx.hideLoading();
+
         return;
       }
 
@@ -408,7 +429,7 @@ Page({
         duration: 4000,
       });
     } finally {
-      wx.hideLoading();
+
       if (type === "all") {
         this.setData({ allLoading: false });
       } else if (type === "processed") {

@@ -562,3 +562,13 @@ page {
   background-color: var(--bg-card) !important;
   border-top: 1px solid var(--border-light) !important;
 }
+
+/* 所有页面共用 tabbar 的图标和文字状态，覆盖通用深色 icon 规则。 */
+.t-tab-bar .t-tab-bar-item .t-tab-bar-item__content .t-icon,
+.t-tab-bar .t-tab-bar-item .t-tab-bar-item__content .t-tab-bar-item__text {
+  color: var(--text-muted) !important;
+}
+.t-tab-bar .t-tab-bar-item .t-tab-bar-item__content--checked .t-icon,
+.t-tab-bar .t-tab-bar-item .t-tab-bar-item__content--checked .t-tab-bar-item__text {
+  color: var(--primary) !important;
+}

@@ -81,3 +81,4 @@
     </view>
   </t-popup>
 </view>
+<common-dialog id="common-dialog" />

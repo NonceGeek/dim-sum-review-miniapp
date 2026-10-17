@@ -16,5 +16,8 @@
   },
   "lazyCodeLoading": "requiredComponents",
   "darkmode": true,
-  "themeLocation": "theme.json"
+  "themeLocation": "theme.json",
+  "usingComponents": {
+    "common-dialog": "/components/common-dialog/common-dialog"
+  }
 }

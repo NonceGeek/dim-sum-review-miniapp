@@ -8,10 +8,11 @@
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-navbar": "tdesign-miniprogram/navbar/navbar",
     "t-empty": "tdesign-miniprogram/empty/empty",
-    "t-tab-bar": "tdesign-miniprogram/tab-bar/tab-bar",
-    "t-tab-bar-item": "tdesign-miniprogram/tab-bar-item/tab-bar-item",
     "t-action-sheet": "tdesign-miniprogram/action-sheet/action-sheet",
-    "t-image": "tdesign-miniprogram/image/image"
+    "t-image": "tdesign-miniprogram/image/image",
+    "app-tab-bar": "../../components/app-tab-bar/app-tab-bar",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "task-list": "../../components/task-list/task-list"
   },
   "enablePullDownRefresh": true,
   "navigationBarTitleText": "首页",

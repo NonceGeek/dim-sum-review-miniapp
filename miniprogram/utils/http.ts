@@ -20,7 +20,7 @@ function request(url: string, options: any = {}): Promise<any> {
       url: `${ENV.API_BASE_URL}${url}`,
       method: options.method || "GET",
       data: options.data || {},
-      timeout: 10000,
+      timeout: 15000,
       header: {
         ...(options.header || {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -178,7 +178,7 @@ function public_request(url: string, options: any = {}): Promise<any> {
       url: `${ENV.API_PUBLIC_URL}${url}`,
       method: options.method || "GET",
       data: options.data || {},
-      timeout: 10000,
+      timeout: 15000,
       header: {
         ...(options.header || {}),
       },

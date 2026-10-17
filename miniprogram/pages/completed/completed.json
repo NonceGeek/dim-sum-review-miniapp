@@ -4,7 +4,11 @@
     "t-cell": "tdesign-miniprogram/cell/cell",
     "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
     "t-empty": "tdesign-miniprogram/empty/empty",
-    "t-navbar": "tdesign-miniprogram/navbar/navbar"
+    "t-navbar": "tdesign-miniprogram/navbar/navbar",
+    "app-tab-bar": "../../components/app-tab-bar/app-tab-bar",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "task-list": "../../components/task-list/task-list"
   },
   "navigationBarTitleText": "已处理任务",
   "navigationStyle": "custom"

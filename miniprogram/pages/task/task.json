@@ -1,19 +1,17 @@
 {
   "usingComponents": {
-    "van-icon": "@vant/weapp/icon/index",
-    "van-button": "@vant/weapp/button/index",
-    "van-cell": "@vant/weapp/cell/index",
-    "van-cell-group": "@vant/weapp/cell-group/index",
-    "van-field": "@vant/weapp/field/index",
-    "van-popup": "@vant/weapp/popup/index",
-    "van-picker": "@vant/weapp/picker/index",
     "t-navbar": "tdesign-miniprogram/navbar/navbar",
     "t-collapse": "tdesign-miniprogram/collapse/collapse",
     "t-collapse-panel": "tdesign-miniprogram/collapse-panel/collapse-panel",
     "t-button": "tdesign-miniprogram/button/button",
     "t-popup": "tdesign-miniprogram/popup/popup",
     "t-cell": "tdesign-miniprogram/cell/cell",
-    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group"
+    "t-cell-group": "tdesign-miniprogram/cell-group/cell-group",
+    "t-icon": "tdesign-miniprogram/icon/icon",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea",
+    "t-picker": "tdesign-miniprogram/picker/picker",
+    "t-picker-item": "tdesign-miniprogram/picker-item/picker-item",
+    "t-search": "tdesign-miniprogram/search/search"
   },
   "navigationBarTitleText": "任务详情",
   "navigationStyle": "custom",

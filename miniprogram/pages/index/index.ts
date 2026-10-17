@@ -1,4 +1,4 @@
-import request from "../../utils/http";
+import { showCommonModal } from "../../utils/common-dialog";
 import ENV from "../../config/setting";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
@@ -22,15 +22,11 @@ const THEME_MODE_TEXT: Record<string, string> = {
 Page({
   data: {
     active: "uncompleted",
-    unselected: "all",
-    uncompleted: [] as any[],
+    listReady: false,
+    initialPage: 1,
     headerHeight: 0,
     statusBarHeight,
     theme: "light",
-    ori_uncompleted: [] as any[],
-    uncompletedTotal: 0,
-    uncompletedLoadFinished: false,
-    uncompletedPage: 0,
     // 用户信息
     userInfo: {
       nickname: "",
@@ -48,7 +44,7 @@ Page({
 
   onClick(event: any) {
     console.log("event:", event);
-    const { taskId, taskStatus } = event.target.dataset;
+    const { taskId, taskStatus } = event.detail;
     wx.navigateTo({
       url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}`,
     });
@@ -62,22 +58,8 @@ Page({
     });
   },
 
-  onButtonClick(event: any) {
-    const { type } = event.currentTarget.dataset;
-    const { ori_uncompleted } = this.data;
-
-    let data =
-      type === "all"
-        ? ori_uncompleted
-        : ori_uncompleted.filter((ori) => ori.context.corpusName === type);
-
-    this.setData({
-      uncompleted: data,
-      unselected: type,
-    });
-  },
-
   async onLoad(options) {
+    if (options.active === "mine") this.setData({ active: "mine" });
     const app = getApp<IAppOption>();
 
     // 初始化主题
@@ -136,16 +118,19 @@ Page({
     const p = Number(page) || 0;
 
     this.setData({
-      uncompletedPage: p + 1,
+      initialPage: p + 1,
+      listReady: true,
       headerHeight: navBarHeight,
     });
 
-    await this.fetchUncompletedTasks();
   },
 
   onShow() {
     // 每次显示页面时同步主题状态
     this.syncTheme();
+    if (this.data.listReady) {
+      void this.selectComponent("#task-list")?.loadDatasetCategories();
+    }
   },
 
   /** 首页下拉刷新时，获取当前用户最新的语料库权限。 */
@@ -153,10 +138,11 @@ Page({
     const app = getApp<IAppOption>();
     try {
       await app.syncAllowedCorpora();
-      this.setData({
-        datasets: app.globalData.writeCorpora,
-        unselected: "all",
-        uncompleted: this.data.ori_uncompleted,
+      await new Promise<void>((resolve) => {
+        this.setData({ datasets: app.globalData.writeCorpora }, () => {
+          this.selectComponent("#task-list")?.resetCorpus(false);
+          resolve();
+        });
       });
     } catch (error) {
       console.error("刷新 allowedCorpora 失败:", error);
@@ -168,19 +154,9 @@ Page({
   },
 
   async onPullDownRefresh() {
-    this.setData({
-      uncompleted: [],
-      ori_uncompleted: [],
-      uncompletedTotal: 0,
-      uncompletedPage: 1,
-      uncompletedLoadFinished: false,
-    });
-
     try {
-      await Promise.all([
-        this.refreshAllowedCorpora(),
-        this.fetchUncompletedTasks(),
-      ]);
+      await this.refreshAllowedCorpora();
+      await this.selectComponent("#task-list")?.reloadTasks();
     } finally {
       wx.stopPullDownRefresh();
     }
@@ -275,70 +251,6 @@ Page({
     });
   },
 
-  async fetchUncompletedTasks() {
-    wx.showLoading({ title: "加载中..." });
-    try {
-      let { uncompleted, uncompletedTotal, uncompletedPage, unselected } =
-        this.data;
-      console.log("undata:", this.data);
-      if (uncompletedTotal && uncompleted.length >= uncompletedTotal) {
-        this.setData({
-          uncompletedLoadFinished: true,
-        });
-        wx.hideLoading();
-        return;
-      }
-
-      const page = uncompletedPage;
-      const data = await request(`/task/uncompleted?page=${page}`);
-
-      // 防御性检查：确保返回数据格式正确
-      if (!data || !Array.isArray(data.items)) {
-        console.error("API 返回数据格式错误:", data);
-        throw new Error(data?.message || "数据加载失败");
-      }
-
-      const reassigninglist = data.items.filter(
-        (d: any) => d.status !== "reassigning",
-      );
-      const newList = [...uncompleted, ...reassigninglist];
-
-      let filterData =
-        unselected === "all"
-          ? newList
-          : newList.filter((ori) => ori.context.corpusName === unselected);
-
-      console.log(
-        "total uncompleted:",
-        data.pagination?.total,
-        reassigninglist.length,
-        data.pagination?.total,
-      );
-      this.setData({
-        uncompleted: filterData,
-        ori_uncompleted: newList,
-        uncompletedTotal: data.pagination?.total,
-        uncompletedLoadFinished: filterData.length >= data.pagination?.total,
-      });
-    } catch (err) {
-      console.error("fetchUncompletedTasks 失败", err);
-      wx.showToast({
-        title: err.errMsg || err?.error || "加载失败",
-        icon: "none",
-        duration: 4000,
-      });
-    } finally {
-      wx.hideLoading();
-    }
-  },
-
-  async onClickMore() {
-    this.setData({
-      uncompletedPage: this.data.uncompletedPage + 1,
-    });
-    await this.fetchUncompletedTasks();
-  },
-
   onGoBack() {
     wx.navigateBack({
       delta: 1,
@@ -360,7 +272,7 @@ Page({
   },
 
   onLogout() {
-    wx.showModal({
+    showCommonModal(this, {
       title: "提示",
       content: "确定要退出登录吗？",
       success: (res) => {

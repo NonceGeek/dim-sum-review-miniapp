@@ -1,3 +1,4 @@
+import { showCommonModal } from "./utils/common-dialog";
 // app.ts
 import ENV from "./config/setting";
 import request, { public_request } from "./utils/http";
@@ -435,7 +436,7 @@ App({
     const updateManager = wx.getUpdateManager();
 
     updateManager.onUpdateReady(function () {
-      wx.showModal({
+      showCommonModal(null, {
         title: "更新提示",
         content: "新版本已准备好，请重新登录",
         success(res) {

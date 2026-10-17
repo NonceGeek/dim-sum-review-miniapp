@@ -1,6 +1,17 @@
 import ENV from "../../config/setting";
 const { miniProgram } = wx.getAccountInfoSync();
 
+function getLoginErrorMessage(error: any, fallback: string): string {
+  const candidates = [error?.message, error?.errMsg, error?.error?.message, error?.error, error];
+  const message = candidates.find(value => typeof value === "string" && value.trim() && value !== "[object Object]");
+  if (!message) return fallback;
+  if (/timeout|timed out|超时/i.test(message)) {
+    return fallback.includes("发送") ? "验证码发送超时，请重试" : "登录超时，请重试";
+  }
+  if (/request:fail|network|网络/i.test(message)) return "网络连接失败，请检查网络后重试";
+  return message.replace(/^Error:\s*/, "");
+}
+
 Page({
   data: {
     loading: false,
@@ -64,7 +75,7 @@ Page({
     } catch (err: any) {
       console.error("Login failed", err);
       wx.showToast({
-        title: String(err) || "登录失败",
+        title: getLoginErrorMessage(err, "登录失败，请重试"),
         icon: "none",
         duration: 2000,
       });
@@ -139,7 +150,7 @@ Page({
     } catch (err: any) {
       console.error("发送验证码失败", err);
       wx.showToast({
-        title: String(err) || "发送失败",
+        title: getLoginErrorMessage(err, "验证码发送失败，请重试"),
         icon: "none",
         duration: 2000,
       });
@@ -205,7 +216,7 @@ Page({
     } catch (err: any) {
       console.error("手机号登录失败", err);
       wx.showToast({
-        title: String(err) || "登录失败",
+        title: getLoginErrorMessage(err, "登录失败，请重试"),
         icon: "none",
         duration: 2000,
       });

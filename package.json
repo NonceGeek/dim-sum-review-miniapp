@@ -2,15 +2,18 @@
   "name": "miniprogram-ts-quickstart",
   "version": "1.0.0",
   "description": "",
-  "scripts": {},
+  "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "test:task": "node --test tests/task-*.test.cjs"
+  },
   "keywords": [],
   "author": "",
   "license": "",
   "dependencies": {
-    "@vant/weapp": "^1.11.7",
     "tdesign-miniprogram": "^1.12.1"
   },
   "devDependencies": {
-    "miniprogram-api-typings": "^4.1.2"
+    "miniprogram-api-typings": "^4.1.2",
+    "typescript": "5.9.3"
   }
 }

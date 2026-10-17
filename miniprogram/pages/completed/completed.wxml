@@ -1,32 +1,22 @@
 <view class="container-wrap theme-{{currentTheme}}">
   <t-navbar title="已处理任务" left-arrow bind:go-back="onGoBack" />
   <view style="height: {{headerHeight}}px;"></view>
-  <view class="page">
-    <scroll-view scroll-x enable-flex class="btn-group-scroll btn-group-fixed"
-      style="top: {{headerHeight}}px; width: 100%">
-      <view class="btn-group">
-        <t-button wx:for="{{datasets}}" wx:key="value" theme="{{selected === item.value ? 'primary' : 'default'}}"
-          variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="{{item.value}}"
-          size="small">
-          {{item.label}}
-        </t-button>
-      </view>
-    </scroll-view>
-    <view class="content-wrapper">
-      <t-cell-group bordered="{{false}}">
-        <t-cell wx:for="{{ completed }}" wx:for-item="item" wx:key="taskId" leftIcon="check-circle-filled"
-          title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}"
-          data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
-        <view class="more-view" wx:if="{{ completed.length > 0 && !loadFinished }}">
-          <t-button shape="round" theme="default" variant="text" variant="outline" class="btn-type"
-            bind:tap="onLoadMore">
-            加载更多
-          </t-button>
-        </view>
-        <view class="container" wx:if="{{ completed.length === 0 }}">
-          <t-empty icon="info" description="暂无数据" />
-        </view>
-      </t-cell-group>
-    </view>
+  <view class="page" style="min-height: calc(100vh - {{headerHeight}}px);">
+      <task-list id="task-list"
+        server-filtering="{{true}}"
+        request-path="/task/completed"
+        server-ready="{{listReady}}"
+        initial-page="{{initialPage}}"
+        header-height="{{headerHeight}}"
+        current-theme="{{currentTheme}}"
+        datasets="{{datasets}}"
+        default-task-label="已处理任务"
+        order-text="已处理任务"
+        bind:tasktap="onClick"
+      />
+    <app-tab-bar value="mine" page="completed" />
   </view>
+
 </view>
+
+<common-dialog id="common-dialog" />

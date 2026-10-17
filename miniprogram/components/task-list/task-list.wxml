@@ -1,0 +1,76 @@
+<view class="theme-{{currentTheme}}">
+      <view class="btn-group-fixed" style="top: {{headerHeight}}px;">
+        <view class="category-tabs">
+          <view wx:for="{{contentCategories}}" wx:key="value" class="category-tab {{selectedCategory === item.value ? 'category-tab-active' : ''}}" bind:tap="onCategoryClick" data-value="{{item.value}}" role="button" aria-pressed="{{selectedCategory === item.value}}">{{item.label}}</view>
+        </view>
+        <view class="filter-toolbar">
+          <scroll-view class="task-segment-scroll" scroll-x enable-flex>
+            <view class="task-segments">
+              <view wx:for="{{taskTypes}}" wx:key="value" class="task-segment {{selectedTaskType === item.value ? 'task-segment-active' : ''}}" bind:tap="onTaskTypeClick" data-type="{{item.value}}" role="button" aria-pressed="{{selectedTaskType === item.value}}">{{item.label}}</view>
+            </view>
+          </scroll-view>
+          <view class="corpus-filter-trigger {{selectedFilterTags.length ? 'corpus-filter-trigger-active' : ''}}" bind:tap="onCorpusFilterOpen" role="button" aria-label="筛选语料集">
+            <t-icon name="filter" size="32rpx" />
+            <text>筛选{{selectedFilterTags.length ? '·' + selectedFilterTags.length : ''}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="content-wrapper">
+        <view wx:if="{{selectedFilterTags.length}}" class="selected-filter-tags">
+          <view wx:for="{{selectedFilterTags}}" wx:key="field" class="selected-filter-tag" data-field="{{item.field}}" bind:tap="onClearFilter" role="button" aria-label="清除{{item.label}}筛选">
+            <text>{{item.label}}</text><text class="selected-filter-close">×</text>
+          </view>
+        </view>
+        <view class="task-list-summary" wx:if="{{tasks.length || !(tasksLoading || (serverFiltering && !serverReady))}}">
+          <text class="task-list-summary-label">{{defaultTaskLabel === '已处理任务' ? '已处理' : '待处理'}} {{serverFiltering ? serverTotal : tasks.length}} 条</text>
+        </view>
+        <t-cell-group bordered="{{false}}" class="custom-cell-group">
+          <view wx:for="{{ tasks }}" wx:for-item="item" wx:key="id" class="task-card" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" hover-class="task-card-hover" role="button" aria-label="{{item.cardTitle}}">
+            <view class="task-card-header">
+              <text class="task-card-tag task-card-tag-{{item.cardType}}">{{item.cardTypeLabel}}</text>
+              <t-icon name="chevron-right" size="40rpx" color="var(--text-muted)" />
+            </view>
+            <view wx:if="{{item.cardCorpusLabel}}" class="task-card-corpus">{{item.cardCorpusLabel}}</view>
+            <view class="task-card-title">{{item.cardTitle}}</view>
+            <view wx:if="{{item.cardContext}}" class="task-card-context">{{item.cardContext}}</view>
+            <view wx:if="{{item.cardHint}}" class="task-card-hint">{{item.cardHint}}</view>
+          </view>
+          <task-list-skeleton wx:if="{{tasksLoading || (serverFiltering && !serverReady)}}" />
+          <view class="more-view" wx:if="{{ !loadFinished && !(tasksLoading || (serverFiltering && !serverReady)) }}">
+            <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
+              加载更多
+            </t-button>
+          </view>
+          <view class="container" wx:if="{{ tasks.length === 0 && !(tasksLoading || (serverFiltering && !serverReady)) }}">
+            <t-empty icon="info" description="暂无数据" />
+          </view>
+        </t-cell-group>
+      </view>
+  <t-popup style="--td-popup-border-radius: 32rpx;" visible="{{showCorpusFilter}}" placement="bottom" bind:visible-change="onCorpusFilterClose" close-on-overlay-click="{{true}}">
+    <view class="corpus-filter-sheet">
+      <view class="corpus-filter-handle"></view>
+      <view class="corpus-filter-title">筛选任务</view>
+      <view class="corpus-filter-context">
+        <text>{{corpusFilterContext}}</text>
+      </view>
+      <scroll-view scroll-y class="corpus-filter-options">
+        <view class="corpus-filter-section-title">来源语料库</view>
+        <view class="corpus-filter-chips">
+          <view wx:for="{{datasets}}" wx:key="value" class="corpus-filter-option {{draftCorpus === item.value ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftCorpusClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftCorpus === item.value}}">{{item.label}}</view>
+        </view>
+        <view class="corpus-filter-section-title">语料集分类</view>
+        <view wx:if="{{levelsLoading}}" class="corpus-filter-match">加载中…</view>
+        <view wx:elif="{{levelsError}}" class="corpus-filter-match">{{levelsError}}</view>
+        <view class="corpus-filter-chips">
+          <view wx:for="{{levelOptions}}" wx:key="value" class="corpus-filter-option {{draftLevel === item.value ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftLevelClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftLevel === item.value}}">{{item.label}}</view>
+        </view>
+
+      </scroll-view>
+      <view wx:if="{{!serverFiltering}}" class="corpus-filter-match">匹配 {{draftMatchCount}} 条任务</view>
+      <view class="corpus-filter-actions">
+        <t-button theme="default" shape="round" hover-class="none" t-class="corpus-filter-reset" block bind:tap="onCorpusFilterReset">重置</t-button>
+        <t-button theme="primary" shape="rectangle" block bind:tap="onCorpusFilterApply">{{serverFiltering ? '确认' : '确认（' + draftMatchCount + '）'}}</t-button>
+      </view>
+    </view>
+  </t-popup>
+</view>

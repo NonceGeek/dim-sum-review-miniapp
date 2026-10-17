@@ -2,7 +2,7 @@
 
   <view class="page">
     <!-- Tabs 选项卡 -->
-    <t-tabs value="{{activeTab}}" bind:change="onTabChange" space-evenly sticky>
+    <t-tabs t-class="others-filter-tabs" value="{{activeTab}}" bind:change="onTabChange" space-evenly sticky>
       <t-tab-panel value="all" label="全部" />
       <t-tab-panel value="processed" label="已处理" />
       <t-tab-panel value="unprocessed" label="未处理" />
@@ -25,18 +25,28 @@
     <!-- 内容区域 -->
     <view class="content-wrapper">
       <t-cell-group bordered="{{false}}" class="custom-cell-group">
-        <t-cell wx:for="{{ currentTasks }}" wx:for-item="item" wx:key="index" leftIcon="{{ item.status === 'completed' ? 'check-circle-filled': 'help-circle'}}"
-          title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}"
-          data-task-status="{{ item.status }}" hover class="custom-cell" arrow/>
-        <view class="more-view" wx:if="{{ currentTasks.length > 0 && ((activeTab === 'all' && !allLoadFinished) || (activeTab === 'processed' && !processedLoadFinished) || (activeTab === 'unprocessed' && !unprocessedLoadFinished)) }}">
+        <view wx:for="{{currentTasks}}" wx:for-item="item" wx:key="id" class="task-card" bind:tap="onClick" data-task-id="{{item.id}}" data-task-status="{{item.status}}" hover-class="task-card-hover" role="button" aria-label="{{item.cardTitle}}">
+          <view class="task-card-header">
+            <text class="task-card-tag task-card-tag-{{item.cardType}}">{{item.cardTypeLabel}}</text>
+            <t-icon name="chevron-right" size="40rpx" color="var(--text-muted)" />
+          </view>
+          <view wx:if="{{item.cardCorpusLabel}}" class="task-card-corpus">{{item.cardCorpusLabel}}</view>
+          <view class="task-card-title">{{item.cardTitle}}</view>
+          <view wx:if="{{item.cardContext}}" class="task-card-context">{{item.cardContext}}</view>
+          <view wx:if="{{item.cardHint}}" class="task-card-hint">{{item.cardHint}}</view>
+        </view>
+        <task-list-skeleton wx:if="{{(activeTab === 'all' && allLoading) || (activeTab === 'processed' && processedLoading) || (activeTab === 'unprocessed' && unprocessedLoading)}}" />
+        <view class="more-view" wx:if="{{ !((activeTab === 'all' && allLoading) || (activeTab === 'processed' && processedLoading) || (activeTab === 'unprocessed' && unprocessedLoading)) && currentTasks.length > 0 && ((activeTab === 'all' && !allLoadFinished) || (activeTab === 'processed' && !processedLoadFinished) || (activeTab === 'unprocessed' && !unprocessedLoadFinished)) }}">
           <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
             加载更多
           </t-button>
         </view>
-        <view class="container" wx:if="{{ currentTasks.length === 0 }}">
+        <view class="container" wx:if="{{ currentTasks.length === 0 && !((activeTab === 'all' && allLoading) || (activeTab === 'processed' && processedLoading) || (activeTab === 'unprocessed' && unprocessedLoading)) }}">
           <t-empty icon="info" description="暂无数据" />
         </view>
       </t-cell-group>
     </view>
   </view>
+  <app-tab-bar value="mine" page="others" />
 </view>
+<common-dialog id="common-dialog" />

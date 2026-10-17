@@ -1,0 +1,4 @@
+<t-tab-bar value="{{value}}" fixed="{{true}}" bordered="{{false}}" split="{{false}}" z-index="100" bind:change="onChange">
+  <t-tab-bar-item value="uncompleted" icon="home">任务</t-tab-bar-item>
+  <t-tab-bar-item value="mine" icon="user">我的</t-tab-bar-item>
+</t-tab-bar>

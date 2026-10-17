@@ -1,0 +1,8 @@
+<view wx:if="{{variant === 'dashboard'}}" class="dashboard-skeleton" aria-label="任务进度加载中">
+  <view class="skeleton-card dashboard-card" wx:if="{{showOverview}}"><t-skeleton row-col="{{overviewSkeleton}}" animation="gradient" /></view>
+  <view class="skeleton-section-title">用户进度</view>
+  <view class="skeleton-card dashboard-card" wx:for="{{skeletonCards}}" wx:key="*this"><t-skeleton row-col="{{userSkeleton}}" animation="gradient" /></view>
+</view>
+<view wx:else aria-label="任务加载中">
+  <view class="skeleton-card" wx:for="{{cards}}" wx:key="*this"><t-skeleton row-col="{{rows}}" animation="gradient" /></view>
+</view>

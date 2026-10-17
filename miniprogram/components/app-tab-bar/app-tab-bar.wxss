@@ -1,0 +1,8 @@
+:host {
+  --td-font-body-extraSmall: 24rpx / 36rpx var(--td-font-family, sans-serif);
+  --td-tab-bar-height: 100rpx;
+  --td-tab-bar-bg-color: var(--bg-card);
+  --td-tab-bar-color: var(--text-muted);
+  --td-tab-bar-active-color: var(--primary);
+}
+

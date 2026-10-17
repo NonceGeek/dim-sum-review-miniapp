@@ -1,0 +1,20 @@
+<view class="common-dialog-host theme-{{currentTheme}}">
+<t-dialog
+  visible="{{visible}}"
+  title="{{title}}"
+  content="{{content}}"
+  z-index="{{14000}}"
+  confirm-btn="{{confirmBtn}}"
+  cancel-btn="{{cancelBtn}}"
+  close-on-overlay-click="{{false}}"
+  overlay-props="{{overlayProps}}"
+  t-class="common-dialog theme-{{currentTheme}} {{showCancel ? 'has-cancel' : 'single-action'}}"
+  t-class-content="common-dialog-content"
+  t-class-confirm="common-dialog-confirm"
+  t-class-cancel="common-dialog-cancel"
+  bind:confirm="onConfirm"
+  bind:cancel="onCancel"
+  bind:close="onClose"
+/>
+
+</view>

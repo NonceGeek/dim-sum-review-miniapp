@@ -3,145 +3,9 @@
 .page {
   background-color: var(--bg-page);
   color: var(--text-primary);
-  padding-bottom: 200rpx;
-  min-height: 100vh;
-  padding-bottom: constant(safe-area-inset-bottom);
-  padding-bottom: env(safe-area-inset-bottom);
+  padding-bottom: calc(124rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
   transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* ============================================
-   筛选按钮组
-   ============================================ */
-.btn-group-scroll {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 24rpx 0;
-  background-color: var(--bg-card);
-  border-bottom: 1px solid var(--border-light);
-  transition: background-color 0.3s ease;
-}
-
-.btn-group-fixed {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-.btn-group {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  padding: 0 24rpx;
-  gap: 16rpx;
-  box-sizing: border-box;
-  width: max-content;
-}
-
-.content-wrapper {
-  padding-top: 160rpx;
-}
-
-/* 筛选按钮样式 */
-.btn-type {
-  flex: 0 0 auto !important;
-  align-self: flex-start !important;
-  width: auto !important;
-  max-width: 100%;
-  display: inline-flex !important;
-  margin: 0 !important;
-  justify-content: flex-start !important;
-  border-radius: var(--radius-full) !important;
-  font-weight: 500 !important;
-  transition: all 0.2s ease !important;
-}
-
-/* TDesign 按钮样式覆盖 - primary状态 */
-.btn-type.t-button--primary {
-  background: var(--gradient-primary) !important;
-  border: none !important;
-  color: #fff !important;
-  box-shadow: var(--shadow-primary) !important;
-}
-
-/* TDesign 按钮样式覆盖 - default状态 */
-.btn-type.t-button--default {
-  background-color: var(--bg-input) !important;
-  border: 1px solid var(--border-color) !important;
-  color: var(--text-secondary) !important;
-}
-
-.btn-type.t-button--default:active {
-  background-color: var(--border-color) !important;
-}
-
-/* ============================================
-   任务列表
-   ============================================ */
-.custom-cell-group {
-  margin: 0 24rpx;
-}
-
-/* 自定义 Cell 样式 */
-.custom-cell {
-  margin-bottom: 16rpx !important;
-  border-radius: var(--radius-lg) !important;
-  background-color: var(--bg-card) !important;
-  box-shadow: var(--shadow-sm) !important;
-  border: 1px solid var(--border-light) !important;
-  overflow: hidden !important;
-  transition: all 0.2s ease !important;
-}
-
-/* 去除 t-cell 下划线 */
-.custom-cell::after {
-  display: none !important;
-}
-
-.custom-cell:active {
-  transform: scale(0.995);
-  box-shadow: var(--shadow-md) !important;
-}
-
-/* Cell 左侧图标 */
-.custom-cell .t-cell__left-icon {
-  color: var(--primary) !important;
-}
-
-/* Cell 标题 */
-.custom-cell .t-cell__title {
-  color: var(--text-primary) !important;
-  font-weight: 500 !important;
-  font-size: 32rpx !important;
-}
-
-/* Cell 箭头 */
-.custom-cell .t-cell__right-icon {
-  color: var(--text-muted) !important;
-}
-
-/* 空状态容器 */
-.container {
-  height: 60vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-}
-
-/* 加载更多 */
-.more-view {
-  text-align: center;
-  padding: 32rpx 0;
-}
-
-.container-wrap .more-view .btn-type {
-  color: var(--text-secondary) !important;
-  background-color: transparent !important;
-  border: 1px solid var(--border-color) !important;
 }
 
 /* ============================================
@@ -185,7 +49,7 @@
 }
 
 .avatar-text {
-  font-size: 48rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #fff;
 }
@@ -196,7 +60,7 @@
 }
 
 .user-name {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #fff;
   margin-bottom: 8rpx;
@@ -206,7 +70,7 @@
   font-size: 26rpx;
   color: rgba(255, 255, 255, 0.8);
   background: rgba(255, 255, 255, 0.2);
-  padding: 4rpx 16rpx;
+  padding: 8rpx 16rpx;
   border-radius: var(--radius-full);
   width: fit-content;
 }
@@ -431,3 +295,5 @@ t-action-sheet {
   justify-content: center;
   color: var(--text-primary);
 }
+
+/* 任务卡片：类型、来源、标题和辅助信息 */

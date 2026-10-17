@@ -1,9 +1,12 @@
+import { showCommonModal } from "../../utils/common-dialog";
 import ENV from "../../config/setting";
 import { ITaskDetail } from "../../types/task";
 import { add8Hours } from "../../utils/date";
 import request, { public_request } from "../../utils/http";
 const systemInfo = wx.getSystemInfoSync();
 const statusBarHeight = systemInfo.statusBarHeight;
+
+type ClassificationOption = { label: string; children: string[] };
 
 const SOURCE_NAME_DEFAULT = "llm";
 // should test when use baseline: lexiconBaseCorpusName
@@ -27,7 +30,9 @@ function getSourceInfo(
   return {
     source,
     source_name:
-      source === "llm"
+      kind === "custom"
+        ? wx.getStorageSync("userInfo").name
+        : source === "llm"
         ? SOURCE_NAME_DEFAULT
         : category
           ? category.nickname || category.name
@@ -43,7 +48,7 @@ function getAuthCorpus(data) {
       return SOURCE_NAME_DEFAULT;
     } else if (s.kind === "baseline") {
       return s.lexiconBaseCorpusName;
-    }
+    } 
   });
   const { role, isSystemAdmin } = wx.getStorageSync("userInfo");
 
@@ -90,13 +95,48 @@ Page({
     status: "notified",
     taskDetail: [] as any[],
     currentIndex: 0,
+    fieldEditor: {
+      visible: false,
+      option: 0,
+      label: "",
+      value: "",
+      field: "",
+      index: 0,
+      parentindex: undefined as number | undefined,
+    },
+    taskSource: { name: "", category: "" },
+    tagEditingKey: "",
+    tagPickerVisible: false,
+    tagOption: 0,
+    tagKeyword: "",
+    tagOptions: [] as { id: string; name: string }[],
+    tagDraft: [] as { id: string; name: string }[],
+    tagSelectedMap: {} as Record<string, boolean>,
+    tagLoading: false,
+    tagCreating: false,
+    tagError: "",
     statusBarHeight,
     headerHeight: 0,
     hidden: false,
     violationType: "", //检查类型
     completedAt: "",
     // 可添加的额外字段配置
+    classificationOptions: [] as ClassificationOption[],
+    classificationLoading: false,
+    classificationIds: {} as Record<string, string>,
+    customClassification: false,
+    customClassificationParent: "",
+    customClassificationChild: "",
+    classificationSaving: false,
+    showClassificationPicker: false,
+    classificationValue: [] as string[],
+    classificationFirstOptions: [] as { label: string; value: string }[],
+    classificationSecondOptions: [] as { label: string; value: string }[],
+    emotionPickerValue: [] as string[],
+    emotionPickerOptions: [] as { label: string; value: string }[],
     extraFields: [
+      { label: "分类", value: "classification", placeholder: "请输入分类" },
+      { label: "标签", value: "tags", placeholder: "添加标签" },
       { label: "词组", value: "phrase", placeholder: "请输入词组" },
       {
         label: "例句",
@@ -160,6 +200,11 @@ Page({
       string,
       () => { type: string; content?: string; url?: string }
     > = {
+      classification: () => ({
+        new: true,
+        type: "classification",
+        content: "",
+      }),
       phrase: () => ({
         new: true,
         type: "phrase",
@@ -225,7 +270,10 @@ Page({
       async () => {
         console.log("[页面] onLoad options:", options);
         this.syncTheme();
-        await this.getTask(taskId);
+        await Promise.all([
+          this.getTask(taskId),
+          this.loadClassificationOptions(),
+        ]);
       },
     );
   },
@@ -327,6 +375,21 @@ Page({
       this.setData(
         {
           taskDetail: entity,
+          // 页面固定展示任务来源，不随建议选项切换。
+          taskSource: {
+            name: getSourceInfo(
+              "original",
+              "",
+              data.context.corpusName,
+              categories,
+            ).source_name,
+            category: [
+              data.context.category?.parent?.name,
+              data.context.category?.name,
+            ]
+              .filter(Boolean)
+              .join(" / "),
+          },
           violationType: data.violationType,
           completedAt: add8Hours(data.resolvedAt),
           corpus: corpusWrite,
@@ -345,7 +408,20 @@ Page({
       });
     }
   },
+  onOptionTap(e) {
+    const current = Number(e.currentTarget.dataset.index);
+    if (
+      !Number.isInteger(current) ||
+      current < 0 ||
+      current >= this.data.taskDetail.length
+    )
+      return;
+    this.onSwiperChange({ detail: { current } });
+  },
   onSwiperChange(e) {
+    // 点击更新 swiper 后也会触发 change，避免重复检查或弹窗。
+    if (e.detail.current === this.data.currentIndex) return;
+    this.setData({ tagEditingKey: "" });
     console.log("e:", e.detail.current);
     const { id } = wx.getStorageSync("userInfo");
     const { currentIndex, taskDetail } = this.data;
@@ -378,7 +454,7 @@ Page({
         },
       );
     } else {
-      wx.showModal({
+      showCommonModal(this, {
         title: "提示",
         content: "是否保存并提交当前编辑内容？",
         showCancel: true,
@@ -415,7 +491,7 @@ Page({
     }
   },
   async onSubmit() {
-    wx.showModal({
+    showCommonModal(this, {
       title: "提示",
       content: "是否确认提交？",
       showCancel: true,
@@ -434,6 +510,11 @@ Page({
     const { id } = wx.getStorageSync("userInfo");
     const currentIndex = this.data.currentIndex;
     const taskDetail = this.data.taskDetail;
+    this.checkCanSubmit();
+    if (!this.data.canSubmit) {
+      wx.showToast({ title: "请填写原文和粤音", icon: "none" });
+      return;
+    }
 
     // 检查情感数据完整性
     const isEmotionValid = this.checkEmotion();
@@ -452,46 +533,80 @@ Page({
           ...c,
           blocks: c.blocks.filter(
             (b) =>
-              (b.content && b.content.trim()) ||
-              (b.url && b.url.trim()) ||
-              b.category ||
-              b.intensity,
+              b.type !== "classification" &&
+              ((b.content && b.content.trim()) ||
+                (b.url && b.url.trim()) ||
+                b.category ||
+                b.intensity),
           ),
         }))
         .filter((c) => c.jyutping);
     }
 
+    // category/tags 和 classification block 仅供展示，写入使用显式 ID。
+    delete preSubmit.record.category;
+    delete preSubmit.record.tags;
     const submitData = { ...preSubmit.suggestions, record: preSubmit.record };
     console.log("submitData:", submitData);
     wx.showLoading({ title: "请稍后..." });
 
-    const data = await request(`/task/submit/${this.data.taskId}`, {
-      method: "POST",
-      data: {
-        actorRef: id,
-        selected: [submitData],
-      },
-    });
-    if (data.ok) {
-      wx.hideLoading();
-      wx.showToast({
-        title: "已提交",
-        icon: "success",
-        duration: 3000,
-        mask: true,
-        success: () => {
-          setTimeout(() => {
-            wx.navigateTo({ url: "/pages/index/index?page=0" });
-          }, 200);
+    try {
+      const data = await request(`/task/submit/${this.data.taskId}`, {
+        method: "POST",
+        data: {
+          actorRef: id,
+          selected: [submitData],
         },
       });
-    } else {
-      wx.hideLoading();
-      wx.showModal({
+      if (data.ok) {
+        wx.showToast({
+          title: "已提交",
+          icon: "success",
+          duration: 3000,
+          mask: true,
+          success: () => {
+            setTimeout(() => {
+              wx.navigateTo({ url: "/pages/index/index?page=0" });
+            }, 200);
+          },
+        });
+      } else {
+        const candidates = [
+          data?.details?.reason,
+          data?.error?.message,
+          data?.error,
+          data?.message,
+          data?.detail,
+        ];
+        const message = candidates
+          .map((value) => {
+            if (typeof value === "string") return value.trim();
+            if (Array.isArray(value))
+              return value
+                .map((item) =>
+                  typeof item === "string"
+                    ? item
+                    : item?.msg || item?.message || "",
+                )
+                .filter(Boolean)
+                .join("\n");
+            return "";
+          })
+          .find(Boolean);
+        showCommonModal(this, {
+          title: "提交失败",
+          content: message || "提交失败，请稍后重试",
+          showCancel: false,
+        });
+      }
+    } catch (error: any) {
+      showCommonModal(this, {
         title: "提交失败",
-        content: data?.details?.reason || "",
+        content: error?.message || error?.errMsg || "网络异常，请重试",
         showCancel: false,
       });
+    } finally {
+      wx.hideLoading();
     }
   },
 
@@ -502,7 +617,7 @@ Page({
 
   onCancel() {
     const taskId = this.data.taskId;
-    wx.showModal({
+    showCommonModal(this, {
       title: "提示",
       content: "是否返回上一页？",
       showCancel: true,
@@ -557,13 +672,23 @@ Page({
   onAddClick() {
     const { id, name } = wx.getStorageSync("userInfo");
     console.log("this.data.taskDetail:", this.data.taskDetail);
+    const original = this.data.taskDetail[0];
+    console.log("original:", original);
+    // 自定义方案保留原记录标识，提交类型写在 suggestions 中。
     const data = {
-      data: this.data.taskDetail[0].data,
+      data: original.data,
+      suggestions: {
+        ...JSON.parse(JSON.stringify(original.suggestions)),
+        kind: "custom",
+        source: id,
+      },
       source: id,
       source_name: name,
       new: true,
       canEdit: true,
       record: {
+        ...JSON.parse(JSON.stringify(original.record)),
+        ...{ source: id },
         data: [
           {
             new: true,
@@ -574,7 +699,7 @@ Page({
       },
     };
 
-    const newTaskDetail = this.data.taskDetail;
+    const newTaskDetail = [...this.data.taskDetail];
     newTaskDetail.push(data);
     console.log("new:", newTaskDetail);
     this.setData(
@@ -607,7 +732,6 @@ Page({
   },
 
   onAddNewCantonese() {
-    const newId = `custom_${Date.now()}`;
     const { taskDetail, currentIndex } = this.data;
     const updatedTaskDetail = [...taskDetail];
     const currentTask = JSON.parse(
@@ -640,7 +764,10 @@ Page({
     this.setData(
       {
         taskDetail: updatedTaskDetail,
-        expandedValues: [...this.data.expandedValues, newId],
+        expandedValues: [
+          ...this.data.expandedValues,
+          `card_${currentTask.record.data.length - 1}`,
+        ],
       },
       () => {
         this.checkCanSubmit();
@@ -655,6 +782,475 @@ Page({
       longPressIndex: e.currentTarget.dataset.index,
     });
   },
+  async loadClassificationOptions() {
+    this.setData({ classificationLoading: true });
+    try {
+      const response = await request("/content-categories/tree");
+      console.log("tree:", response);
+      const items = Array.isArray(response) ? response : response?.items;
+      if (!Array.isArray(items)) throw new Error("分类接口数据格式错误");
+      const classificationOptions: ClassificationOption[] = items
+        .filter(
+          (item: any) =>
+            typeof item?.name === "string" && Array.isArray(item.children),
+        )
+        .map((item: any) => ({
+          label: item.name,
+          children: item.children
+            .filter((child: any) => typeof child?.name === "string")
+            .map((child: any) => child.name),
+        }))
+        .filter((item: ClassificationOption) => item.children.length > 0);
+      const classificationIds: Record<string, string> = {};
+      items.forEach((parent: any) =>
+        (parent.children || []).forEach((child: any) => {
+          if (child.id != null)
+            classificationIds[JSON.stringify([parent.name, child.name])] =
+              String(child.id);
+        }),
+      );
+      console.log("classificationOptions:", classificationOptions);
+      console.log("classificationIds:", classificationIds);
+      this.setData({ classificationOptions, classificationIds });
+      return classificationOptions.length > 0;
+    } catch (error) {
+      console.error("加载分类树失败", error);
+      return false;
+    } finally {
+      this.setData({ classificationLoading: false });
+    }
+  },
+  async onFieldLongPress(e: any) {
+    const d = e.currentTarget.dataset;
+    const option = Number(d.option);
+    if (
+      this.data.status === "completed" ||
+      option !== this.data.currentIndex ||
+      !this.data.taskDetail[option]?.canEdit
+    )
+      return;
+    if (d.field === "classification") {
+      if (this.data.classificationLoading) {
+        wx.showToast({ title: "分类加载中，请稍后重试", icon: "none" });
+        return;
+      }
+      if (
+        !this.data.classificationOptions.length &&
+        !(await this.loadClassificationOptions())
+      ) {
+        wx.showToast({ title: "暂无可用分类，请稍后重试", icon: "none" });
+        return;
+      }
+      if (
+        option !== this.data.currentIndex ||
+        this.data.status === "completed" ||
+        !this.data.taskDetail[option]?.canEdit
+      )
+        return;
+      const [first, second] = String(d.value || "").split(" / ");
+      const firstIndex = Math.max(
+        0,
+        this.data.classificationOptions.findIndex(
+          (item) => item.label === first,
+        ),
+      );
+      const children = this.data.classificationOptions[firstIndex].children;
+      this.setData({
+        fieldEditor: {
+          visible: false,
+          option,
+          label: d.label,
+          value: String(d.value || ""),
+          field: d.field,
+          index: Number(d.index),
+          parentindex: Number(d.parentindex),
+        },
+        classificationFirstOptions: this.data.classificationOptions.map(
+          (item) => ({ label: item.label, value: item.label }),
+        ),
+        classificationSecondOptions: children.map((value) => ({
+          label: value,
+          value,
+        })),
+        classificationValue: [
+          this.data.classificationOptions[firstIndex].label,
+          children[Math.max(0, children.indexOf(second))],
+        ],
+        showClassificationPicker: true,
+      });
+      return;
+    }
+    this.setData({
+      customClassification: false,
+      fieldEditor: {
+        visible: true,
+        option,
+        label: d.label,
+        value: String(d.value ?? ""),
+        field: d.field,
+        index: Number(d.index),
+        parentindex:
+          d.parentindex === undefined ? undefined : Number(d.parentindex),
+      },
+    });
+  },
+  onClassificationPickerChange(e: any) {
+    const { value, column } = e.detail;
+    console.log("onClassificationPickerChange:", value, column);
+    if (column !== 0) return;
+    const selected = this.data.classificationOptions.find(
+      (item) => item.label === value[0],
+    );
+    if (!selected) return;
+    this.setData({
+      classificationSecondOptions: selected.children.map((value) => ({
+        label: value,
+        value,
+      })),
+      classificationValue: [selected.label, selected.children[0]],
+    });
+  },
+  onTagEditLongPress(e: any) {
+    const option = Number(e.currentTarget.dataset.option);
+    if (
+      option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !this.data.taskDetail[option]?.canEdit
+    )
+      return;
+    this.setData({
+      tagEditingKey: `${option}:${Number(e.currentTarget.dataset.card)}`,
+    });
+  },
+  tagRequestId: 0,
+  async onOpenTags(e: any) {
+    const option = Number(e.currentTarget.dataset.option);
+    const task = this.data.taskDetail[option];
+    if (
+      this.data.status === "completed" ||
+      option !== this.data.currentIndex ||
+      !task?.canEdit
+    )
+      return;
+    const tags = (task.record.tags || [])
+      .filter((tag: any) => tag.id != null && tag.name)
+      .map((tag: any) => ({ id: String(tag.id), name: tag.name }));
+    const tagSelectedMap: Record<string, boolean> = {};
+    tags.forEach((tag: any) => {
+      tagSelectedMap[tag.id] = true;
+    });
+    this.setData({
+      tagPickerVisible: true,
+      tagOption: option,
+      tagKeyword: "",
+      tagDraft: tags,
+      tagSelectedMap,
+      tagOptions: [],
+      tagError: "",
+    });
+    await this.loadTagOptions("");
+  },
+  async loadTagOptions(keyword: string) {
+    const requestId = ++this.tagRequestId;
+    this.setData({ tagLoading: true, tagError: "" });
+    try {
+      const response = await request(
+        `/tags?q=${encodeURIComponent(keyword.trim())}`,
+      );
+      if (requestId !== this.tagRequestId || !this.data.tagPickerVisible)
+        return;
+      if (!Array.isArray(response?.items))
+        throw new Error(response?.message || "标签加载失败");
+      this.setData({
+        tagOptions: response.items
+          .filter((tag: any) => tag.id != null && tag.name)
+          .map((tag: any) => ({ id: String(tag.id), name: tag.name })),
+      });
+    } catch (error: any) {
+      if (requestId === this.tagRequestId)
+        this.setData({
+          tagOptions: [],
+          tagError: error?.message || "标签加载失败，请重试",
+        });
+    } finally {
+      if (requestId === this.tagRequestId) this.setData({ tagLoading: false });
+    }
+  },
+  onTagSearch(e: any) {
+    const tagKeyword = String(e.detail.value || "");
+    this.setData({ tagKeyword });
+    void this.loadTagOptions(tagKeyword);
+  },
+  onTagToggle(e: any) {
+    const tag = this.data.tagOptions.find(
+      (item) => item.id === String(e.currentTarget.dataset.id),
+    );
+    if (!tag || this.data.tagCreating) return;
+    const selected = this.data.tagDraft.some((item) => item.id === tag.id);
+    const tagDraft = selected
+      ? this.data.tagDraft.filter((item) => item.id !== tag.id)
+      : [...this.data.tagDraft, tag];
+    const tagSelectedMap: Record<string, boolean> = {};
+    tagDraft.forEach((item) => {
+      tagSelectedMap[item.id] = true;
+    });
+    this.setData({ tagDraft, tagSelectedMap });
+  },
+  onTagDraftRemove(e: any) {
+    if (this.data.tagCreating) return;
+    const id = String(e.currentTarget.dataset.id);
+    const tagDraft = this.data.tagDraft.filter((tag) => tag.id !== id);
+    const tagSelectedMap = { ...this.data.tagSelectedMap };
+    delete tagSelectedMap[id];
+    this.setData({ tagDraft, tagSelectedMap });
+  },
+  async onCreateTag() {
+    const name = this.data.tagKeyword.trim().replace(/^#+/, "").trim();
+    if (!name || this.data.tagCreating) return;
+    const option = this.data.tagOption;
+    this.setData({ tagCreating: true });
+    try {
+      const response = await request("/tags", {
+        method: "POST",
+        data: { name },
+      });
+      if (!response?.item?.id)
+        throw new Error(response?.message || "标签创建失败");
+      if (!this.data.tagPickerVisible || option !== this.data.tagOption) return;
+      const tag = {
+        id: String(response.item.id),
+        name: response.item.name || name,
+      };
+      const tagDraft = this.data.tagDraft.some((item) => item.id === tag.id)
+        ? this.data.tagDraft
+        : [...this.data.tagDraft, tag];
+      this.setData({
+        tagDraft,
+        tagSelectedMap: { ...this.data.tagSelectedMap, [tag.id]: true },
+        tagKeyword: "",
+      });
+      await this.loadTagOptions("");
+    } catch (error: any) {
+      wx.showToast({
+        title: error?.message || "标签创建失败，请重试",
+        icon: "none",
+      });
+    } finally {
+      this.setData({ tagCreating: false });
+    }
+  },
+  onTagPickerClose() {
+    if (this.data.tagCreating) return;
+    ++this.tagRequestId;
+    this.setData({ tagPickerVisible: false, tagLoading: false });
+  },
+  onRemoveTaskTag(e: any) {
+    const option = Number(e.currentTarget.dataset.option);
+    const task = this.data.taskDetail[option];
+    if (
+      option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !task?.canEdit
+    )
+      return;
+    const tags = (task.record.tags || []).filter(
+      (tag: any) => String(tag.id) !== String(e.currentTarget.dataset.id),
+    );
+    const taskDetail = [...this.data.taskDetail];
+    taskDetail[option] = {
+      ...task,
+      record: {
+        ...task.record,
+        tags,
+        tagIds: tags.map((tag: any) => String(tag.id)),
+      },
+    };
+    this.setData({ taskDetail }, () => this.checkCanSubmit());
+  },
+  onTagPickerConfirm() {
+    if (this.data.tagCreating) return;
+    const option = this.data.tagOption;
+    const task = this.data.taskDetail[option];
+    if (
+      option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !task?.canEdit
+    )
+      return;
+    const taskDetail = [...this.data.taskDetail];
+    taskDetail[option] = {
+      ...task,
+      record: {
+        ...task.record,
+        tags: [...this.data.tagDraft],
+        tagIds: this.data.tagDraft.map((tag) => tag.id),
+      },
+    };
+    this.setData({ taskDetail }, () => this.checkCanSubmit());
+    this.onTagPickerClose();
+  },
+  onCustomClassification() {
+    const editor = this.data.fieldEditor;
+    if (
+      editor.option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !this.data.taskDetail[editor.option]?.canEdit
+    )
+      return;
+    const [parent = "", child = ""] = editor.value.split(" / ");
+    this.setData({
+      showClassificationPicker: false,
+      "fieldEditor.visible": true,
+      customClassification: true,
+      customClassificationParent: parent,
+      customClassificationChild: child,
+    });
+  },
+  onClassificationPickerClose() {
+    this.setData({ showClassificationPicker: false });
+  },
+  onClassificationPickerConfirm(e: any) {
+    const editor = this.data.fieldEditor;
+    if (
+      editor.option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !this.data.taskDetail[editor.option]?.canEdit
+    )
+      return;
+    const [first, second] = e.detail.value;
+    const selected = this.data.classificationOptions.find(
+      (item) => item.label === first,
+    );
+    if (!selected || !selected.children.includes(second)) return;
+    const categoryId =
+      this.data.classificationIds[JSON.stringify([first, second])];
+    if (!categoryId) {
+      wx.showToast({ title: "分类缺少 ID，请重新加载", icon: "none" });
+      return;
+    }
+    this.applyClassification(editor, categoryId, first, second);
+    this.onClassificationPickerClose();
+  },
+  applyClassification(
+    editor: any,
+    categoryId: string,
+    parent: string,
+    child: string,
+  ) {
+    const taskDetail = [...this.data.taskDetail];
+    const task = JSON.parse(JSON.stringify(taskDetail[editor.option]));
+    const block =
+      task?.record?.data?.[editor.parentindex]?.blocks?.[editor.index];
+    if (!block) throw new Error("当前分类字段不存在，请重新打开");
+    task.record.categoryId = categoryId;
+    block.content = `${parent} / ${child}`;
+    taskDetail[editor.option] = task;
+    this.setData({ taskDetail }, () => this.checkCanSubmit());
+  },
+  onCustomClassificationInput(e: any) {
+    const field = e.currentTarget.dataset.field;
+    if (
+      field !== "customClassificationParent" &&
+      field !== "customClassificationChild"
+    )
+      return;
+    this.setData({ [field]: e.detail.value });
+  },
+  async onCustomClassificationSave() {
+    if (this.data.classificationSaving) return;
+    const editor = { ...this.data.fieldEditor };
+    if (
+      !editor.visible ||
+      editor.option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !this.data.taskDetail[editor.option]?.canEdit
+    )
+      return;
+    const parent = this.data.customClassificationParent.trim();
+    const child = this.data.customClassificationChild.trim();
+    if (!parent || !child) {
+      wx.showToast({ title: "请填写一级分类和二级分类", icon: "none" });
+      return;
+    }
+    this.setData({ classificationSaving: true });
+    try {
+      const first = await request("/content-categories", {
+        method: "POST",
+        data: { name: parent, parentId: null },
+      });
+      if (!first?.item?.id)
+        throw new Error(first?.message || "一级分类创建失败");
+      const second = await request("/content-categories", {
+        method: "POST",
+        data: { name: child, parentId: first.item.id },
+      });
+      if (!second?.item?.id)
+        throw new Error(second?.message || "二级分类创建失败");
+      if (
+        editor.option !== this.data.currentIndex ||
+        this.data.status === "completed" ||
+        !this.data.taskDetail[editor.option]?.canEdit
+      )
+        throw new Error("选项已切换，请重新选择分类");
+      this.applyClassification(
+        editor,
+        String(second.item.id),
+        first.item.name || parent,
+        second.item.name || child,
+      );
+      this.setData({
+        "fieldEditor.visible": false,
+        customClassification: false,
+      });
+      void this.loadClassificationOptions();
+    } catch (error: any) {
+      wx.showToast({
+        title: error?.message || "分类创建失败，请重试",
+        icon: "none",
+      });
+    } finally {
+      this.setData({ classificationSaving: false });
+    }
+  },
+  onFieldEditorInput(e: any) {
+    this.setData({ "fieldEditor.value": e.detail.value });
+  },
+  onFieldEditorClose() {
+    if (this.data.classificationSaving) return;
+    const returnToPicker = this.data.customClassification;
+    this.setData({
+      "fieldEditor.visible": false,
+      customClassification: false,
+      ...(returnToPicker ? { showClassificationPicker: true } : {}),
+    });
+  },
+  onFieldEditorSave() {
+    if (this.data.customClassification) {
+      void this.onCustomClassificationSave();
+      return;
+    }
+    const editor = this.data.fieldEditor;
+    if (
+      !editor.visible ||
+      editor.option !== this.data.currentIndex ||
+      this.data.status === "completed" ||
+      !this.data.taskDetail[editor.option]?.canEdit
+    )
+      return;
+    this.onOriginalBaseFieldChange({
+      currentTarget: { dataset: editor },
+      detail: editor.value,
+    });
+    const record = this.data.taskDetail[editor.option].record;
+    const saved =
+      editor.field === "originText"
+        ? record.text
+        : editor.field === "cantonesePronunciations"
+          ? record.data[editor.index].jyutping
+          : record.data[editor.parentindex!].blocks[editor.index].content;
+    if (saved === editor.value) this.onFieldEditorClose();
+  },
+
   onOriginalBaseFieldChange(e: any) {
     console.log("e:", e.currentTarget.dataset);
     const { field, index, parentindex } = e.currentTarget.dataset;
@@ -732,6 +1328,13 @@ Page({
   },
   onPopupSelect(e: any) {
     const { value } = e.currentTarget.dataset;
+    if (value === "tags") {
+      this.onPopupClose();
+      void this.onOpenTags({
+        currentTarget: { dataset: { option: this.data.currentIndex } },
+      });
+      return;
+    }
     console.log("value:", value);
     const { currentIndex, taskDetail, longPressIndex } = this.data;
     const updatedTaskDetail = [...taskDetail];
@@ -763,7 +1366,7 @@ Page({
   },
 
   onDeleteBlock(e: any) {
-    wx.showModal({
+    showCommonModal(this, {
       title: "确认删除",
       content: "确定要删除吗？",
       success: (res) => {
@@ -883,7 +1486,7 @@ Page({
               this.doStartRecord(cardIndex, blockIndex);
             },
             fail: () => {
-              wx.showModal({
+              showCommonModal(this, {
                 title: "提示",
                 content: "需要录音权限才能使用此功能",
                 showCancel: false,
@@ -1203,8 +1806,19 @@ Page({
       blockIndex,
     );
 
+    const options =
+      pickerType === "emotion" ? this.data.emotions : this.data.intensityLevels;
+    const block =
+      this.data.taskDetail[this.data.currentIndex]?.record?.data?.[cardIndex]
+        ?.blocks?.[blockIndex];
+    const currentValue =
+      pickerType === "emotion" ? block?.category : block?.intensity;
     this.setData({
       showEmotionPicker: true,
+      emotionPickerOptions: options.map((value) => ({ label: value, value })),
+      emotionPickerValue: [
+        options.includes(currentValue) ? currentValue : options[0],
+      ],
       pickerType: pickerType,
       currentEmotionCardIndex: cardIndex,
       currentEmotionBlockIndex: blockIndex,
@@ -1223,7 +1837,7 @@ Page({
 
   // 确认选择
   onEmotionConfirm(e: any) {
-    const { value } = e.detail;
+    const value = e.detail.value[0];
     const {
       currentIndex,
       taskDetail,
@@ -1286,23 +1900,12 @@ Page({
 
     // 检查是否所有 block 都有完整的情感数据（要么都填，要么都不填）
     const allBlocksValid = currentTask.record.data
-      .map((c: any) => ({
-        ...c,
-        blocks: c.blocks.filter(
-          (b: any) =>
-            (b.content && b.content.trim()) || (b.url && b.url.trim()),
-        ),
-      }))
-      .filter((c: any) => c.jyutping)
+      .filter((card: any) => card.jyutping && card.jyutping.trim())
       .every((card: any) =>
         card.blocks.every((block: any) => {
-          if (block.category) {
-            return block.intensity !== undefined && block.intensity !== "";
-          }
-          if (block.intensity) {
-            return block.category !== undefined && block.category !== "";
-          }
-          return true;
+          const hasEmotion = Boolean(String(block.category ?? "").trim());
+          const hasIntensity = Boolean(String(block.intensity ?? "").trim());
+          return hasEmotion === hasIntensity;
         }),
       );
 

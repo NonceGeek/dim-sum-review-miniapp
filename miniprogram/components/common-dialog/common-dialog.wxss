@@ -1,0 +1,125 @@
+:host {
+  display: block;
+}
+
+.common-dialog {
+  width: calc(100vw - 96rpx) !important;
+  max-width: 620rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 32rpx !important;
+  box-shadow: 0 24rpx 80rpx rgba(0, 0, 0, 0.2);
+  color: var(--text-primary) !important;
+  --td-dialog-title-color: var(--text-primary);
+  --td-dialog-content-color: var(--text-secondary);
+  --td-dialog-border-radius: 32rpx;
+  --td-popup-border-radius: 32rpx;
+  --td-popup-bg-color: transparent;
+}
+
+.common-dialog .t-dialog__content {
+  padding: 44rpx 40rpx 0;
+}
+
+.common-dialog .t-dialog__header {
+  color: var(--text-primary) !important;
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.common-dialog .t-dialog__header + .t-dialog__body {
+  margin-top: 20rpx;
+}
+
+.common-dialog .t-dialog__body {
+  color: var(--text-secondary) !important;
+  font-size: 28rpx;
+  line-height: 1.65;
+  text-align: center;
+}
+
+.common-dialog .t-dialog__body-text,
+.common-dialog-content {
+  color: var(--text-secondary) !important;
+  white-space: pre-wrap;
+}
+
+.common-dialog-content {
+  padding: 44rpx 40rpx 0 !important;
+}
+
+.common-dialog .t-dialog__footer {
+  justify-content: center;
+  gap: 24rpx;
+  padding: 40rpx 40rpx 36rpx !important;
+}
+
+.common-dialog
+  .t-dialog__button--horizontal
+  + .t-dialog__button--horizontal {
+  margin-left: 0 !important;
+}
+
+.common-dialog-cancel,
+.common-dialog-confirm {
+  flex: 1 !important;
+  width: auto !important;
+  height: 88rpx !important;
+  min-height: 88rpx !important;
+  padding: 0 24rpx !important;
+  overflow: hidden;
+  border-radius: var(--radius-full) !important;
+}
+
+.common-dialog-cancel {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.common-dialog-confirm {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+.common-dialog.single-action .common-dialog-confirm {
+  flex: 0 0 calc(50% - 12rpx) !important;
+  width: calc(50% - 12rpx) !important;
+}
+
+.common-dialog-cancel::before,
+.common-dialog-confirm::before {
+  display: none !important;
+}
+
+.common-dialog-cancel .t-button__text,
+.common-dialog-confirm .t-button__text {
+  font-size: 32rpx !important;
+  font-weight: 500 !important;
+  line-height: 88rpx !important;
+}
+
+.common-dialog.theme-dark {
+  box-shadow: 0 24rpx 80rpx rgba(0, 0, 0, 0.48);
+}
+
+/* 变量设在 dialog 外层，让内部 popup 的圆角背板保持透明。 */
+.common-dialog-host {
+  --td-popup-bg-color: transparent;
+  --td-dialog-border-radius: 32rpx;
+  --td-bg-color-container: var(--bg-card);
+}
+.theme-dark .common-dialog.common-dialog { border: none !important; }
+.theme-dark .common-dialog-cancel.common-dialog-cancel {
+  --td-button-border-width: 0;
+  border: none !important;
+  background: var(--bg-input) !important;
+  color: var(--text-secondary) !important;
+}
+.theme-dark .common-dialog-cancel.common-dialog-cancel::after { border: none !important; }

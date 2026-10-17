@@ -1,11 +1,14 @@
 <view class="container-wrap theme-{{currentTheme}}">
   <view class="fixed-header-wrapper">
-    <t-cell-group class="dataset-cell-group" theme="card">
-      <t-cell title="语料集" arrow hover note="{{datasetText}}" bind:click="onDatasetPicker" />
-    </t-cell-group>
-    <t-cell-group class="dataset-cell-group" theme="card">
-      <t-cell title="用户" arrow hover note="{{userText}}" bind:click="onUserPicker" />
-    </t-cell-group>
+    <view class="dashboard-task-types">
+      <view wx:for="{{taskTypeOptions}}" wx:key="value" class="dashboard-task-type {{taskType === item.value ? 'dashboard-task-type-active' : ''}}" data-value="{{item.value}}" bind:tap="onTaskTypeChange" role="button" aria-pressed="{{taskType === item.value}}">{{item.label}}</view>
+    </view>
+    <view class="dashboard-filters">
+      <view class="dashboard-filter" data-key="contentAttribute" bind:tap="onStatsFilterOpen"><text class="filter-label">内容类型</text><view class="filter-value"><text>{{contentAttributeText}}</text><t-icon name="chevron-down" size="28rpx" /></view></view>
+      <view class="dashboard-filter" bindtap="onUserPicker"><text class="filter-label">用户</text><view class="filter-value"><text>{{userText}}</text><t-icon name="chevron-down" size="28rpx" /></view></view>
+      <view class="dashboard-filter" bindtap="onDatasetPicker"><text class="filter-label">语料集</text><view class="filter-value"><text>{{datasetText}}</text><t-icon name="chevron-down" size="28rpx" /></view></view>
+      <view class="dashboard-filter" data-key="categoryId" bind:tap="onStatsFilterOpen"><text class="filter-label">语料集分类</text><view class="filter-value"><text>{{categoryLoading ? '加载中…' : categoryText}}</text><t-icon name="chevron-down" size="28rpx" /></view></view>
+    </view>
   </view>
 
   <!-- 可搜索的用户选择器 -->
@@ -62,70 +65,55 @@
     </view>
   </view>
   <block wx:if="{{loading}}">
+    <view class="content-wrapper">
+      <task-list-skeleton variant="dashboard" show-overview="{{userValue === 'all'}}" />
+    </view>
   </block>
   <block wx:else>
     <view class="content-wrapper">
-      <t-cell-group wx:if="{{userValue === 'all'}}" class="dataset-cell-group" theme="card">
-        <t-cell title="统计" hover>
-          <view class="avatar" slot="left-icon">
-            <t-avatar shape="circle" size="small">统</t-avatar>
-          </view>
-        </t-cell>
-        <t-cell title="总语料数" hover note="{{summary.totalCorpusCount}}" />
-        <t-cell title="总任务数" hover note="{{summary.totalCount}}" />
-        <t-cell title="已处理" hover note="{{summary.processedCount}}" />
-        <t-cell title="未处理" hover note="{{summary.unprocessedCount}}" />
-        <t-cell title="完成率" hover>
-          <view slot="note"
-            class="completion-rate {{summary.completionRate > 75 ? 'rate-green' : summary.completionRate > 50 ? 'rate-orange' : summary.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
-            {{summary.completionRate}}%
-          </view>
-        </t-cell>
-      </t-cell-group>
-
-      <block wx:for="{{items}}" wx:key="value" wx:for-item="item">
-        <t-cell-group class="dataset-cell-group" theme="card" bind:tap="onHandleUserTaskList"
-          data-user-id="{{item.assigneeRef}}" data-dataset-name="{{item.corpusId}}">
-          <t-cell wx:if="{{item.assigneeRef !== currentUserId}}" title="{{item.assigneeRefName}}" hover arrow>
-            <view class="avatar" slot="left-icon">
-              <block wx:if="{{item.assigneeRefAvatar}}">
-                <t-image shape="circle" src="{{item.assigneeRefAvatar}}" alt="{{item.assigneeRefName}}" width="80rpx"
-                  height="80rpx" />
-              </block>
-              <block wx:else>
-                <t-avatar shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar>
-              </block>
-            </view>
-          </t-cell>
-          <t-cell wx:else title="{{item.assigneeRefName}}（自己）" hover arrow>
-            <view class="avatar" slot="left-icon">
-              <block wx:if="{{item.assigneeRefAvatar}}">
-                <t-image shape="circle" src="{{item.assigneeRefAvatar}}" alt="{{item.assigneeRefName}}" width="80rpx"
-                  height="80rpx" />
-              </block>
-              <block wx:else>
-                <t-avatar shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar>
-              </block>
-            </view>
-          </t-cell>
-          <t-cell wx:if="{{datasetValue === 'all'}}" title="语料集" hover note="{{item.corpusName}}" />
-          <t-cell title="总任务数" hover note="{{item.totalCount}}" />
-          <t-cell title="已处理" hover note="{{item.processedCount}}" />
-          <t-cell title="未处理" hover note="{{item.unprocessedCount}}" />
-          <t-cell title="完成率" hover>
-            <view slot="note"
-              class="completion-rate {{item.completionRate > 75 ? 'rate-green' : item.completionRate > 50 ? 'rate-orange' : item.completionRate > 25 ? 'rate-yellow' : 'rate-red'}}">
-              {{item.completionRate}}%
-            </view>
-          </t-cell>
-        </t-cell-group>
+      <block wx:if="{{hasTaskProgress}}">
+      <view class="overview" wx:if="{{userValue === 'all'}}">
+        <view class="section-heading"><text>任务概览</text><text class="section-caption">总语料 {{summary.totalCorpusCount}}</text></view>
+        <view class="stats-grid">
+          <view class="metric"><text class="metric-value">{{summary.totalCount}}</text><text class="metric-label">总任务</text></view>
+          <view class="metric"><text class="metric-value metric-done">{{summary.processedCount}}</text><text class="metric-label">已处理</text></view>
+          <view class="metric"><text class="metric-value">{{summary.unprocessedCount}}</text><text class="metric-label">未处理</text></view>
+        </view>
+        <view class="progress-heading"><text>整体完成率</text><text class="progress-value">{{summary.completionRate}}%</text></view>
+        <view class="progress-track"><view class="progress-fill" style="width: {{summary.completionRate}}%;"></view></view>
+      </view>
+      <view class="section-heading user-section"><text>用户进度</text></view>
+      <view class="user-card" wx:for="{{items}}" wx:key="value" bindtap="onHandleUserTaskList" data-user-id="{{item.assigneeRef}}" data-dataset-name="{{item.corpusId}}">
+        <view class="user-card-header">
+          <view class="user-avatar"><t-image wx:if="{{item.assigneeRefAvatar}}" shape="circle" src="{{item.assigneeRefAvatar}}" width="72rpx" height="72rpx" /><t-avatar wx:else shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar></view>
+          <view class="user-info"><view class="user-name">{{item.assigneeRefName}}<text class="self-tag" wx:if="{{item.assigneeRef === currentUserId}}">自己</text></view><text class="user-corpus" wx:if="{{datasetValue === 'all'}}">{{item.corpusName}}</text></view>
+          <t-icon name="chevron-right" size="32rpx" color="var(--text-muted)" />
+        </view>
+        <view class="user-metrics">
+          <view><text class="user-metric-value">{{item.totalCount}}</text><text class="metric-label">总任务</text></view>
+          <view><text class="user-metric-value metric-done">{{item.processedCount}}</text><text class="metric-label">已处理</text></view>
+          <view><text class="user-metric-value">{{item.unprocessedCount}}</text><text class="metric-label">未处理</text></view>
+        </view>
+        <view class="progress-heading"><text>完成率</text><text class="progress-value">{{item.completionRate}}%</text></view>
+        <view class="progress-track"><view class="progress-fill" style="width: {{item.completionRate}}%;"></view></view>
+      </view>
       </block>
+      <view class="empty-state" wx:if="{{!hasTaskProgress || !items.length}}"><text class="empty-text">暂无任务进度</text></view>
 
     </view>
   </block>
 
-  <t-picker visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
+  <t-popup visible="{{datasetVisible}}" placement="bottom" t-class="dashboard-rounded-popup" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onPickerCancel">
+  <t-picker use-popup="{{false}}" t-class="dashboard-picker" style="--td-picker-border-radius: 32rpx;" visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
     confirmBtn="确认" usingCustomNavbar bindchange="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
     <t-picker-item options="{{datasets}}"></t-picker-item>
   </t-picker>
+  </t-popup>
+  <t-popup visible="{{statsFilterVisible}}" placement="bottom" t-class="dashboard-rounded-popup" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onStatsFilterClose">
+    <t-picker wx:if="{{statsFilterVisible}}" use-popup="{{false}}" value="{{statsFilterValue}}" title="{{statsFilterTitle}}" cancel-btn="取消" confirm-btn="确定" bind:confirm="onStatsFilterConfirm" bind:cancel="onStatsFilterClose" t-class="dashboard-picker">
+      <t-picker-item options="{{statsFilterOptions}}" />
+    </t-picker>
+  </t-popup>
+  <app-tab-bar value="mine" page="dashboard" />
 </view>
+<common-dialog id="common-dialog" />

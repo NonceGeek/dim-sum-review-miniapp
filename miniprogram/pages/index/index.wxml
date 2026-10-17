@@ -2,29 +2,21 @@
   <t-navbar title="{{active === 'mine' ? '我的' : '任务列表'}}" />
   <!-- Add a space holder div because t-navbar is fixed -->
   <view style="height: {{headerHeight}}px;"></view>
-  <view class="page">
-    <block wx:if="{{ active === 'uncompleted' }}">
-      <scroll-view class="btn-group-scroll btn-group-fixed" scroll-x enable-flex style="top: {{headerHeight}}px; width: 100%">
-        <view class="btn-group">
-          <t-button wx:for="{{datasets}}" wx:key="value" theme="{{unselected === item.value ? 'primary' : 'default'}}" variant="outline" shape="round" bind:tap="onButtonClick" class="btn-type" data-type="{{item.value}}" size="small">
-            {{item.label}}
-          </t-button>
-        </view>
-      </scroll-view>
-      <view class="content-wrapper">
-        <t-cell-group bordered="{{false}}" class="custom-cell-group">
-          <t-cell wx:for="{{ uncompleted }}" wx:for-item="item" wx:key="id" leftIcon="help-circle" title="{{item.context.text}}" bind:tap="onClick" data-task-id="{{ item.id }}" data-task-status="{{ item.status }}" arrow hover class="custom-cell" />
-          <view class="more-view" wx:if="{{ uncompleted.length > 0 && !uncompletedLoadFinished }}">
-            <t-button shape="round" theme="default" variant="outline" class="btn-type" bind:tap="onClickMore">
-              加载更多
-            </t-button>
-          </view>
-          <view class="container" wx:if="{{ uncompleted.length === 0 }}">
-            <t-empty icon="info" description="暂无数据" />
-          </view>
-        </t-cell-group>
-      </view>
-    </block>
+  <view class="page" style="min-height: calc(100vh - {{headerHeight}}px);">
+    <view hidden="{{active !== 'uncompleted'}}">
+      <task-list id="task-list"
+        server-filtering="{{true}}"
+        request-path="/task/uncompleted"
+        server-ready="{{listReady}}"
+        initial-page="{{initialPage}}"
+        header-height="{{headerHeight}}"
+        current-theme="{{currentTheme}}"
+        datasets="{{datasets}}"
+        default-task-label="待处理任务"
+        bind:tasktap="onClick"
+      />
+
+    </view>
     <block wx:if="{{ active === 'mine' }}">
       <view class="mine-container">
         <!-- 用户信息卡片 -->
@@ -93,9 +85,8 @@
       <!-- 主题选择弹窗 -->
       <t-action-sheet visible="{{showThemeSheet}}" items="{{themeOptions}}" bind:selected="onThemeSelect" bind:cancel="onThemeSheetClose" bind:close="onThemeSheetClose" />
     </block>
-    <t-tab-bar value="{{active}}" bordered="{{false}}" bind:change="onChange" split="{{false}}" color="{{tabBarColor}}">
-      <t-tab-bar-item value="uncompleted" icon="home">任务</t-tab-bar-item>
-      <t-tab-bar-item value="mine" icon="user">我的</t-tab-bar-item>
-    </t-tab-bar>
+    <app-tab-bar value="{{active}}" page="index" bind:change="onChange" />
   </view>
+
 </view>
+<common-dialog id="common-dialog" />

@@ -3,7 +3,7 @@
 .page {
   background-color: var(--bg-page);
   color: var(--text-primary);
-  padding-bottom: 32rpx;
+  padding-bottom: calc(124rpx + env(safe-area-inset-bottom));
 }
 
 /* ============================================
@@ -177,3 +177,76 @@
     background-color: var(--bg-page);
   }
 }
+
+/* 与 index 相同的任务卡片样式 */
+.task-card {
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.task-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  gap: 16rpx;
+}
+
+.task-card-tag {
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
+  color: var(--primary);
+  font-size: 24rpx;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.task-card-corpus {
+  margin-bottom: 10rpx;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.task-card-title {
+  color: var(--text-primary);
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.task-card-context,
+.task-card-hint {
+  margin-top: 12rpx;
+  color: var(--text-secondary);
+  font-size: 26rpx;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.task-card-hover {
+  background-color: var(--bg-input);
+}
+
+.task-card-tag-classification_check {
+  color: #00875f;
+  background-color: rgba(0, 168, 112, 0.12);
+}
+.task-card-tag-content_review {
+  color: #d97706;
+  background-color: rgba(245, 158, 11, 0.14);
+}
+.theme-dark .task-card-tag-classification_check { color: #5fd4ac; }
+.theme-dark .task-card-tag-content_review { color: #f5b35c; }
+
+.container-wrap {
+  --td-tab-border-color: transparent;
+}
+.others-filter-tabs.others-filter-tabs::after { display: none !important; }

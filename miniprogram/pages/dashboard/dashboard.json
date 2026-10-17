@@ -8,7 +8,10 @@
     "t-col": "tdesign-miniprogram/col/col",
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-avatar": "tdesign-miniprogram/avatar/avatar",
-    "t-image": "tdesign-miniprogram/image/image"
+    "t-image": "tdesign-miniprogram/image/image",
+    "app-tab-bar": "../../components/app-tab-bar/app-tab-bar",
+    "t-popup": "tdesign-miniprogram/popup/popup",
+    "task-list-skeleton": "../../components/task-list-skeleton/task-list-skeleton"
   },
   "enablePullDownRefresh": true,
   "navigationBarTitleText": "任务看板"

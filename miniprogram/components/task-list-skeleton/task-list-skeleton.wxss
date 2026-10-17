@@ -1,0 +1,13 @@
+.skeleton-card {
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid var(--border-light);
+  border-radius: 24rpx;
+  background: var(--bg-card);
+  --td-skeleton-bg-color: var(--bg-input);
+  --td-skeleton-row-spacing: 24rpx;
+}
+
+.dashboard-card { padding: 24rpx; --td-skeleton-row-spacing: 32rpx; }
+.skeleton-section-title { margin: 32rpx 0 24rpx; font-size: 32rpx; font-weight: 600; color: var(--text-primary); }
+.skeleton-section-title:first-child { margin-top: 0; }

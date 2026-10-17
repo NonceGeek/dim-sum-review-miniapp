@@ -1,0 +1,357 @@
+/* 首页和已处理任务共用的筛选、卡片及弹窗样式。 */
+/* ============================================
+   筛选按钮组
+   ============================================ */
+.btn-group-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: var(--bg-page);
+}
+.category-tabs {
+  display: flex;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background-color: var(--bg-card);
+}
+.category-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.category-tab-active { color: var(--primary); }
+.category-tab-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 48rpx;
+  height: 6rpx;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+}
+.filter-toolbar {
+  display: flex;
+  align-items: center;
+  height: 124rpx;
+  padding: 24rpx;
+  gap: 20rpx;
+  box-sizing: border-box;
+}
+.task-segment-scroll {
+  flex: 1;
+  width: 0;
+  height: 76rpx;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-input);
+}
+.task-segments {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  height: 100%;
+  padding: 6rpx;
+  box-sizing: border-box;
+}
+.task-segment {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24rpx;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 28rpx;
+  white-space: nowrap;
+}
+.task-segment-active {
+  background-color: var(--bg-card);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+.corpus-filter-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  flex-shrink: 0;
+  min-height: 76rpx;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+}
+.corpus-filter-trigger-active { color: var(--primary); }
+.content-wrapper { padding-top: 212rpx; }
+.corpus-filter-sheet {
+  padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: 32rpx 32rpx 0 0;
+}
+.corpus-filter-handle {
+  width: 68rpx;
+  height: 8rpx;
+  margin: 0 auto 32rpx;
+  border-radius: var(--radius-full);
+  background-color: var(--border-color);
+}
+.corpus-filter-title { font-size: 36rpx; font-weight: 600; }
+.corpus-filter-context {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin: 20rpx 0;
+  color: var(--text-secondary);
+  font-size: 26rpx;
+}
+.corpus-filter-cancel { padding: 16rpx; }
+.corpus-filter-options { height: 440rpx; }
+.corpus-filter-section-title { font-size: 28rpx; font-weight: 600; margin: 24rpx 0; }
+.corpus-filter-chips { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.corpus-filter-option {
+  padding: 16rpx 24rpx;
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  font-size: 28rpx;
+  color: var(--text-primary);
+  background-color: var(--bg-input);
+  border: 2rpx solid transparent;
+  border-radius: var(--radius-md);
+}
+.corpus-filter-option-active {
+  color: var(--primary);
+  border-color: var(--primary);
+  background-color: var(--bg-input);
+}
+.corpus-filter-unavailable { color: var(--text-muted); font-size: 24rpx; margin-top: 16rpx; }
+.corpus-filter-match { color: var(--text-secondary); font-size: 26rpx; margin-top: 24rpx; }
+.corpus-filter-actions { display: flex; gap: 20rpx; margin-top: 32rpx; --td-button-border-radius: 16rpx; }
+.corpus-filter-actions t-button { flex: 1; }
+
+/* 筛选按钮样式 */
+.btn-type {
+  flex: 0 0 auto !important;
+  align-self: flex-start !important;
+  width: auto !important;
+  max-width: 100%;
+  display: inline-flex !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  border-radius: var(--radius-full) !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* TDesign 按钮样式覆盖 - primary状态 */
+.btn-type.t-button--primary {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-primary) !important;
+}
+
+/* TDesign 按钮样式覆盖 - default状态 */
+.btn-type.t-button--default {
+  background-color: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+.btn-type.t-button--default:active {
+  background-color: var(--border-color) !important;
+}
+
+/* ============================================
+   任务列表
+   ============================================ */
+.custom-cell-group {
+  margin: 0 24rpx;
+}
+
+/* 自定义 Cell 样式 */
+.custom-cell {
+  margin-bottom: 16rpx !important;
+  border-radius: var(--radius-lg) !important;
+  background-color: var(--bg-card) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border-light) !important;
+  overflow: hidden !important;
+  transition: all 0.2s ease !important;
+}
+
+/* 去除 t-cell 下划线 */
+.custom-cell::after {
+  display: none !important;
+}
+
+.custom-cell:active {
+  transform: scale(0.995);
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Cell 左侧图标 */
+.custom-cell .t-cell__left-icon {
+  color: var(--primary) !important;
+}
+
+/* Cell 标题 */
+.custom-cell .t-cell__title {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: 32rpx !important;
+}
+
+/* Cell 箭头 */
+.custom-cell .t-cell__right-icon {
+  color: var(--text-muted) !important;
+}
+
+/* 空状态容器 */
+.container {
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* 加载更多 */
+.more-view {
+  text-align: center;
+  padding: 32rpx 0;
+}
+
+.more-view .btn-type {
+  color: var(--text-secondary) !important;
+  background-color: transparent !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+
+.task-card {
+  margin-bottom: 24rpx;
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+}
+
+.task-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  gap: 16rpx;
+}
+
+.task-card-tag {
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-input);
+  color: var(--primary);
+  font-size: 24rpx;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.task-card-corpus {
+  margin-bottom: 10rpx;
+  color: var(--text-secondary);
+  font-size: 28rpx;
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.task-card-title {
+  color: var(--text-primary);
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.task-card-context,
+.task-card-hint {
+  margin-top: 12rpx;
+  color: var(--text-secondary);
+  font-size: 26rpx;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+}
+
+.task-card-hover {
+  background-color: var(--bg-input);
+}
+
+.task-list-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  margin: 0 32rpx 20rpx;
+  color: var(--text-secondary);
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+
+.task-list-summary-label {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.task-list-summary-order {
+  flex-shrink: 0;
+}
+
+.task-card-tag-classification_check {
+  color: #00875f;
+  background-color: rgba(0, 168, 112, 0.12);
+}
+.task-card-tag-content_review {
+  color: #d97706;
+  background-color: rgba(245, 158, 11, 0.14);
+}
+.theme-dark .task-card-tag-classification_check { color: #5fd4ac; }
+.theme-dark .task-card-tag-content_review { color: #f5b35c; }
+
+.selected-filter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin: 0 24rpx 24rpx;
+}
+.selected-filter-tag {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 16rpx;
+  border-radius: 16rpx;
+  background: rgba(24, 119, 255, 0.08);
+  color: var(--primary);
+  font-size: 26rpx;
+  line-height: 1.4;
+  overflow-wrap: break-word;
+}
+.selected-filter-close { flex-shrink: 0; }
+
+.corpus-filter-reset.corpus-filter-reset {
+  background: var(--bg-input) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-full) !important;
+  transition: none !important;
+}
+.theme-dark .corpus-filter-reset.corpus-filter-reset {
+  --td-button-border-width: 0;
+  border: none !important;
+}
+.theme-dark .corpus-filter-reset.corpus-filter-reset::after { border: none !important; }
