@@ -236,8 +236,8 @@
         </view>
         <!-- 新增粤音按钮 -->
         <view class="btn-add-group" wx:if="{{status !== 'completed' && task.canEdit}}">
-          <t-button icon="add" hover-class="none" theme="primary" shape="round" block size="large" bind:tap="onAddNewCantonese" class="btn-submit-inner">
-            新增粤音
+          <t-button hover-class="none" theme="primary" shape="round" block size="large" bind:tap="onAddNewCantonese" class="btn-submit-inner">
+            ＋ 新增粤音
           </t-button>
         </view>
 
@@ -260,7 +260,7 @@
   </block>
 </swiper>
 <!-- 底部弹出选择框 -->
-<t-popup style="--td-popup-border-radius: 32rpx;" visible="{{ showPopup }}" placement="bottom" bind:visible-change="onPopupClose" close-on-overlay-click="{{true}}">
+<t-popup t-class="app-themed-bottom-popup theme-{{currentTheme}}" style="--td-popup-border-radius: 32rpx;" visible="{{ showPopup }}" placement="bottom" bind:visible-change="onPopupClose" close-on-overlay-click="{{true}}">
   <view class="popup-container">
     <view class="popup-title">选择要添加的内容</view>
     <t-cell-group bordered="{{false}}">
@@ -271,7 +271,7 @@
   </view>
 </t-popup>
 <!-- 文字字段编辑：草稿仅在保存时写入当前选项 -->
-<t-popup t-class="task-rounded-popup" t-class-content="task-rounded-popup-content" visible="{{fieldEditor.visible}}" placement="bottom" bind:visible-change="onFieldEditorClose" close-on-overlay-click="{{true}}">
+<t-popup t-class="task-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="task-rounded-popup-content" visible="{{fieldEditor.visible}}" placement="bottom" bind:visible-change="onFieldEditorClose" close-on-overlay-click="{{true}}">
   <view class="field-editor theme-{{currentTheme}}">
     <view class="field-editor-handle"></view>
     <view class="field-editor-title">修改选项 {{fieldEditor.option + 1}} · {{fieldEditor.label}}</view>
@@ -290,25 +290,25 @@
   </view>
 </t-popup>
 <!-- 分类和情感统一使用 TDesign picker -->
-<t-popup visible="{{showClassificationPicker}}" placement="bottom" t-class="task-rounded-popup" t-class-content="task-rounded-popup-content" bind:visible-change="onClassificationPickerClose">
+<t-popup visible="{{showClassificationPicker}}" placement="bottom" t-class="task-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="task-rounded-popup-content" bind:visible-change="onClassificationPickerClose">
   <view class="task-picker-theme theme-{{currentTheme}}">
   <t-picker wx:if="{{showClassificationPicker}}" use-popup="{{false}}" auto-close="{{false}}" value="{{classificationValue}}" title="选择分类" cancel-btn="取消" confirm-btn="确定" bind:pick="onClassificationPickerChange" bind:confirm="onClassificationPickerConfirm" bind:cancel="onClassificationPickerClose" t-class="task-picker">
     <t-picker-item options="{{classificationFirstOptions}}" />
     <t-picker-item options="{{classificationSecondOptions}}" />
   </t-picker>
   <view class="classification-custom-entry">
-    <t-button block theme="default" shape="round" hover-class="none" t-class="classification-custom-button" bind:tap="onCustomClassification">自定义分类</t-button>
+    <t-button block size="large" theme="default" shape="round" hover-class="none" t-class="classification-custom-button" bind:tap="onCustomClassification">自定义分类</t-button>
   </view>
   </view>
 </t-popup>
-<t-popup visible="{{showEmotionPicker}}" placement="bottom" t-class="task-rounded-popup" t-class-content="task-rounded-popup-content" bind:visible-change="onEmotionPickerClose">
+<t-popup visible="{{showEmotionPicker}}" placement="bottom" t-class="task-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="task-rounded-popup-content" bind:visible-change="onEmotionPickerClose">
   <view class="task-picker-theme theme-{{currentTheme}}">
   <t-picker wx:if="{{showEmotionPicker}}" use-popup="{{false}}" auto-close="{{false}}" value="{{emotionPickerValue}}" title="{{pickerType === 'emotion' ? '情感' : '情感强度'}}" cancel-btn="取消" confirm-btn="确定" bind:confirm="onEmotionConfirm" bind:cancel="onEmotionPickerClose" t-class="task-picker">
     <t-picker-item options="{{emotionPickerOptions}}" />
   </t-picker>
   </view>
 </t-popup>
-<t-popup visible="{{tagPickerVisible}}" placement="bottom" t-class="task-rounded-popup" t-class-content="task-rounded-popup-content" close-on-overlay-click="{{!tagCreating}}" bind:visible-change="onTagPickerClose">
+<t-popup visible="{{tagPickerVisible}}" placement="bottom" t-class="task-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="task-rounded-popup-content" close-on-overlay-click="{{!tagCreating}}" bind:visible-change="onTagPickerClose">
   <view class="task-tag-picker theme-{{currentTheme}}">
     <view class="task-tag-picker-header"><text class="task-tag-cancel" bind:tap="onTagPickerClose">取消</text><text class="task-tag-picker-title">选择标签</text><text class="task-tag-confirm" bind:tap="onTagPickerConfirm">确定</text></view>
     <t-search value="{{tagKeyword}}" placeholder="搜索或添加标签" bind:change="onTagSearch" />
@@ -323,5 +323,6 @@
     </scroll-view>
   </view>
 </t-popup>
+<app-tab-bar value="{{activeTab}}" page="task" />
 </view>
 <common-dialog id="common-dialog" />

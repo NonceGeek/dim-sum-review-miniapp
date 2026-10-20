@@ -76,14 +76,14 @@
         </view>
         <!-- 退出登录按钮 -->
         <view class="logout-section">
-          <t-button theme="danger" variant="light" size="large" block bind:tap="onLogout" class="logout-btn">
+          <t-button theme="danger" variant="light" shape="round" size="large" block bind:tap="onLogout" class="logout-btn">
             退出登录
           </t-button>
         </view>
         <view class="version-hint">Version: {{version}}</view>
       </view>
       <!-- 主题选择弹窗 -->
-      <t-action-sheet visible="{{showThemeSheet}}" items="{{themeOptions}}" bind:selected="onThemeSelect" bind:cancel="onThemeSheetClose" bind:close="onThemeSheetClose" />
+      <t-action-sheet t-class="theme-sheet theme-sheet-{{currentTheme}}" visible="{{showThemeSheet}}" items="{{themeOptions}}" bind:selected="onThemeSelect" bind:cancel="onThemeSheetClose" bind:close="onThemeSheetClose" />
     </block>
     <app-tab-bar value="{{active}}" page="index" bind:change="onChange" />
   </view>

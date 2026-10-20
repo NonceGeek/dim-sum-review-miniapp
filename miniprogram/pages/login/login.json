@@ -2,6 +2,7 @@
   "navigationBarTitleText": "登录",
   "navigationStyle": "custom",
   "usingComponents": {
+    "t-checkbox": "tdesign-miniprogram/checkbox/checkbox",
     "t-popup": "tdesign-miniprogram/popup/popup",
     "t-input": "tdesign-miniprogram/input/input",
     "t-button": "tdesign-miniprogram/button/button",

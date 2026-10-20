@@ -140,11 +140,8 @@ Page({
 
   syncTheme() {
     const app = getApp<IAppOption>();
+    app.syncNavigationTheme?.();
     const currentTheme = app.getTheme() || "light";
-    wx.setNavigationBarColor({
-      frontColor: currentTheme === "dark" ? "#ffffff" : "#000000",
-      backgroundColor: currentTheme === "dark" ? "#161B22" : "#FFFFFF",
-    });
     this.setData({ currentTheme });
   },
   /**

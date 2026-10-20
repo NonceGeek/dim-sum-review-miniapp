@@ -3,6 +3,6 @@ export default {
   // 请求source
   API_PUBLIC_URL: "https://backend.aidimsum.com",
   IS_REVIEW: false,
-  VERSION: "20261008",
+  VERSION: "20261019",
   // API_BASE_URL: "https://yue-lint-agent.api.tokentapestry.com",
 };

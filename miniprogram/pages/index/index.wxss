@@ -297,3 +297,20 @@ t-action-sheet {
 }
 
 /* 任务卡片：类型、来源、标题和辅助信息 */
+
+.container-wrap { --td-action-sheet-border-color: transparent; }
+
+.theme-sheet-light {
+  --td-bg-color-container: #FFFFFF;
+  --td-action-sheet-color: #1A1F36;
+  --td-action-sheet-cancel-color: #1A1F36;
+  --td-action-sheet-gap-color: #F5F7FA;
+  --td-action-sheet-border-color: transparent;
+}
+.theme-sheet-dark {
+  --td-bg-color-container: #161B22;
+  --td-action-sheet-color: #F0F6FC;
+  --td-action-sheet-cancel-color: #F0F6FC;
+  --td-action-sheet-gap-color: #0D1117;
+  --td-action-sheet-border-color: transparent;
+}

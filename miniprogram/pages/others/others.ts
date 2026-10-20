@@ -216,7 +216,7 @@ Page({
     console.log("event:", event);
     const { taskId, taskStatus } = event.currentTarget.dataset;
     wx.navigateTo({
-      url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}&userId=${this.data.user}`,
+      url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}&userId=${this.data.user}&tab=mine`,
     });
   },
 
@@ -246,12 +246,9 @@ Page({
    */
   syncTheme() {
     const app = getApp<IAppOption>();
+    app.syncNavigationTheme?.();
     const themeMode = app.getThemeMode();
     const currentTheme = app.getTheme();
-    wx.setNavigationBarColor({
-      frontColor: currentTheme === "dark" ? "#ffffff" : "#000000",
-      backgroundColor: currentTheme === "dark" ? "#161B22" : "#FFFFFF",
-    });
 
     if (
       this.data.themeMode !== themeMode ||

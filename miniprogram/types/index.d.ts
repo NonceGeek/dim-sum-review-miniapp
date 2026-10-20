@@ -47,6 +47,7 @@ interface IAppOption {
   // 主题相关
   initTheme(): Promise<void>;
   applyTheme(theme: ThemeValue): void;
+  syncNavigationTheme(): void;
   getThemeMode(): ThemeMode;
   getTheme(): ThemeValue;
   setThemeMode(mode: ThemeMode): Promise<void>;

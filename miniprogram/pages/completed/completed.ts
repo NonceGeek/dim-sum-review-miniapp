@@ -37,6 +37,7 @@ Page({
 
   syncTheme() {
     const app = getApp<any>();
+    app.syncNavigationTheme?.();
     const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
@@ -44,7 +45,7 @@ Page({
   onClick(event: any) {
     const { taskId, taskStatus } = event.detail;
     wx.navigateTo({
-      url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}`,
+      url: `/pages/task/task?taskId=${taskId}&status=${taskStatus}&tab=mine`,
     });
   },
 

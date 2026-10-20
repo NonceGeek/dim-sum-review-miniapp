@@ -250,3 +250,12 @@
   --td-tab-border-color: transparent;
 }
 .others-filter-tabs.others-filter-tabs::after { display: none !important; }
+
+.others-filter-tabs.others-filter-tabs {
+  --td-tab-nav-bg-color: var(--bg-card);
+  --td-tab-item-color: var(--text-secondary);
+  --td-tab-item-active-color: var(--primary);
+  --td-tab-track-color: var(--primary);
+  --td-tab-border-color: transparent;
+  background: var(--bg-card) !important;
+}

@@ -37,6 +37,7 @@ Page({
 
   syncTheme() {
     const app = getApp<any>();
+    app.syncNavigationTheme?.();
     const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
@@ -227,7 +228,7 @@ Page({
   // 协议复选框变化
   onAgreementChange(e: any) {
     console.log("e:", e);
-    const checked = e.detail.value.length > 0;
+    const checked = e.detail.checked;
     this.setData({
       agreedToTerms: checked,
     });

@@ -189,6 +189,7 @@ Page({
    */
   syncTheme() {
     const app = getApp<any>();
+    app.syncNavigationTheme?.();
     const themeMode = app.getThemeMode();
     const currentTheme = app.getTheme();
 
@@ -213,6 +214,12 @@ Page({
    */
   onThemeSettingTap() {
     this.setData({
+      themeOptions: THEME_OPTIONS.map((item) => ({
+        ...item,
+        color: item.value === this.data.themeMode
+          ? (this.data.currentTheme === "dark" ? "#5D8CF5" : "#4A7CF3")
+          : (this.data.currentTheme === "dark" ? "#F0F6FC" : "#1A1F36"),
+      })),
       showThemeSheet: true,
     });
   },

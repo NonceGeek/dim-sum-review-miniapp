@@ -103,13 +103,13 @@
     </view>
   </block>
 
-  <t-popup visible="{{datasetVisible}}" placement="bottom" t-class="dashboard-rounded-popup" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onPickerCancel">
+  <t-popup visible="{{datasetVisible}}" placement="bottom" t-class="dashboard-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onPickerCancel">
   <t-picker use-popup="{{false}}" t-class="dashboard-picker" style="--td-picker-border-radius: 32rpx;" visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
     confirmBtn="确认" usingCustomNavbar bindchange="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
     <t-picker-item options="{{datasets}}"></t-picker-item>
   </t-picker>
   </t-popup>
-  <t-popup visible="{{statsFilterVisible}}" placement="bottom" t-class="dashboard-rounded-popup" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onStatsFilterClose">
+  <t-popup visible="{{statsFilterVisible}}" placement="bottom" t-class="dashboard-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onStatsFilterClose">
     <t-picker wx:if="{{statsFilterVisible}}" use-popup="{{false}}" value="{{statsFilterValue}}" title="{{statsFilterTitle}}" cancel-btn="取消" confirm-btn="确定" bind:confirm="onStatsFilterConfirm" bind:cancel="onStatsFilterClose" t-class="dashboard-picker">
       <t-picker-item options="{{statsFilterOptions}}" />
     </t-picker>

@@ -240,3 +240,25 @@
     box-shadow: var(--shadow-primary) !important;
   }
 }
+
+.agreement-group {
+  --td-checkbox-bg-color: transparent;
+  --td-checkbox-border-color: var(--border-color);
+  --td-checkbox-icon-color: var(--text-muted);
+  --td-checkbox-icon-checked-color: var(--primary);
+  --td-checkbox-vertical-padding: 0;
+}
+.agreement-checkbox { display: inline-flex; vertical-align: middle; }
+
+.phone-login-popup {
+  --td-input-bg-color: var(--bg-input);
+  --td-input-default-text-color: var(--text-primary);
+  --td-input-placeholder-text-color: var(--text-muted);
+  --td-input-prefix-icon-color: var(--text-muted);
+  --td-input-suffix-icon-color: var(--text-muted);
+  --td-input-border-color: transparent;
+}
+
+.phone-login-popup {
+  --td-countdown-default-color: var(--text-secondary);
+}

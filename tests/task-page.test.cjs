@@ -250,7 +250,7 @@ for (const [category, intensity, valid] of [['', '强', false], ['高兴', ' ', 
 }
 test('新增粤音关闭默认点击高亮', () => {
   const fs = require('node:fs');
-  assert.match(fs.readFileSync('miniprogram/pages/task/task.wxml', 'utf8'), /<t-button icon="add" hover-class="none"/);
+  assert.match(fs.readFileSync('miniprogram/pages/task/task.wxml', 'utf8'), /<t-button[^>]*hover-class="none"[^>]*bind:tap="onAddNewCantonese"/);
 });
 
 for (const [response, message] of [

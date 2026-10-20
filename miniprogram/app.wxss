@@ -161,8 +161,7 @@ page {
     color: var(--text-secondary) !important;
   }
   
-  .t-cell .t-cell__left-icon,
-  .t-icon {
+  .t-cell .t-cell__left-icon {
     color: var(--text-primary) !important;
   }
   
@@ -465,8 +464,7 @@ page {
   color: var(--text-secondary) !important;
 }
 
-.theme-dark .t-cell .t-cell__left-icon,
-.theme-dark .t-icon {
+.theme-dark .t-cell .t-cell__left-icon {
   color: var(--text-primary) !important;
 }
 
@@ -571,4 +569,29 @@ page {
 .t-tab-bar .t-tab-bar-item .t-tab-bar-item__content--checked .t-icon,
 .t-tab-bar .t-tab-bar-item .t-tab-bar-item__content--checked .t-tab-bar-item__text {
   color: var(--primary) !important;
+}
+
+/* 自定义导航的实际背景在 content 层；显式主题优先于系统媒体查询。 */
+.theme-light, .theme-dark {
+  --td-navbar-background: var(--bg-card) !important;
+  --td-navbar-bg-color: var(--bg-card) !important;
+  --td-navbar-color: var(--text-primary) !important;
+}
+.theme-light .t-navbar__content, .theme-dark .t-navbar__content {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+}
+
+/* 主题类直接放在 popup 根节点，安全区不再继承系统 page 的主题。 */
+.app-themed-bottom-popup.app-themed-bottom-popup {
+  --td-popup-bg-color: var(--bg-card);
+  --td-picker-bg-color: var(--bg-card);
+  --td-picker-title-color: var(--text-primary);
+  --td-picker-cancel-color: var(--text-secondary);
+  --td-picker-confirm-color: var(--primary);
+  --td-picker-item-color: var(--text-secondary);
+  --td-picker-item-active-color: var(--text-primary);
+  --td-picker-indicator-bg-color: var(--bg-input);
+  --td-picker-transparent-color: transparent;
+  background: var(--bg-card) !important;
 }

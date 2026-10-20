@@ -1,5 +1,6 @@
 {
   "usingComponents": {
+    "app-tab-bar": "../../components/app-tab-bar/app-tab-bar",
     "t-navbar": "tdesign-miniprogram/navbar/navbar",
     "t-collapse": "tdesign-miniprogram/collapse/collapse",
     "t-collapse-panel": "tdesign-miniprogram/collapse-panel/collapse-panel",

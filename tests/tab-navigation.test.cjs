@@ -29,3 +29,18 @@ test('返回页面不卸载 tab，避免返回后延迟出现', () => {
   const source = fs.readFileSync('miniprogram/components/app-tab-bar/app-tab-bar.ts', 'utf8');
   assert.doesNotMatch(source, /tabBarVisible/);
 });
+
+
+test('详情页 tab 跟随入口：已处理和任务情况选我的，首页任务选任务', async () => {
+  const { createPage } = require('./helpers/task-page.cjs');
+  for (const [options, expected] of [
+    [{ status: 'notified' }, 'uncompleted'],
+    [{ status: 'completed' }, 'mine'],
+    [{ status: 'notified', tab: 'mine' }, 'mine'],
+  ]) {
+    const { page } = createPage();
+    page.syncTheme = () => {}; page.getTask = async () => {}; page.loadClassificationOptions = async () => {};
+    await page.onLoad({ taskId: '1', ...options });
+    assert.equal(page.data.activeTab, expected);
+  }
+});

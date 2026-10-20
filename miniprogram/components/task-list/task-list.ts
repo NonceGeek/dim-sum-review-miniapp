@@ -1,6 +1,15 @@
 import { getTaskType, TASK_TYPE_OPTIONS } from "./task-type";
 import request from "../../utils/http";
 
+// “all” 表示不限；多个值沿用接口的逗号分隔参数格式。
+const filterValues = (value: string): string[] => value === "all" ? [] : value.split(",").filter(Boolean);
+const toggleFilter = (current: string, value: string): string => {
+  if (value === "all") return "all";
+  const values = filterValues(current);
+  const next = values.includes(value) ? values.filter((item) => item !== value) : [...values, value];
+  return next.join(",") || "all";
+};
+
 Component({
   options: { styleIsolation: "apply-shared" },
   properties: {
@@ -46,8 +55,10 @@ Component({
     showCorpusFilter: false,
     draftCorpus: "all",
     draftMatchCount: 0,
+    draftCorpusMap: { all: true } as Record<string, boolean>,
+    draftLevelMap: { all: true } as Record<string, boolean>,
     corpusFilterContext: "全部 · 全部",
-    selectedFilterTags: [] as { field: string; label: string }[],
+    selectedFilterTags: [] as { field: string; value: string; label: string }[],
     taskTypes: TASK_TYPE_OPTIONS,
     tasks: [] as any[],
   },
@@ -92,7 +103,7 @@ Component({
         tasks: [],
         serverPage: page - 1,
         serverTotal: 0,
-            loadFinished: false,
+        loadFinished: false,
       });
       await this.fetchTasks(page);
     },
@@ -228,7 +239,7 @@ Component({
         category.datasets.some((dataset) =>
           corpus === "all"
             ? availableDatasets.has(dataset.name)
-            : dataset.name === corpus,
+            : filterValues(corpus).includes(dataset.name),
         ),
       );
       return [
@@ -242,11 +253,9 @@ Component({
 
     syncDraftLevels() {
       const levelOptions = this.getLevelOptions(this.data.draftCorpus);
-      const draftLevel = levelOptions.some(
-        (item) => item.value === this.data.draftLevel,
-      )
-        ? this.data.draftLevel
-        : "all";
+      const draftLevel = filterValues(this.data.draftLevel)
+        .filter((value) => levelOptions.some((item) => item.value === value))
+        .join(",") || "all";
       this.setData({ levelOptions, draftLevel });
       this.updateDraftMatchCount();
     },
@@ -256,12 +265,12 @@ Component({
     },
 
     onDraftCorpusClick(event: any) {
-      this.setData({ draftCorpus: event.currentTarget.dataset.value });
+      this.setData({ draftCorpus: toggleFilter(this.data.draftCorpus, event.currentTarget.dataset.value) });
       this.syncDraftLevels();
     },
 
     onDraftLevelClick(event: any) {
-      this.setData({ draftLevel: event.currentTarget.dataset.value });
+      this.setData({ draftLevel: toggleFilter(this.data.draftLevel, event.currentTarget.dataset.value) });
       this.updateDraftMatchCount();
     },
 
@@ -285,37 +294,33 @@ Component({
         level === undefined ? this.data.selectedLevel : level;
       const { selectedCategory, selectedTaskType } = this.data;
       const context = task.context || {};
-      const category = this.data.datasetCategories.find(
-        (item) => item.id === selectedLevel,
-      );
       const matchesLevel =
         selectedLevel === "all" ||
         (context.category?.id != null
-          ? String(context.category.id) === selectedLevel
+          ? filterValues(selectedLevel).includes(String(context.category.id))
           : Boolean(
-              category &&
-              (context.category?.name || context.levelCategory) ===
-                category.name,
+              this.data.datasetCategories.some((item) =>
+                filterValues(selectedLevel).includes(item.id) &&
+                (context.category?.name || context.levelCategory) === item.name),
             ));
       return (
         matchesLevel &&
         (selectedCategory === "all" ||
           context.contentAttribute === selectedCategory) &&
-        (corpus === "all" || context.corpusName === corpus) &&
+        (corpus === "all" || filterValues(corpus).includes(context.corpusName)) &&
         (selectedTaskType === "all" || getTaskType(task) === selectedTaskType)
       );
     },
 
     updateDraftMatchCount() {
-      const corpusLabel =
-        this.data.datasets.find((item) => item.value === this.data.draftCorpus)
-          ?.label || "全部";
-      const levelLabel =
-        this.data.levelOptions.find(
-          (item) => item.value === this.data.draftLevel,
-        )?.label || "全部";
+      const corpora = filterValues(this.data.draftCorpus);
+      const levels = filterValues(this.data.draftLevel);
+      const corpusLabel = corpora.map((value) => this.data.datasets.find((item) => item.value === value)?.label || value).join("、") || "全部";
+      const levelLabel = levels.map((value) => this.data.levelOptions.find((item) => item.value === value)?.label || value).join("、") || "全部";
       this.setData({
         corpusFilterContext: `${corpusLabel} · ${levelLabel}`,
+        draftCorpusMap: Object.fromEntries((corpora.length ? corpora : ["all"]).map((value) => [value, true])),
+        draftLevelMap: Object.fromEntries((levels.length ? levels : ["all"]).map((value) => [value, true])),
       });
       if (this.data.serverFiltering) return;
       this.setData({
@@ -330,9 +335,9 @@ Component({
     },
 
     onClearFilter(event: WechatMiniprogram.CustomEvent) {
-      const { field } = event.currentTarget.dataset;
-      if (field === "corpus") this.setData({ selectedCorpus: "all" });
-      else if (field === "level") this.setData({ selectedLevel: "all" });
+      const { field, value } = event.currentTarget.dataset;
+      if (field === "corpus") this.setData({ selectedCorpus: value ? filterValues(this.data.selectedCorpus).filter((item) => item !== value).join(",") || "all" : "all" });
+      else if (field === "level") this.setData({ selectedLevel: value ? filterValues(this.data.selectedLevel).filter((item) => item !== value).join(",") || "all" : "all" });
       else return;
       this.applyTaskFilters();
       return this.notifyFilterChange();
@@ -340,22 +345,10 @@ Component({
 
     applyTaskFilters() {
       const { rawTasks, selectedCorpus, selectedLevel, datasets } = this.data;
-      const selectedFilterTags: { field: string; label: string }[] = [];
-      if (selectedCorpus !== "all")
-        selectedFilterTags.push({
-          field: "corpus",
-          label:
-            datasets.find((item) => item.value === selectedCorpus)?.label ||
-            selectedCorpus,
-        });
-      if (selectedLevel !== "all")
-        selectedFilterTags.push({
-          field: "level",
-          label:
-            this.data.datasetCategories.find(
-              (item) => item.id === selectedLevel,
-            )?.name || selectedLevel,
-        });
+      const selectedFilterTags: { field: string; value: string; label: string }[] = [
+        ...filterValues(selectedCorpus).map((value) => ({ field: "corpus", value, label: datasets.find((item) => item.value === value)?.label || value })),
+        ...filterValues(selectedLevel).map((value) => ({ field: "level", value, label: this.data.datasetCategories.find((item) => item.id === value)?.name || value })),
+      ];
       this.setData({
         selectedFilterTags,
         tasks: rawTasks

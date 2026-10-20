@@ -87,7 +87,7 @@
 .corpus-filter-trigger-active { color: var(--primary); }
 .content-wrapper { padding-top: 212rpx; }
 .corpus-filter-sheet {
-  padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom));
+  padding: 32rpx;
   background-color: var(--bg-card);
   color: var(--text-primary);
   border-radius: 32rpx 32rpx 0 0;
@@ -130,7 +130,7 @@
 }
 .corpus-filter-unavailable { color: var(--text-muted); font-size: 24rpx; margin-top: 16rpx; }
 .corpus-filter-match { color: var(--text-secondary); font-size: 26rpx; margin-top: 24rpx; }
-.corpus-filter-actions { display: flex; gap: 20rpx; margin-top: 32rpx; --td-button-border-radius: 16rpx; }
+.corpus-filter-actions { display: flex; align-items: center; gap: 24rpx; margin-top: 32rpx; --td-button-large-height: 96rpx; }
 .corpus-filter-actions t-button { flex: 1; }
 
 /* 筛选按钮样式 */
@@ -355,3 +355,18 @@
   border: none !important;
 }
 .theme-dark .corpus-filter-reset.corpus-filter-reset::after { border: none !important; }
+
+.corpus-filter-heading { display: flex; align-items: center; justify-content: space-between; }
+.corpus-filter-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56rpx;
+  height: 56rpx;
+  box-sizing: border-box;
+  border-radius: var(--radius-full);
+  border: 2rpx solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}

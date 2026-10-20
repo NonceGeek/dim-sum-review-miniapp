@@ -17,7 +17,7 @@
       </view>
       <view class="content-wrapper">
         <view wx:if="{{selectedFilterTags.length}}" class="selected-filter-tags">
-          <view wx:for="{{selectedFilterTags}}" wx:key="field" class="selected-filter-tag" data-field="{{item.field}}" bind:tap="onClearFilter" role="button" aria-label="清除{{item.label}}筛选">
+          <view wx:for="{{selectedFilterTags}}" wx:key="label" class="selected-filter-tag" data-field="{{item.field}}" data-value="{{item.value}}" bind:tap="onClearFilter" role="button" aria-label="清除{{item.label}}筛选">
             <text>{{item.label}}</text><text class="selected-filter-close">×</text>
           </view>
         </view>
@@ -46,30 +46,33 @@
           </view>
         </t-cell-group>
       </view>
-  <t-popup style="--td-popup-border-radius: 32rpx;" visible="{{showCorpusFilter}}" placement="bottom" bind:visible-change="onCorpusFilterClose" close-on-overlay-click="{{true}}">
+  <t-popup t-class="app-themed-bottom-popup theme-{{currentTheme}}" style="--td-popup-border-radius: 32rpx;" visible="{{showCorpusFilter}}" placement="bottom" bind:visible-change="onCorpusFilterClose" close-on-overlay-click="{{true}}">
     <view class="corpus-filter-sheet">
       <view class="corpus-filter-handle"></view>
-      <view class="corpus-filter-title">筛选任务</view>
+      <view class="corpus-filter-heading">
+        <view class="corpus-filter-title">筛选任务</view>
+        <view class="corpus-filter-close" bind:tap="onCorpusFilterClose" role="button" aria-label="取消筛选并关闭"><t-icon name="close" size="32rpx" /></view>
+      </view>
       <view class="corpus-filter-context">
         <text>{{corpusFilterContext}}</text>
       </view>
       <scroll-view scroll-y class="corpus-filter-options">
         <view class="corpus-filter-section-title">来源语料库</view>
         <view class="corpus-filter-chips">
-          <view wx:for="{{datasets}}" wx:key="value" class="corpus-filter-option {{draftCorpus === item.value ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftCorpusClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftCorpus === item.value}}">{{item.label}}</view>
+          <view wx:for="{{datasets}}" wx:key="value" class="corpus-filter-option {{draftCorpusMap[item.value] ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftCorpusClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftCorpusMap[item.value]}}">{{item.label}}</view>
         </view>
         <view class="corpus-filter-section-title">语料集分类</view>
         <view wx:if="{{levelsLoading}}" class="corpus-filter-match">加载中…</view>
         <view wx:elif="{{levelsError}}" class="corpus-filter-match">{{levelsError}}</view>
         <view class="corpus-filter-chips">
-          <view wx:for="{{levelOptions}}" wx:key="value" class="corpus-filter-option {{draftLevel === item.value ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftLevelClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftLevel === item.value}}">{{item.label}}</view>
+          <view wx:for="{{levelOptions}}" wx:key="value" class="corpus-filter-option {{draftLevelMap[item.value] ? 'corpus-filter-option-active' : ''}}" bind:tap="onDraftLevelClick" data-value="{{item.value}}" role="button" aria-pressed="{{draftLevelMap[item.value]}}">{{item.label}}</view>
         </view>
 
       </scroll-view>
       <view wx:if="{{!serverFiltering}}" class="corpus-filter-match">匹配 {{draftMatchCount}} 条任务</view>
       <view class="corpus-filter-actions">
-        <t-button theme="default" shape="round" hover-class="none" t-class="corpus-filter-reset" block bind:tap="onCorpusFilterReset">重置</t-button>
-        <t-button theme="primary" shape="rectangle" block bind:tap="onCorpusFilterApply">{{serverFiltering ? '确认' : '确认（' + draftMatchCount + '）'}}</t-button>
+        <t-button size="large" theme="default" shape="round" hover-class="none" t-class="corpus-filter-reset" block bind:tap="onCorpusFilterReset">重置</t-button>
+        <t-button size="large" theme="primary" shape="round" block bind:tap="onCorpusFilterApply">{{serverFiltering ? '确认' : '确认（' + draftMatchCount + '）'}}</t-button>
       </view>
     </view>
   </t-popup>

@@ -124,19 +124,17 @@ App({
       }
     });
 
-    // 设置导航栏样式
-    const navBarStyle =
-      theme === "dark"
-        ? { backgroundColor: "#161B22", frontColor: "#ffffff" }
-        : { backgroundColor: "#FFFFFF", frontColor: "#000000" };
-
-    wx.setNavigationBarColor({
-      frontColor: navBarStyle.frontColor as "#ffffff" | "#000000",
-      backgroundColor: navBarStyle.backgroundColor,
-      animation: { duration: 300, timingFunc: "easeInOut" },
-    });
+    this.syncNavigationTheme();
 
     console.log("主题已应用:", theme);
+  },
+
+  syncNavigationTheme() {
+    const dark = this.getTheme() === "dark";
+    wx.setNavigationBarColor({
+      frontColor: dark ? "#ffffff" : "#000000",
+      backgroundColor: dark ? "#161B22" : "#FFFFFF",
+    });
   },
 
   /**

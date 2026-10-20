@@ -92,6 +92,7 @@ Page({
    */
   data: {
     taskId: "",
+    activeTab: "uncompleted",
     status: "notified",
     taskDetail: [] as any[],
     currentIndex: 0,
@@ -248,8 +249,8 @@ Page({
   /**
    * 生命周期函数--监听页面加载
    */
-  async onLoad(options: { taskId: string }) {
-    const { taskId, status, userId } = options;
+  async onLoad(options: { taskId: string; status?: string; userId?: string; tab?: string }) {
+    const { taskId, status, userId, tab } = options;
 
     // Calculate Navbar Height
     const rect = wx.getMenuButtonBoundingClientRect();
@@ -264,6 +265,7 @@ Page({
       {
         taskId,
         status,
+        activeTab: tab === "mine" || status === "completed" ? "mine" : "uncompleted",
         headerHeight: navBarHeight,
         isOwner,
       },
@@ -306,6 +308,7 @@ Page({
 
   syncTheme() {
     const app = getApp<any>();
+    app.syncNavigationTheme?.();
     const currentTheme = app.getTheme() || "light";
     this.setData({ currentTheme });
   },
