@@ -93,6 +93,8 @@ Page({
     const value = e.detail.value?.[0];
     const selected = this.data.statsFilterOptions.find(item => item.value === value);
     if (!selected) return;
+    const current = this.data.statsFilterKey === "categoryId" ? this.data.categoryId : this.data.contentAttribute;
+    if (value === current) { this.onStatsFilterClose(); return; }
     if (this.data.statsFilterKey === "categoryId") this.setData({ categoryId: value, categoryText: selected.label });
     else this.setData({ contentAttribute: value, contentAttributeText: selected.label });
     this.onStatsFilterClose();
@@ -124,7 +126,7 @@ Page({
       });
 
       await this.loadDatasetCategories();
-      await this.loadUsersByDataset(datasetValue);
+      await this.loadUsersByDataset(datasetValue, true);
     } catch (error: any) {
       console.error("刷新任务看板失败:", error);
       wx.showToast({
@@ -188,8 +190,7 @@ Page({
         userInfo.isSystemAdmin
       ) {
         this.setData({ datasets, currentUserId: userInfo.id });
-        await this.loadDatasetCategories();
-        await this.loadUsersByDataset("all");
+        await Promise.all([this.loadDatasetCategories(), this.loadUsersByDataset("all")]);
       } else {
         wx.showToast({
           title: "权限有误，请联系管理员",
@@ -226,6 +227,7 @@ Page({
     const { datasets } = this.data;
     console.log("value:", value);
     if (value && value.length > 0) {
+      if (value[0] === this.data.datasetValue) { this.setData({ datasetVisible: false }); return; }
       const selectedDataset = datasets.find(
         (dataset) => dataset.value === value[0],
       );
@@ -310,9 +312,7 @@ Page({
         userVisible: false,
         userSearchKeyword: "",
       },
-      async () => {
-        await this.loadUsersByDataset(this.data.datasetValue);
-      },
+      () => { this.renderStats(); },
     );
 
     console.log("已选择用户:", { value, label });
@@ -331,9 +331,7 @@ Page({
           userValue: "all",
           userText: "全部",
         },
-        async () => {
-          await this.loadUsersByDataset(this.data.datasetValue);
-        },
+        () => { this.renderStats(); },
       );
     } else {
       this.setData({
@@ -343,7 +341,7 @@ Page({
     }
   },
 
-  async loadUsersByDataset(datasetName: string) {
+  async loadUsersByDataset(datasetName: string, refreshUserProfiles = false) {
     const requestId = ++this.statsRequestId;
     try {
       this.setData({ loading: true });
@@ -374,87 +372,13 @@ Page({
         console.error("/task/stats API 返回数据格式错误:", data);
         throw new Error(data?.message || "任务统计数据加载失败");
       }
-      // 获取所有用户信息
-      const userIdsArray = [
-        ...new Set(data.items.map((item: ItemSummary) => item.assigneeRef)),
-      ];
-
-      if (userIdsArray.length > 100) {
-        throw new Error("用户数据异常，最多支持100个用户查询，请联系管理员");
-      }
-      const userIds = userIdsArray.join(",");
-
-      const userlist = userIdsArray.length
-        ? await request(`/users/public?userIds=${userIds}`)
-        : { users: [] };
-      if (requestId !== this.statsRequestId) return;
-
-      if (!userlist || !Array.isArray(userlist.users)) {
-        console.error("/users/public API 返回数据格式错误:", data);
-        throw new Error(data?.message || "用户详情数据加载失败");
-      }
-      // 格式化 items 并关联用户信息
-      let items = data.items
-        .map((item: ItemSummary) => {
-          const user = userlist.users.find(
-            (u: any) => u.userId === item.assigneeRef,
-          );
-          return {
-            assigneeRef: item.assigneeRef,
-            corpusId: item.corpusId,
-            corpusName:
-              datasets.find((d) => d.value === item.corpusId)?.label || "",
-            assigneeRefName: user?.username || "",
-            assigneeRefAvatar: user?.avatar || "",
-            completionRate: formatPercent(item.completionRate),
-            totalCorpusCount: formatNumber(item.totalCorpusCount),
-            totalCount: formatNumber(item.totalCount),
-            processedCount: formatNumber(item.processedCount),
-            unprocessedCount: formatNumber(item.unprocessedCount),
-          };
-        })
-        .sort((a: any, b: any) => b.completionRate - a.completionRate);
-
-      // 如果选择了特定用户，筛选该用户的 items
-      const { userValue } = this.data;
-      if (userValue && userValue !== "all") {
-        items = items.filter((item: any) => item.assigneeRef === userValue);
-      }
-
-      // 构建用户列表
-      const users = [
-        { userId: "all", username: "全部" },
-        ...(userlist.users || []),
-      ];
-
-      const hasCounts = (stats: any) =>
-        [stats.totalCount, stats.processedCount, stats.unprocessedCount, stats.totalCorpusCount]
-          .some(value => Number(value) > 0);
-      const hasTaskProgress = userValue === "all"
-        ? hasCounts(data.summary || {}) || data.items.some(hasCounts)
-        : data.items.some((item: ItemSummary) => item.assigneeRef === userValue && hasCounts(item));
-
-      // 格式化 summary
-      const stats = data.summary || {};
-      const summary = {
-        ...stats,
-        completionRate: formatPercent(stats.completionRate || 0),
-        totalCorpusCount: formatNumber(stats.totalCorpusCount || 0),
-        totalCount: formatNumber(stats.totalCount || 0),
-        processedCount: formatNumber(stats.processedCount || 0),
-        unprocessedCount: formatNumber(stats.unprocessedCount || 0),
-      };
-
-      console.log("items:", items);
-      console.log("summary:", summary);
-      this.setData({
-        summary,
-        hasTaskProgress,
-        items,
-        users,
-        filteredUsers: users,
-        loading: false,
-      });
+      this.statsData = data;
+      const userIds = [...new Set<string>(data.items.map((item: ItemSummary) => item.assigneeRef))].filter(Boolean);
+      // 按用户保存状态，批量中缺失和网络失败分别处理。
+      const profiles = this.loadUserProfiles(userIds, refreshUserProfiles);
+      this.renderStats();
+      this.setData({ loading: false });
+      await profiles;
     } catch (error: any) {
       if (requestId !== this.statsRequestId) return;
       console.error("加载任务统计失败", error);
@@ -465,6 +389,100 @@ Page({
 
       }
     }
+  },
+  statsData: null as any,
+  userProfileStates: null as Map<string, "loading" | "ready" | "missing" | "error"> | null,
+  userCache: null as Map<string, any> | null,
+  async loadUserProfiles(ids: string[], forceRefresh = false) {
+    if (forceRefresh) {
+      // 换用新缓存，刷新前仍在途的请求只会写入旧缓存。
+      this.userCache = new Map();
+      this.userProfileStates = new Map();
+    }
+    if (!this.userCache) this.userCache = new Map();
+    if (!this.userProfileStates) this.userProfileStates = new Map();
+    const cache = this.userCache;
+    const states = this.userProfileStates;
+    const pending = [...new Set(ids)].filter(id => !cache.has(id) && states.get(id) !== "missing" && states.get(id) !== "loading");
+    pending.forEach(id => states.set(id, "loading"));
+    const chunks: string[][] = [];
+    for (let i = 0; i < pending.length; i += 100) chunks.push(pending.slice(i, i + 100));
+    await Promise.all(chunks.map(async chunk => {
+      try {
+        const response = await request(`/users/public?userIds=${encodeURIComponent(chunk.join(","))}`);
+        if (!Array.isArray(response?.users)) throw new Error("用户详情数据加载失败");
+        const users = new Map<string, any>(response.users.map((user: any) => [user.userId, user]));
+        chunk.forEach(id => {
+          const user = users.get(id);
+          if (user) cache.set(id, user);
+          states.set(id, user ? "ready" : "missing");
+        });
+      } catch {
+        chunk.forEach(id => states.set(id, "error"));
+      }
+      this.renderStats();
+    }));
+  },
+  async onRetryUserProfile(e: WechatMiniprogram.CustomEvent) {
+    const id = e.currentTarget.dataset.userId;
+    if (!id || this.userProfileStates?.get(id) !== "error") return;
+    const pending = this.loadUserProfiles([id]);
+    this.renderStats();
+    await pending;
+  },
+  getUserDisplayName(id: string) {
+    const user = this.userCache?.get(id);
+    if (user) return user.username || "未知用户";
+    const state = this.userProfileStates?.get(id);
+    if (state === "error") return "加载失败，点击重试";
+    return state === "missing" ? "未知用户" : "加载中…";
+  },
+  renderStats() {
+    const data = this.statsData;
+    if (!data) return;
+    const { datasets, userValue } = this.data;
+    const userIds = [...new Set(data.items.map((item: ItemSummary) => item.assigneeRef))] as string[];
+    const users = [{ userId: "all", username: "全部", avatar: "" }, ...userIds.map(userId => {
+      const user = this.userCache?.get(userId);
+      return { userId, username: this.getUserDisplayName(userId), avatar: user?.avatar || "" };
+    })];
+    const hasCounts = (stats: any) => [stats.totalCount, stats.processedCount, stats.unprocessedCount, stats.totalCorpusCount]
+      .some(value => Number(value) > 0);
+    const items = data.items
+      .filter((item: ItemSummary) => userValue === "all" || item.assigneeRef === userValue)
+      .slice().sort((a: ItemSummary, b: ItemSummary) => Number(b.completionRate) - Number(a.completionRate))
+      .map((item: ItemSummary) => {
+        const user = this.userCache?.get(item.assigneeRef);
+        return {
+          ...item,
+          corpusName: datasets.find(d => d.value === item.corpusId)?.label || "",
+          assigneeRefName: this.getUserDisplayName(item.assigneeRef),
+          assigneeRefAvatar: user?.avatar || "",
+          userProfileFailed: this.userProfileStates?.get(item.assigneeRef) === "error",
+          completionRate: formatPercent(item.completionRate),
+          totalCorpusCount: formatNumber(item.totalCorpusCount),
+          totalCount: formatNumber(item.totalCount),
+          processedCount: formatNumber(item.processedCount),
+          unprocessedCount: formatNumber(item.unprocessedCount),
+        };
+      });
+    const stats = data.summary || {};
+    const keyword = this.data.userSearchKeyword.toLowerCase();
+    this.setData({
+      items, users,
+      filteredUsers: users.filter(user => user.username.toLowerCase().includes(keyword)),
+      hasTaskProgress: userValue === "all"
+        ? hasCounts(stats) || data.items.some(hasCounts)
+        : data.items.some((item: ItemSummary) => item.assigneeRef === userValue && hasCounts(item)),
+      summary: {
+        ...stats,
+        completionRate: formatPercent(stats.completionRate || 0),
+        totalCorpusCount: formatNumber(stats.totalCorpusCount || 0),
+        totalCount: formatNumber(stats.totalCount || 0),
+        processedCount: formatNumber(stats.processedCount || 0),
+        unprocessedCount: formatNumber(stats.unprocessedCount || 0),
+      },
+    });
   },
   onHandleUserTaskList(e) {
     const { userId, datasetName } = e.currentTarget.dataset;

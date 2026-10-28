@@ -260,20 +260,17 @@ page {
 }
 
 .picker-close {
-  width: 48rpx;
-  height: 48rpx;
+  width: 56rpx;
+  height: 56rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background-color: var(--bg-input);
-}
-
-.close-icon {
-  font-size: 48rpx;
+  box-sizing: border-box;
+  border-radius: var(--radius-full);
+  border: 2rpx solid var(--border-color);
+  background: var(--bg-card);
   color: var(--text-secondary);
-  line-height: 1;
-  font-weight: 300;
+  flex-shrink: 0;
 }
 
 .search-box {
@@ -480,3 +477,5 @@ page {
 
 
 .dashboard-rounded-popup, .dashboard-rounded-popup-content { border-radius: 32rpx 32rpx 0 0; overflow: hidden; }
+
+.user-profile-retry { color: var(--primary); font-size: 26rpx; }

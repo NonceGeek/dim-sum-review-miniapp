@@ -17,8 +17,8 @@
     <view class="picker-container">
       <view class="picker-header">
         <text class="picker-title">选择用户</text>
-        <view class="picker-close" bindtap="onUserPickerCancel">
-          <text class="close-icon">×</text>
+        <view class="picker-close" bindtap="onUserPickerCancel" role="button" aria-label="关闭用户选择">
+          <t-icon name="close" size="32rpx" />
         </view>
       </view>
 
@@ -86,7 +86,7 @@
       <view class="user-card" wx:for="{{items}}" wx:key="value" bindtap="onHandleUserTaskList" data-user-id="{{item.assigneeRef}}" data-dataset-name="{{item.corpusId}}">
         <view class="user-card-header">
           <view class="user-avatar"><t-image wx:if="{{item.assigneeRefAvatar}}" shape="circle" src="{{item.assigneeRefAvatar}}" width="72rpx" height="72rpx" /><t-avatar wx:else shape="circle" size="small">{{item.assigneeRefName[0]}}</t-avatar></view>
-          <view class="user-info"><view class="user-name">{{item.assigneeRefName}}<text class="self-tag" wx:if="{{item.assigneeRef === currentUserId}}">自己</text></view><text class="user-corpus" wx:if="{{datasetValue === 'all'}}">{{item.corpusName}}</text></view>
+          <view class="user-info"><view class="user-name"><text wx:if="{{item.userProfileFailed}}" class="user-profile-retry" data-user-id="{{item.assigneeRef}}" catch:tap="onRetryUserProfile">{{item.assigneeRefName}}</text><text wx:else>{{item.assigneeRefName}}</text><text class="self-tag" wx:if="{{item.assigneeRef === currentUserId}}">自己</text></view><text class="user-corpus" wx:if="{{datasetValue === 'all'}}">{{item.corpusName}}</text></view>
           <t-icon name="chevron-right" size="32rpx" color="var(--text-muted)" />
         </view>
         <view class="user-metrics">
@@ -104,8 +104,8 @@
   </block>
 
   <t-popup visible="{{datasetVisible}}" placement="bottom" t-class="dashboard-rounded-popup app-themed-bottom-popup theme-{{currentTheme}}" t-class-content="dashboard-rounded-popup-content" bind:visible-change="onPickerCancel">
-  <t-picker use-popup="{{false}}" t-class="dashboard-picker" style="--td-picker-border-radius: 32rpx;" visible="{{datasetVisible}}" value="{{datasetValue}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
-    confirmBtn="确认" usingCustomNavbar bindchange="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
+  <t-picker wx:if="{{datasetVisible}}" use-popup="{{false}}" t-class="dashboard-picker" style="--td-picker-border-radius: 32rpx;" visible="{{datasetVisible}}" value="{{[datasetValue]}}" data-key="dataset" title="选择语料集" cancelBtn="取消"
+    confirmBtn="确认" usingCustomNavbar bind:confirm="onPickerChange" bindpick="onColumnChange" bindcancel="onPickerCancel">
     <t-picker-item options="{{datasets}}"></t-picker-item>
   </t-picker>
   </t-popup>
